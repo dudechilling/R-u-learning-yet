@@ -1,0 +1,34 @@
+---
+title: "What is the probability of at least k successes?"
+---
+
+## What the question asks
+
+What is the probability of at least k successes?
+
+## Steps in RStudio
+
+1. Identify n, p and minimum k.
+
+2. Calculate P(X > k-1) with pbinom(k-1,n,p,lower.tail=FALSE).
+
+3. Explain the inclusive boundary.
+
+## Runnable example
+
+```{r}
+n <- 10; p <- 0.3; k <- 5
+answer <- pbinom(k-1,size=n,prob=p,lower.tail=FALSE)
+print(answer)
+stopifnot(isTRUE(all.equal(answer,sum(dbinom(k:n,n,p)))))
+```
+
+## Interpret the result
+
+The result is the chance of five or more successes. The expression adds probabilities for 5, 6, 7, 8, 9, and 10 successes.
+
+## Check before using your own data
+
+Use k-1 as the cutoff for 1-P(X <= k-1). Using k would answer a different question.
+
+[Open standalone script](../inst/examples/binomial_at_least.R)

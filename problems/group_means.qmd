@@ -1,0 +1,34 @@
+---
+title: "How do I calculate an average separately for each group?"
+---
+
+## What the question asks
+
+How do I calculate an average separately for each group?
+
+## Steps in RStudio
+
+1. Match each numeric value to one group label.
+
+2. Check group sizes with table().
+
+3. Use tapply() or aggregate() with mean().
+
+## Runnable example
+
+```{r}
+group <- c("north","north","south","south","south")
+temperature_c <- c(7,9,11,15,13)
+print(table(group))
+print(tapply(temperature_c,group,mean))
+```
+
+## Interpret the result
+
+The example north mean is 8°C and south mean is 13°C. Different group sizes do not make either mean invalid, but they matter for uncertainty.
+
+## Check before applying this to real data
+
+Count observations in each group and decide how missing measurements affect each average.
+
+[Open the standalone R script](../inst/examples/group_means.R)

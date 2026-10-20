@@ -1,0 +1,39 @@
+---
+title: "If Pearson correlation is zero, does that mean there is no relationship?"
+---
+
+## What the question asks
+
+If Pearson correlation is zero, does that mean there is no relationship?
+
+## Steps in RStudio
+
+1. Calculate Pearson's r with cor().
+
+2. Plot the paired data.
+
+3. Look for a curved or segmented shape before interpreting r.
+
+## Runnable example
+
+```{r}
+x <- -3:3
+y <- x^2
+print(cor(x,y))
+plot(x,y,pch=19,col="#3F78A8",xlab="X",ylab="Y",
+     main="Zero linear correlation, clear curved pattern")
+curve(x^2,from=-3,to=3,add=TRUE,col="#A35E20",lwd=2)
+legend("top",legend=c("Observed pairs","Curved pattern"),
+       pch=c(19,NA),lty=c(0,1),
+       col=c("#3F78A8","#A35E20"),bty="n")
+```
+
+## Interpret the result
+
+Pearson's r is zero, yet y is exactly x squared. The curve demonstrates a deterministic nonlinear relationship.
+
+## Check before applying to real data
+
+Never conclude that zero correlation proves complete independence or absence of every relationship.
+
+[Open standalone R script](../inst/examples/zero_correlation.R)

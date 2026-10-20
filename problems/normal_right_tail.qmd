@@ -1,0 +1,32 @@
+---
+title: "How do I find the probability above a threshold?"
+---
+
+## What the question asks
+
+How do I find the probability above a threshold?
+
+## Steps in RStudio
+
+1. Check the mean, standard deviation, and threshold.
+
+2. Call pnorm(threshold,mean,sd,lower.tail=FALSE).
+
+3. Interpret the result as the upper-tail probability.
+
+## Runnable example
+
+```{r}
+answer <- pnorm(120,mean=100,sd=15,lower.tail=FALSE)
+print(answer)
+```
+
+## Interpret the result
+
+The modeled probability above 120 is about 0.091, or 9.1%, for a normal distribution centered at 100 with standard deviation 15.
+
+## Check before using your own data
+
+Distinguish P(X > a) from P(X < a); the two areas add to 1 for a continuous normal model.
+
+[Open standalone script](../inst/examples/normal_right_tail.R)

@@ -1,0 +1,36 @@
+---
+title: "How far is one value from the sample mean in standard deviations?"
+---
+
+## What the question asks
+
+How far is one value from the sample mean in standard deviations?
+
+## Steps in RStudio
+
+1. Calculate the sample mean and sd().
+
+2. Subtract the mean from the chosen value.
+
+3. Divide by sd() if it is positive.
+
+## Runnable example
+
+```{r}
+x <- c(10,12,14,16,18)
+chosen <- 18
+s <- sd(x)
+if (s==0) stop("No variation: z-score is undefined.")
+z <- (chosen-mean(x))/s
+print(z)
+```
+
+## Interpret the result
+
+The chosen observation 18 is approximately 1.26 sample standard deviations above the sample mean 14.
+
+## Check before applying this to real data
+
+Do not divide by zero when all observations are equal; a large magnitude does not establish that a measurement is an error.
+
+[Open the standalone R script](../inst/examples/z_score.R)

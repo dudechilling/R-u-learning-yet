@@ -1,0 +1,34 @@
+---
+title: "How do I calculate the standard error of a sample mean?"
+---
+
+## What the question asks
+
+How do I calculate the standard error of a sample mean?
+
+## Steps in RStudio
+
+1. Count the usable observations.
+
+2. Calculate their sample standard deviation.
+
+3. Divide sd by sqrt(n) and label it as an estimated standard error.
+
+## Runnable example
+
+```{r}
+x <- c(11,12,14,16,17,18,19,21)
+n <- length(x)
+se <- sd(x)/sqrt(n)
+print(c(n=n,mean=mean(x),sample_sd=sd(x),SE=se))
+```
+
+## Interpret the result
+
+Standard error is smaller than the sample standard deviation because it measures uncertainty in the sample mean, not the dispersion of the measurements.
+
+## Check before using real data
+
+Standard error is not the spread of individual observations. Independence and sampling design matter.
+
+[Open standalone R script](../inst/examples/standard_error.R)

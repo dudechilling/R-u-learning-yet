@@ -1,0 +1,9 @@
+Package: rulearn
+Title: Searchable RStudio Problem Bank
+Version: 0.1.0
+Authors@R: person("R", "Community", email="maintainer@example.com", role=c("aut","cre"))
+Description: Find question-based R examples, inspect conditional solution steps, and run self-contained demonstrations from the console using base R.
+License: file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1)
+NeedsCompilation: no

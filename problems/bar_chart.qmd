@@ -1,0 +1,36 @@
+---
+title: "How do I make a bar chart with readable category labels and counts?"
+---
+
+## What the question asks
+
+How do I make a bar chart with readable category labels and counts?
+
+## Steps in RStudio
+
+1. Count categories with table().
+
+2. Call barplot() and capture bar-center positions.
+
+3. Use text() to show values above the bars.
+
+## Runnable example
+
+```{r}
+responses <- c("bus","bike","bus","walk","walk","bus","bike")
+counts <- table(responses)
+at <- barplot(counts,col=c("#CDE1EF","#EAC99E","#B7D7C5"),
+              border="#244967",ylab="Responses",
+              main="Travel choices",ylim=c(0,max(counts)+2))
+text(at,counts,labels=counts,pos=3)
+```
+
+## Interpret the result
+
+Each bar represents a named category and its number of responses. The values above the bars prevent readers from estimating counts by eye.
+
+## Check before applying to real data
+
+Explain whether the bars show counts or percentages and include an appropriate zero baseline.
+
+[Open standalone R script](../inst/examples/bar_chart.R)

@@ -1,0 +1,36 @@
+---
+title: "How do I compare the means of two independent groups?"
+---
+
+## What the question asks
+
+How do I compare the means of two independent groups?
+
+## Steps in RStudio
+
+1. Confirm the samples represent independent groups.
+
+2. Examine plots and sample sizes.
+
+3. Use t.test(groupA,groupB,var.equal=FALSE) and interpret the interval for mean difference.
+
+## Runnable example
+
+```{r}
+group_a <- c(8,9,11,10,12,9,13,11)
+group_b <- c(13,15,12,16,14,15,17,14)
+result <- t.test(group_a,group_b,var.equal=FALSE)
+print(result$estimate)
+print(result$conf.int)
+print(result$p.value)
+```
+
+## Interpret the result
+
+The result estimates the difference in the two population means with a Welch confidence interval. It cannot establish why the groups differ.
+
+## Check before using real data
+
+The method is not appropriate for paired observations. Verify independence and examine distributions before interpreting the result.
+
+[Open standalone R script](../inst/examples/two_sample_t.R)

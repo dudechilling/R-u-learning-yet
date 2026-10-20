@@ -1,0 +1,36 @@
+---
+title: "How do I calculate the probability of A given that B occurred?"
+---
+
+## What the question asks
+
+How do I calculate the probability of A given that B occurred?
+
+## Steps in RStudio
+
+1. Identify event B (given) and count its occurrences.
+
+2. Count observations where both A and B hold.
+
+3. Divide the joint count by the B count.
+
+## Runnable example
+
+```{r}
+rain <- c(TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE)
+wind <- c(TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE)
+denom <- sum(rain)
+if (denom==0L) stop("No observations satisfy the given event.")
+p <- sum(wind & rain)/denom
+print(c(joint=sum(wind & rain),given=denom,conditional=p))
+```
+
+## Interpret the result
+
+Wind occurred on three of the five sampled rainy days. The observed probability of wind given rain is 3/5, or 0.6.
+
+## Check before using your own data
+
+If no observations satisfy B, the conditional sample proportion is undefined. Keep the denominator explicit.
+
+[Open standalone script](../inst/examples/conditional_probability.R)

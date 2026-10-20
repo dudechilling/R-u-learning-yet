@@ -1,0 +1,34 @@
+---
+title: "How do I calculate quartiles, the five-number summary, and IQR?"
+---
+
+## What the question asks
+
+How do I calculate quartiles, the five-number summary, and IQR?
+
+## Steps in RStudio
+
+1. Sort the data to see their order.
+
+2. Run quantile(x,probs=c(0,.25,.5,.75,1)).
+
+3. Calculate IQR() as Q3 minus Q1.
+
+## Runnable example
+
+```{r}
+x <- c(2,4,6,8,10,12,14,16,18)
+print(quantile(x,probs=c(0,.25,.5,.75,1)))
+print(IQR(x))
+print(fivenum(x))
+```
+
+## Interpret the result
+
+Using quantile() defaults, Q1 is 6 and Q3 is 14, so the IQR is 8. This five-number example happens to agree with fivenum(), but agreement is not guaranteed for all samples.
+
+## Check before applying this to real data
+
+fivenum() and quantile() can use different quartile conventions; state which was used.
+
+[Open the standalone R script](../inst/examples/five_number.R)

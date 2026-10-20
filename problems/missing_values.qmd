@@ -1,0 +1,34 @@
+---
+title: "How many measurements are missing and how do I exclude them from a mean?"
+---
+
+## What the question asks
+
+How many measurements are missing and how do I exclude them from a mean?
+
+## Steps in RStudio
+
+1. Count is.na(x).
+
+2. Decide whether the remaining observations answer the question.
+
+3. Compute mean(x,na.rm=TRUE) and report the denominator.
+
+## Runnable example
+
+```{r}
+x <- c(8,12,NA,14,16,NA)
+print(sum(is.na(x)))
+print(sum(!is.na(x)))
+print(mean(x,na.rm=TRUE))
+```
+
+## Interpret the result
+
+Two of six observations are missing; the observed-value mean is 12.5, calculated from four values. It is not the mean of all six measurements.
+
+## Check before applying this to real data
+
+Report how many values were missing. Do not treat an unavailable observation as zero.
+
+[Open the standalone R script](../inst/examples/missing_values.R)

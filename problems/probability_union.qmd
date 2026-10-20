@@ -1,0 +1,36 @@
+---
+title: "How do I find the probability that A or B occurs without double-counting?"
+---
+
+## What the question asks
+
+How do I find the probability that A or B occurs without double-counting?
+
+## Steps in RStudio
+
+1. Calculate the fraction for A and for B.
+
+2. Calculate the overlap A AND B.
+
+3. Use P(A)+P(B)-P(A and B), then check that the result is at most 1.
+
+## Runnable example
+
+```{r}
+rain <- c(TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE)
+wind <- c(TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE)
+p_a <- mean(rain); p_b <- mean(wind); overlap <- mean(rain & wind)
+p_union <- p_a+p_b-overlap
+print(c(P_A=p_a,P_B=p_b,P_both=overlap,P_either=p_union))
+stopifnot(isTRUE(all.equal(p_union,mean(rain | wind))))
+```
+
+## Interpret the result
+
+Five of eight days had rain, four had wind, and three had both. The probability of either event in this sample is 6/8 = 0.75.
+
+## Check before using your own data
+
+The word 'or' is normally inclusive; confirm whether the question instead requires exactly one event.
+
+[Open standalone script](../inst/examples/probability_union.R)

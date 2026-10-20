@@ -1,0 +1,34 @@
+---
+title: "Which category occurs most often, including ties?"
+---
+
+## What the question asks
+
+Which category occurs most often, including ties?
+
+## Steps in RStudio
+
+1. Count categories with table().
+
+2. Find max(counts).
+
+3. Return every category whose count matches that maximum.
+
+## Runnable example
+
+```{r}
+choice <- c("A","B","A","B","C","A","B")
+counts <- table(choice)
+print(counts)
+print(names(counts)[counts==max(counts)])
+```
+
+## Interpret the result
+
+A and B are tied as the most frequent categories, each appearing three times. Calling mode(choice) would not give this statistical result.
+
+## Check before applying this to real data
+
+Report tied categories when more than one category shares the maximum count.
+
+[Open the standalone R script](../inst/examples/categorical_mode.R)

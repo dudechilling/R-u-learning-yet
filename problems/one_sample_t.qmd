@@ -1,0 +1,36 @@
+---
+title: "How do I test whether a sample mean differs from a reference value?"
+---
+
+## What the question asks
+
+How do I test whether a sample mean differs from a reference value?
+
+## Steps in RStudio
+
+1. Identify the reference mean and the sample observations.
+
+2. Decide whether the question is two-sided or one-sided.
+
+3. Run t.test(x,mu=...) and report the mean difference, interval, and p-value.
+
+## Runnable example
+
+```{r}
+x <- c(10,12,11,15,14,13,12,16)
+reference_mean <- 10
+test <- t.test(x,mu=reference_mean,alternative="two.sided")
+print(test$estimate)
+print(test$conf.int)
+print(test$p.value)
+```
+
+## Interpret the result
+
+The two-sided test asks whether the population mean differs from 10 in either direction. Its p-value depends on the reference, sample, and assumptions.
+
+## Check before using real data
+
+A small p-value is not the size or importance of an effect. Assess assumptions and confidence interval.
+
+[Open standalone R script](../inst/examples/one_sample_t.R)

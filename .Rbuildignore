@@ -1,0 +1,6 @@
+^_quarto\.yml$
+^index\.qmd$
+^problems$
+^methodology\.md$
+^_site$
+^\.github$

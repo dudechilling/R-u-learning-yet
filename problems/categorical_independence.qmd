@@ -1,0 +1,37 @@
+---
+title: "How do I test whether two categories are associated?"
+---
+
+## What the question asks
+
+How do I test whether two categories are associated?
+
+## Steps in RStudio
+
+1. Create a contingency table of observed counts.
+
+2. Inspect expected counts from chisq.test().
+
+3. Use the appropriate test and interpret p-value without implying causation.
+
+## Runnable example
+
+```{r}
+counts <- matrix(c(24,15,18,27),nrow=2,byrow=TRUE,
+                 dimnames=list(setting=c("A","B"),outcome=c("Yes","No")))
+result <- chisq.test(counts,correct=FALSE)
+print(counts)
+print(result$expected)
+print(result$p.value)
+if (any(result$expected<5)) print(fisher.test(counts)$p.value)
+```
+
+## Interpret the result
+
+The test asks whether the two categorical variables are independent in the sampled population under the sampling assumptions. It does not explain any observed association.
+
+## Check before using real data
+
+For sparse 2x2 tables, consider fisher.test(); expected-cell conditions and sampling design matter.
+
+[Open standalone R script](../inst/examples/categorical_independence.R)

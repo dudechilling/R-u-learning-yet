@@ -1,0 +1,40 @@
+---
+title: "How do I load a CSV into R and check that it worked?"
+---
+
+## What the question asks
+
+How do I load a CSV into R and check that it worked?
+
+## Steps in RStudio
+
+1. Identify the CSV file path.
+
+2. Use read.csv() and store the result.
+
+3. Inspect head(), str(), names(), and nrow().
+
+## Runnable example
+
+```{r}
+# Example: make a temporary CSV so this script runs anywhere.
+source_data <- data.frame(day=c(1,2,3), rainfall_mm=c(4,0,9))
+file <- tempfile(fileext=".csv")
+write.csv(source_data,file,row.names=FALSE)
+d <- read.csv(file)
+print(head(d))
+str(d)
+print(names(d))
+print(nrow(d))
+unlink(file)
+```
+
+## Interpret the result
+
+The sample has three rows and a numeric rainfall column. Replace the temporary file path with the location of your own CSV. Never assume the imported columns have the intended types.
+
+## Check before applying this to real data
+
+Inspect the column names, data types, row count, and whether numbers were imported as text.
+
+[Open the standalone R script](../inst/examples/import_csv.R)

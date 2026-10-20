@@ -1,0 +1,37 @@
+---
+title: "How do I test for a linear association between two numerical variables?"
+---
+
+## What the question asks
+
+How do I test for a linear association between two numerical variables?
+
+## Steps in RStudio
+
+1. Check x and y are paired and numerical.
+
+2. Plot them for curves and outliers.
+
+3. Run cor.test(x,y) and report r, its interval, and p-value separately.
+
+## Runnable example
+
+```{r}
+x <- c(2,4,5,7,8,10,11,13)
+y <- c(3,5,6,9,8,12,11,15)
+plot(x,y,pch=19,col="#3F78A8",xlab="X",ylab="Y")
+result <- cor.test(x,y,method="pearson")
+print(result$estimate)
+print(result$conf.int)
+print(result$p.value)
+```
+
+## Interpret the result
+
+Pearson's r summarizes linear association, while the p-value addresses a null hypothesis under assumptions. Neither proves causation.
+
+## Check before using real data
+
+Outliers, curved patterns, dependence, and restricted measurement ranges can invalidate a simple interpretation.
+
+[Open standalone R script](../inst/examples/correlation_test.R)

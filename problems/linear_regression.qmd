@@ -1,0 +1,40 @@
+---
+title: "How do I fit a linear regression and explain the slope?"
+---
+
+## What the question asks
+
+How do I fit a linear regression and explain the slope?
+
+## Steps in RStudio
+
+1. Decide which variable is the predictor and which is the outcome.
+
+2. Fit lm(y
+
+x).
+
+3. Interpret coefficient units and inspect residuals.
+
+## Runnable example
+
+```{r}
+rain_mm <- c(1,2,3,5,6,8,10)
+flow <- c(2,4,4,8,11,13,16)
+fit <- lm(flow ~ rain_mm)
+print(coef(fit))
+print(summary(fit)$r.squared)
+plot(rain_mm,flow,pch=19,col="#3F78A8",
+     xlab="Rainfall (mm)",ylab="Flow index")
+abline(fit,col="#A35E20",lty=2,lwd=2)
+```
+
+## Interpret the result
+
+The slope represents the modeled change in flow index per additional millimeter of rainfall. It is an association within this model, not a causal claim.
+
+## Check before using real data
+
+A fitted relationship is not automatically causal. Examine residuals and avoid extrapolation.
+
+[Open standalone R script](../inst/examples/linear_regression.R)

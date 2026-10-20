@@ -1,0 +1,34 @@
+---
+title: "How do I keep only rows that meet a condition?"
+---
+
+## What the question asks
+
+How do I keep only rows that meet a condition?
+
+## Steps in RStudio
+
+1. Read the actual column names.
+
+2. Write the condition with >, >=, ==, or %in%.
+
+3. Inspect the remaining rows and count them.
+
+## Runnable example
+
+```{r}
+d <- data.frame(id=1:5, rainfall_mm=c(1,0,7,4,10))
+wet <- subset(d,rainfall_mm>=5)
+print(wet)
+print(nrow(wet))
+```
+
+## Interpret the result
+
+Two rows have rainfall of at least 5 mm. The >= operator includes observations exactly equal to the threshold.
+
+## Check before applying this to real data
+
+Compare nrow() before and after filtering, and confirm the condition includes or excludes the boundary correctly.
+
+[Open the standalone R script](../inst/examples/filter_rows.R)

@@ -1,0 +1,41 @@
+---
+title: "How do I explore whether a time series has a stable mean over time?"
+---
+
+## What the question asks
+
+How do I explore whether a time series has a stable mean over time?
+
+## Steps in RStudio
+
+1. Plot the measurements against time.
+
+2. Compare early and late windows of similar length.
+
+3. Inspect whether trend or changing spread contradicts a stable process.
+
+## Runnable example
+
+```{r}
+set.seed(3)
+stable <- rnorm(80,mean=8,sd=2)
+trending <- stable + seq(0,12,length.out=80)
+op <- par(mfrow=c(1,2))
+plot(stable,type="l",col="#3F78A8",ylab="Value",
+     main="Simulated stable process")
+plot(trending,type="l",col="#A35E20",ylab="Value",
+     main="Same noise with increasing trend")
+par(op)
+print(c(mean(stable[1:40]),mean(stable[41:80])))
+print(c(mean(trending[1:40]),mean(trending[41:80])))
+```
+
+## Interpret the result
+
+The second series has an imposed upward trend and therefore does not have a constant mean. A stable-looking sample does not by itself prove stationarity.
+
+## Check before applying to real data
+
+Two window means and a plot are preliminary checks, not proof of stationarity. Also consider variance and serial dependence.
+
+[Open standalone R script](../inst/examples/stationarity.R)

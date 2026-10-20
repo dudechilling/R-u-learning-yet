@@ -1,0 +1,36 @@
+---
+title: "How do I draw a boxplot and identify potential outliers?"
+---
+
+## What the question asks
+
+How do I draw a boxplot and identify potential outliers?
+
+## Steps in RStudio
+
+1. Confirm the values are numeric.
+
+2. Draw boxplot() and label the units.
+
+3. Inspect boxplot.stats() and explain its flagged points.
+
+## Runnable example
+
+```{r}
+x <- c(3,4,5,5,6,6,7,7,8,8,9,31)
+boxplot(x,col="#CEE2F0",border="#244967",ylab="Depth (cm)",
+        main="Distribution of depths")
+s <- boxplot.stats(x)
+print(s$out)
+legend("topright",legend=paste("Median =",median(x)),bty="n")
+```
+
+## Interpret the result
+
+The box shows the middle half and median. The separate flagged observation should be checked against the original measurement, not deleted without evidence.
+
+## Check before applying to real data
+
+Boxplot outliers are values outside the default 1.5 x IQR fences, not automatically measurement errors.
+
+[Open standalone R script](../inst/examples/boxplot.R)

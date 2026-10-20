@@ -1,0 +1,36 @@
+---
+title: "How do I compare before-and-after measurements from the same subjects?"
+---
+
+## What the question asks
+
+How do I compare before-and-after measurements from the same subjects?
+
+## Steps in RStudio
+
+1. Confirm the before and after observations belong to the same units.
+
+2. Compute each change.
+
+3. Run t.test(after,before,paired=TRUE) and interpret the mean change.
+
+## Runnable example
+
+```{r}
+before <- c(12,14,13,11,15,16,14,12)
+after <- c(14,15,15,11,16,17,16,13)
+change <- after-before
+print(change)
+print(mean(change))
+print(t.test(after,before,paired=TRUE)$p.value)
+```
+
+## Interpret the result
+
+The mean change is computed from paired differences. The test evaluates whether the population mean change differs from zero under its assumptions.
+
+## Check before using real data
+
+Keep each before value aligned with its own after value. Missing one side of a pair requires explicit handling.
+
+[Open standalone R script](../inst/examples/paired_t.R)

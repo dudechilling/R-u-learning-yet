@@ -1,0 +1,33 @@
+---
+title: "What is the chance of exactly k successes in n independent trials?"
+---
+
+## What the question asks
+
+What is the chance of exactly k successes in n independent trials?
+
+## Steps in RStudio
+
+1. Identify number of trials n, success probability p, and target k.
+
+2. Check n and k are whole numbers with 0 <= k <= n.
+
+3. Run dbinom(k,size=n,prob=p).
+
+## Runnable example
+
+```{r}
+n <- 10; p <- 0.3; k <- 3
+answer <- dbinom(k,size=n,prob=p)
+print(answer)
+```
+
+## Interpret the result
+
+For ten independent trials with success probability 0.3, dbinom(3,10,0.3) gives about 0.267 for exactly three successes.
+
+## Check before using your own data
+
+If independence or constant probability is implausible, do not use the binomial model without justification.
+
+[Open standalone script](../inst/examples/binomial_exact.R)

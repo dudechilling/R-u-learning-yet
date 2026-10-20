@@ -2,16 +2,18 @@ project:
   type: website
   output-dir: _site
   resources:
-    - "R/*.R"
+    - "inst/examples/*.R"
 website:
   title: "R-u-learning-yet"
   search: true
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Start
       - href: problems/index.qmd
-        text: Problem bank
+        text: All problems
+      - href: methodology.md
+        text: Standards
 format:
   html:
     theme: cosmo

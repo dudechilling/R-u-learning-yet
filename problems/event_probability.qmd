@@ -1,0 +1,35 @@
+---
+title: "How do I estimate the probability of an event from observed trials?"
+---
+
+## What the question asks
+
+How do I estimate the probability of an event from observed trials?
+
+## Steps in RStudio
+
+1. Count qualifying events and total trials.
+
+2. Divide successes by total when the denominator is positive.
+
+3. State the sample size and what counts as an event.
+
+## Runnable example
+
+```{r}
+events <- c(TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE)
+successes <- sum(events)
+trials <- length(events)
+p <- successes/trials
+print(c(successes=successes,trials=trials,rate=p))
+```
+
+## Interpret the result
+
+Five successes among eight recorded trials give an observed event proportion of 0.625, or 62.5%. This is an estimate for a broader chance only under suitable sampling conditions.
+
+## Check before using your own data
+
+An observed proportion is not necessarily the true probability for the wider population, especially with a small or biased sample.
+
+[Open standalone script](../inst/examples/event_probability.R)

@@ -1,0 +1,39 @@
+---
+title: "How do I estimate a value between two known measurements?"
+---
+
+## What the question asks
+
+How do I estimate a value between two known measurements?
+
+## Steps in RStudio
+
+1. Sort x and y pairs by x.
+
+2. Check the target lies inside the observed x range.
+
+3. Use approx(x,y,xout=target) and label the estimate.
+
+## Runnable example
+
+```{r}
+time <- c(0,5,10,15)
+temperature <- c(10,16,22,21)
+target <- 7.5
+stopifnot(target>=min(time),target<=max(time))
+print(approx(time,temperature,xout=target))
+plot(time,temperature,type="b",pch=19,col="#3F78A8",
+     xlab="Minutes",ylab="Temperature (C)")
+points(target,approx(time,temperature,xout=target)$y,
+       col="#A35E20",pch=19,cex=1.5)
+```
+
+## Interpret the result
+
+Between 5 and 10 minutes the modeled temperature changes linearly from 16°C to 22°C. At 7.5 minutes the interpolated value is 19°C.
+
+## Check before using real data
+
+Interpolation assumes a straight change between known points. Do not confuse interpolation with extrapolation beyond them.
+
+[Open standalone R script](../inst/examples/interpolation.R)

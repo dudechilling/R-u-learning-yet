@@ -1,0 +1,35 @@
+---
+title: "How do I find what columns and data types are in my dataset?"
+---
+
+## What the question asks
+
+How do I find what columns and data types are in my dataset?
+
+## Steps in RStudio
+
+1. Store the table in a data frame.
+
+2. Run names(), str(), head(), and summary().
+
+3. Choose columns based on actual content, not their position alone.
+
+## Runnable example
+
+```{r}
+d <- data.frame(site=c("A","B","C"), depth_cm=c(12,19,NA))
+print(names(d))
+str(d)
+print(head(d))
+print(summary(d))
+```
+
+## Interpret the result
+
+Here site is text and depth_cm is numeric with one missing measurement. Summary reports the available values; the missing row must be handled explicitly.
+
+## Check before applying this to real data
+
+Verify units and possible missing values. Numeric-looking text is not necessarily imported as numeric.
+
+[Open the standalone R script](../inst/examples/inspect_columns.R)

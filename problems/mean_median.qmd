@@ -1,0 +1,34 @@
+---
+title: "How do I find the mean and median, and which is more typical?"
+---
+
+## What the question asks
+
+How do I find the mean and median, and which is more typical?
+
+## Steps in RStudio
+
+1. Put the numeric values into c().
+
+2. Run mean() and median().
+
+3. Compare the two and look for extreme values.
+
+## Runnable example
+
+```{r}
+x <- c(12,13,14,15,56)
+print(mean(x))
+print(median(x))
+print(sort(x))
+```
+
+## Interpret the result
+
+The mean is 22 and the median is 14. The single value 56 raises the mean; that does not prove it is an error.
+
+## Check before applying this to real data
+
+Compare mean and median and examine unusually high or low observations instead of deleting them.
+
+[Open the standalone R script](../inst/examples/mean_median.R)

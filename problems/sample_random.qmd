@@ -1,0 +1,35 @@
+---
+title: "How do I draw a reproducible random sample without replacement?"
+---
+
+## What the question asks
+
+How do I draw a reproducible random sample without replacement?
+
+## Steps in RStudio
+
+1. Define the population IDs and required sample size.
+
+2. Set a reproducible seed.
+
+3. Call sample(population,size=n,replace=FALSE) and check duplicates.
+
+## Runnable example
+
+```{r}
+population_ids <- 1:50
+set.seed(12)
+selected <- sample(population_ids,size=8,replace=FALSE)
+print(selected)
+stopifnot(length(selected)==8L,!anyDuplicated(selected))
+```
+
+## Interpret the result
+
+The printed IDs form one eight-unit random sample from fifty possible IDs. A seed allows someone to reproduce the same demonstration.
+
+## Check before using your own data
+
+Set the seed when you need repeatability; check that the requested sample is no larger than the population.
+
+[Open standalone script](../inst/examples/sample_random.R)

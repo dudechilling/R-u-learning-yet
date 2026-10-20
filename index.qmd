@@ -2,8 +2,19 @@
 title: "Find the question. Run the solution."
 ---
 
-Search for the task you need to complete, such as "find the average", "make a histogram", or "interpret a correlation".
+Search by what you need to do: **calculate an average**, **identify an outlier**, **make a readable graph**, **estimate a probability**, or **interpret a statistical result**.
 
-Every worked problem includes numbered RStudio steps, runnable example code, and a plain-language explanation.
+Each problem has numbered RStudio steps, an independently runnable R script, a plain-language interpretation, and a warning about what the result does *not* establish.
 
-[Browse all problems](problems/index.qmd)
+## Search from RStudio itself
+
+```r
+library(rulearn)
+ru_find("histogram")
+ru_plan("histogram", have=c("numeric", "units"), missing="groups")
+ru_run("histogram")
+```
+
+[Browse the complete question bank](problems/index.qmd)
+
+The question bank uses fictional practice measurements. Do not substitute example output for calculations using your own data.

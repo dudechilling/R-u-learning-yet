@@ -1,0 +1,37 @@
+---
+title: "How do I simulate a sampling distribution of means?"
+---
+
+## What the question asks
+
+How do I simulate a sampling distribution of means?
+
+## Steps in RStudio
+
+1. Choose a model for observations and a sample size.
+
+2. Repeat random sampling many times and compute each mean.
+
+3. Plot the distribution of the sample means.
+
+## Runnable example
+
+```{r}
+set.seed(42)
+means <- replicate(1000,mean(rexp(30,rate=1/5)))
+h <- hist(means,breaks=25,col="#CEE2F0",border="#244967",
+          xlab="Sample mean",main="Repeated means of skewed data")
+abline(v=5,col="#A35E20",lwd=2,lty=2)
+legend("topright",legend="Model mean = 5",lty=2,col="#A35E20",bty="n")
+print(c(mean_of_means=mean(means),sd_of_means=sd(means)))
+```
+
+## Interpret the result
+
+Each histogram value is a mean from 30 independently simulated observations. The distribution of means is narrower than the original exponential model.
+
+## Check before using your own data
+
+Simulation assumptions and sample size matter; a bell-shaped simulated result is not proof about an unrelated real dataset.
+
+[Open standalone script](../inst/examples/sampling_distribution.R)

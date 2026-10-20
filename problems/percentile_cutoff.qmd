@@ -1,0 +1,32 @@
+---
+title: "What value marks the 75th percentile of my observations?"
+---
+
+## What the question asks
+
+What value marks the 75th percentile of my observations?
+
+## Steps in RStudio
+
+1. Enter numeric observations.
+
+2. Convert 75 percent to probability .75.
+
+3. Run quantile(x,probs=.75).
+
+## Runnable example
+
+```{r}
+x <- c(10,12,15,19,23,26,31,40)
+print(quantile(x,probs=.75))
+```
+
+## Interpret the result
+
+With R's default quantile method, the 75th-percentile cutoff is 27.25. It is an interpolated sample threshold and need not be one of the observed values.
+
+## Check before applying this to real data
+
+Different percentile algorithms can give different thresholds for small samples. Do not confuse rank with value.
+
+[Open the standalone R script](../inst/examples/percentile_cutoff.R)

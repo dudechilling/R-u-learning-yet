@@ -1,0 +1,35 @@
+---
+title: "How do I turn category counts into relative frequencies and percentages?"
+---
+
+## What the question asks
+
+How do I turn category counts into relative frequencies and percentages?
+
+## Steps in RStudio
+
+1. Count each category with table().
+
+2. Divide by the total using prop.table().
+
+3. Multiply by 100 for percentages.
+
+## Runnable example
+
+```{r}
+travel <- c("bus","walk","bus","car","walk","bus")
+counts <- table(travel)
+print(counts)
+print(prop.table(counts))
+print(100*prop.table(counts))
+```
+
+## Interpret the result
+
+Bus accounts for 3 of 6 observations (50%); walking accounts for 2 of 6 (33.3%); car accounts for 1 of 6 (16.7%).
+
+## Check before applying this to real data
+
+Check the total and whether missing observations were excluded. Rounding may prevent percentages from summing to exactly 100.
+
+[Open the standalone R script](../inst/examples/relative_frequency.R)

@@ -1,0 +1,35 @@
+---
+title: "How do I calculate range, variance, and standard deviation?"
+---
+
+## What the question asks
+
+How do I calculate range, variance, and standard deviation?
+
+## Steps in RStudio
+
+1. Check for missing values.
+
+2. Run range(), var(), and sd().
+
+3. Interpret the standard deviation in the original measurement units.
+
+## Runnable example
+
+```{r}
+x <- c(4,6,8,10,12)
+print(range(x))
+print(diff(range(x)))
+print(var(x))
+print(sd(x))
+```
+
+## Interpret the result
+
+The range is 8, the sample variance is 10 square units, and the sample standard deviation is about 3.16 units.
+
+## Check before applying this to real data
+
+R's sd() and var() use the sample denominator n - 1. Do not call them population variance without adjustment.
+
+[Open the standalone R script](../inst/examples/sample_sd.R)

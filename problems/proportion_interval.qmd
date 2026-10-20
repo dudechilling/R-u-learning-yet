@@ -1,0 +1,34 @@
+---
+title: "How do I estimate a population proportion with an interval?"
+---
+
+## What the question asks
+
+How do I estimate a population proportion with an interval?
+
+## Steps in RStudio
+
+1. Identify number of successes and number of independent trials.
+
+2. Check successes are between 0 and n.
+
+3. Use prop.test() and report the confidence level.
+
+## Runnable example
+
+```{r}
+successes <- 26; n <- 50
+estimate <- prop.test(successes,n,conf.level=.95,correct=FALSE)
+print(estimate$estimate)
+print(estimate$conf.int)
+```
+
+## Interpret the result
+
+The observed rate is 26/50 = 0.52, with an approximate 95% interval. That interval reflects sampling uncertainty under the model.
+
+## Check before using real data
+
+Check how the observations were sampled; for small samples or extreme rates consider binom.test() instead of an approximation.
+
+[Open standalone R script](../inst/examples/proportion_interval.R)

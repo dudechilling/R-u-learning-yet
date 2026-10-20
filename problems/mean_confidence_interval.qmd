@@ -1,0 +1,34 @@
+---
+title: "How do I calculate a confidence interval for a population mean?"
+---
+
+## What the question asks
+
+How do I calculate a confidence interval for a population mean?
+
+## Steps in RStudio
+
+1. Verify the observations and whether a mean-based interval is sensible.
+
+2. Set the desired confidence level.
+
+3. Use t.test(x,conf.level=...) and report the estimated interval.
+
+## Runnable example
+
+```{r}
+x <- c(11,12,14,15,17,18,19,20)
+estimate <- t.test(x,conf.level=.95)
+print(estimate$estimate)
+print(estimate$conf.int)
+```
+
+## Interpret the result
+
+The printed endpoints form a 95% confidence interval for the population mean under the test's assumptions. A wider interval usually indicates more uncertainty.
+
+## Check before using real data
+
+95% confidence describes the long-run coverage of the procedure, not a 95% probability about a fixed parameter after data are observed.
+
+[Open standalone R script](../inst/examples/mean_confidence_interval.R)

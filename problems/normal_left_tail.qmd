@@ -1,0 +1,33 @@
+---
+title: "How do I calculate the proportion below a cutoff in a normal model?"
+---
+
+## What the question asks
+
+How do I calculate the proportion below a cutoff in a normal model?
+
+## Steps in RStudio
+
+1. Identify mean, positive standard deviation, and cutoff.
+
+2. Run pnorm(cutoff,mean,sd).
+
+3. Translate the returned number into an area or proportion.
+
+## Runnable example
+
+```{r}
+mu <- 100; sigma <- 15; cutoff <- 85
+answer <- pnorm(cutoff,mean=mu,sd=sigma)
+print(answer)
+```
+
+## Interpret the result
+
+The modeled probability below 85 is about 0.159 (15.9%) when the mean is 100 and standard deviation is 15.
+
+## Check before using your own data
+
+A standard deviation must be positive and the assumed normal model must suit the real variable.
+
+[Open standalone script](../inst/examples/normal_left_tail.R)

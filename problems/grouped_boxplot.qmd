@@ -1,0 +1,39 @@
+---
+title: "How do I compare the distribution of measurements across groups?"
+---
+
+## What the question asks
+
+How do I compare the distribution of measurements across groups?
+
+## Steps in RStudio
+
+1. Match each numeric value to its group.
+
+2. Count cases in each group with table().
+
+3. Plot value
+
+group and label the measurement units.
+
+## Runnable example
+
+```{r}
+site <- rep(c("coast","inland"),each=6)
+temp_c <- c(12,13,12,15,14,13,18,19,20,21,18,22)
+print(table(site))
+boxplot(temp_c ~ site,col=c("#CEE2F0","#EAC99E"),
+        main="Temperatures by setting",ylab="Temperature (C)",xlab="Setting")
+legend("topright",legend=c("Coast","Inland"),
+       fill=c("#CEE2F0","#EAC99E"),bty="n")
+```
+
+## Interpret the result
+
+The groups can be compared on one temperature scale. The graph describes these sample observations; it does not by itself establish a causal difference.
+
+## Check before applying to real data
+
+Check the sample sizes per group; visually different medians alone do not establish a statistically significant difference.
+
+[Open standalone R script](../inst/examples/grouped_boxplot.R)

@@ -1,0 +1,42 @@
+---
+title: "How do I plot two numeric variables with a trend line and point labels?"
+---
+
+## What the question asks
+
+How do I plot two numeric variables with a trend line and point labels?
+
+## Steps in RStudio
+
+1. Check every x has a corresponding y.
+
+2. Plot labeled axes and individual points.
+
+3. Overlay lm() and label an observation only when useful.
+
+## Runnable example
+
+```{r}
+snow_cm <- c(10,15,20,25,30,40)
+visitors <- c(85,91,110,125,139,168)
+plot(snow_cm,visitors,type="n",xlab="Snow depth (cm)",
+     ylab="Visitors",main="Illustrative paired measurements")
+grid(col="gray85")
+points(snow_cm,visitors,col="#3F78A8",pch=19)
+fit <- lm(visitors ~ snow_cm)
+abline(fit,col="#A35E20",lwd=2,lty=2)
+text(snow_cm[6],visitors[6],labels="last observation",pos=2,cex=.75)
+legend("topleft",legend=c("Observations","Linear fit"),
+       pch=c(19,NA),lty=c(0,2),
+       col=c("#3F78A8","#A35E20"),bty="n")
+```
+
+## Interpret the result
+
+The points show the observed pairs, while the dashed line summarizes one fitted linear trend. The line should not be used outside the observed range without a separate justification.
+
+## Check before applying to real data
+
+Plot paired rows only. A straight-line fit does not prove causation or rule out curved relationships.
+
+[Open standalone R script](../inst/examples/scatterplot.R)

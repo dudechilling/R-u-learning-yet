@@ -1,0 +1,35 @@
+---
+title: "How do I check whether a measurement resembles earlier observations?"
+---
+
+## What the question asks
+
+How do I check whether a measurement resembles earlier observations?
+
+## Steps in RStudio
+
+1. Keep observations in time order.
+
+2. Plot the series and inspect trends.
+
+3. Run acf() and describe which lags show a relationship.
+
+## Runnable example
+
+```{r}
+set.seed(25)
+x <- as.numeric(arima.sim(model=list(ar=.6),n=100))
+plot.ts(x,col="#3F78A8",ylab="Simulated value",
+        main="Example with time dependence")
+acf(x,main="Autocorrelation by lag",col="#A35E20")
+```
+
+## Interpret the result
+
+The simulation has positive serial dependence by design. The ACF displays lag-specific correlations; it does not certify that real observations are stationary.
+
+## Check before applying to real data
+
+ACF values can be distorted by trend, seasonality, irregular intervals, and short samples; review the time series first.
+
+[Open standalone R script](../inst/examples/autocorrelation.R)

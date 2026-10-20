@@ -1,0 +1,41 @@
+---
+title: "How do I shade and label a probability under a normal curve?"
+---
+
+## What the question asks
+
+How do I shade and label a probability under a normal curve?
+
+## Steps in RStudio
+
+1. Specify the normal mean, standard deviation, and cutoff.
+
+2. Calculate the tail area using pnorm().
+
+3. Plot dnorm() and shade the matching region.
+
+## Runnable example
+
+```{r}
+mu <- 100; sigma <- 15; cutoff <- 85
+p <- pnorm(cutoff,mean=mu,sd=sigma)
+curve(dnorm(x,mu,sigma),from=40,to=160,lwd=2,col="#3F78A8",
+      xlab="Value",ylab="Density",main="Normal probability to the left")
+xs <- seq(40,cutoff,length.out=150)
+polygon(c(40,xs,cutoff),c(0,dnorm(xs,mu,sigma),0),
+        col="#CEE2F0",border=NA)
+abline(v=cutoff,col="#A35E20",lty=2,lwd=2)
+legend("topright",legend=paste0("P(X <= 85) = ",round(p,3)),
+       fill="#CEE2F0",bty="n")
+print(p)
+```
+
+## Interpret the result
+
+The shaded left-tail area equals pnorm(85,100,15), approximately 0.159. It is a probability for a normal model, not a guarantee about observations.
+
+## Check before applying to real data
+
+Normal modeling requires a defensible distributional assumption. The shaded area changes with mean, sd, and cutoff.
+
+[Open standalone R script](../inst/examples/normal_shaded_area.R)

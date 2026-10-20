@@ -1,0 +1,35 @@
+---
+title: "How do I predict an outcome using a fitted regression equation?"
+---
+
+## What the question asks
+
+How do I predict an outcome using a fitted regression equation?
+
+## Steps in RStudio
+
+1. Fit the model with the original paired observations.
+
+2. Provide a new data frame whose predictor name matches the model.
+
+3. Request interval='prediction' and explain uncertainty.
+
+## Runnable example
+
+```{r}
+distance_km <- c(1,2,3,4,5,6,7,8)
+time_min <- c(4,6,9,11,14,16,18,21)
+fit <- lm(time_min ~ distance_km)
+new_case <- data.frame(distance_km=5.5)
+print(predict(fit,newdata=new_case,interval="prediction"))
+```
+
+## Interpret the result
+
+The fitted model predicts travel time at 5.5 km and reports a prediction interval for a new observation under its assumptions.
+
+## Check before using real data
+
+A prediction interval for a future observation is wider than a confidence interval for the mean response. Avoid unsupported extrapolation.
+
+[Open standalone R script](../inst/examples/predict_regression.R)

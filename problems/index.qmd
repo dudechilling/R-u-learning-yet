@@ -1,11 +1,70 @@
 ---
-title: "Problem bank"
+title: "Worked RStudio problem bank"
 ---
 
-Choose the question that resembles the one you need to answer.
+Search this website by what a question asks. From the RStudio console, use `ru_find("your question")`, then `ru_plan("problem_id")` to see conditions, or `ru_run("problem_id")` to execute an independent example.
 
-- [How do I calculate a mean and a median?](mean-median.qmd)
-- [How do I calculate relative frequencies?](relative-frequencies.qmd)
-- [How do I explain a correlation close to zero?](zero-correlation.qmd)
+## Data
 
-Each page links to a standalone R script. More questions will be added as they are checked.
+- [How do I calculate an average separately for each group?](group_means.qmd)
+- [How do I find what columns and data types are in my dataset?](inspect_columns.qmd)
+- [How do I keep only rows that meet a condition?](filter_rows.qmd)
+- [How do I load a CSV into R and check that it worked?](import_csv.qmd)
+- [How many measurements are missing and how do I exclude them from a mean?](missing_values.qmd)
+
+## Summaries
+
+- [How do I calculate quartiles, the five-number summary, and IQR?](five_number.qmd)
+- [How do I calculate range, variance, and standard deviation?](sample_sd.qmd)
+- [How do I find the mean and median, and which is more typical?](mean_median.qmd)
+- [How do I turn category counts into relative frequencies and percentages?](relative_frequency.qmd)
+- [How far is one value from the sample mean in standard deviations?](z_score.qmd)
+- [What value marks the 75th percentile of my observations?](percentile_cutoff.qmd)
+- [Which category occurs most often, including ties?](categorical_mode.qmd)
+
+## Graphs
+
+- [How do I check whether a measurement resembles earlier observations?](autocorrelation.qmd)
+- [How do I compare the distribution of measurements across groups?](grouped_boxplot.qmd)
+- [How do I draw a boxplot and identify potential outliers?](boxplot.qmd)
+- [How do I draw a histogram with counts, units, mean, and median?](histogram.qmd)
+- [How do I explore whether a time series has a stable mean over time?](stationarity.qmd)
+- [How do I make a bar chart with readable category labels and counts?](bar_chart.qmd)
+- [How do I plot two numeric variables with a trend line and point labels?](scatterplot.qmd)
+- [How do I plot values across dates or ordered time points?](line_chart.qmd)
+- [How do I shade and label a probability under a normal curve?](normal_shaded_area.qmd)
+- [How do I smooth noisy measurements with a moving average?](moving_average.qmd)
+- [If Pearson correlation is zero, does that mean there is no relationship?](zero_correlation.qmd)
+
+## Probability
+
+- [How do I calculate the expected value of a discrete probability distribution?](discrete_expectation.qmd)
+- [How do I calculate the probability of A given that B occurred?](conditional_probability.qmd)
+- [How do I calculate the proportion below a cutoff in a normal model?](normal_left_tail.qmd)
+- [How do I estimate the probability of an event from observed trials?](event_probability.qmd)
+- [How do I find the probability above a threshold?](normal_right_tail.qmd)
+- [How do I find the probability that A or B occurs without double-counting?](probability_union.qmd)
+- [What cutoff marks a given percentage of a normal distribution?](normal_percentile.qmd)
+- [What is the chance of exactly k successes in n independent trials?](binomial_exact.qmd)
+- [What is the probability of at least k successes?](binomial_at_least.qmd)
+
+## Sampling
+
+- [How do I draw a reproducible random sample without replacement?](sample_random.qmd)
+- [How do I simulate a sampling distribution of means?](sampling_distribution.qmd)
+
+## Inference
+
+- [How do I calculate a confidence interval for a population mean?](mean_confidence_interval.qmd)
+- [How do I calculate the standard error of a sample mean?](standard_error.qmd)
+- [How do I compare before-and-after measurements from the same subjects?](paired_t.qmd)
+- [How do I compare the means of two independent groups?](two_sample_t.qmd)
+- [How do I estimate a population proportion with an interval?](proportion_interval.qmd)
+- [How do I estimate a value between two known measurements?](interpolation.qmd)
+- [How do I fit a linear regression and explain the slope?](linear_regression.qmd)
+- [How do I measure a monotonic relationship when linear correlation is unsuitable?](spearman_correlation.qmd)
+- [How do I predict an outcome using a fitted regression equation?](predict_regression.qmd)
+- [How do I test for a linear association between two numerical variables?](correlation_test.qmd)
+- [How do I test whether a sample mean differs from a reference value?](one_sample_t.qmd)
+- [How do I test whether two categories are associated?](categorical_independence.qmd)
+

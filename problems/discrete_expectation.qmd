@@ -1,0 +1,36 @@
+---
+title: "How do I calculate the expected value of a discrete probability distribution?"
+---
+
+## What the question asks
+
+How do I calculate the expected value of a discrete probability distribution?
+
+## Steps in RStudio
+
+1. List each possible numeric outcome with its probability.
+
+2. Check all probabilities are valid and total 1.
+
+3. Multiply outcomes by probabilities and sum.
+
+## Runnable example
+
+```{r}
+outcomes <- 0:3
+p <- c(0.2,0.4,0.3,0.1)
+stopifnot(all(p>=0),isTRUE(all.equal(sum(p),1)))
+expectation <- sum(outcomes*p)
+variance <- sum((outcomes-expectation)^2*p)
+print(c(expected=expectation,variance=variance))
+```
+
+## Interpret the result
+
+The expected value is 1.3 and the modeled variance is 0.81. Expected value is a long-run average, not necessarily a possible single outcome.
+
+## Check before using your own data
+
+All probabilities must be nonnegative and sum to 1; missing outcome probabilities cannot simply be assumed zero.
+
+[Open standalone script](../inst/examples/discrete_expectation.R)
