@@ -1,36 +1,37 @@
 ---
-title: "How do I calculate the probability of A given that B occurred?"
+title: "What is the probability of event A given event B?"
 ---
 
-## What the question asks
+## Question
 
-How do I calculate the probability of A given that B occurred?
+What is the probability of event A given event B?
 
-## Steps in RStudio
+## Work through it
 
-1. Identify event B (given) and count its occurrences.
+Define A and B; restrict to complete cases; count the rows meeting B, then the rows meeting both A and B; divide joint count by the B count.
 
-2. Count observations where both A and B hold.
-
-3. Divide the joint count by the B count.
-
-## Runnable example
+## Worked example: airquality
 
 ```{r}
-rain <- c(TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE)
-wind <- c(TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE)
-denom <- sum(rain)
-if (denom==0L) stop("No observations satisfy the given event.")
-p <- sum(wind & rain)/denom
-print(c(joint=sum(wind & rain),given=denom,conditional=p))
+#| eval: false
+d <- ru_data("airquality")
+A <- d$Ozone > 60
+B <- d$Temp >= 80
+result <- ru_apply("conditional_probability", data=d, x=A, y=B,
+                   event=TRUE, given=TRUE)
+stopifnot(result["probability"]>=0,result["probability"]<=1)
 ```
 
-## Interpret the result
+The denominator consists only of complete observations with temperature at least 80°F; the numerator is the subset also exceeding the ozone threshold. Missing ozone measurements are excluded from both counts.
 
-Wind occurred on three of the five sampled rainy days. The observed probability of wind given rain is 3/5, or 0.6.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("conditional_probability", data=your_data, x=your_data$A, y=your_data$B, event=TRUE, given=TRUE)
+```
 
-If no observations satisfy B, the conditional sample proportion is undefined. Keep the denominator explicit.
+Reverse the condition only if the question asks P(B given A). The two conditional probabilities usually differ.
 
-[Open standalone script](../inst/examples/conditional_probability.R)
+Check the input conditions with `ru_plan("conditional_probability")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/conditional_probability.R)

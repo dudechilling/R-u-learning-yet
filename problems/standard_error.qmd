@@ -1,34 +1,34 @@
 ---
-title: "How do I calculate the standard error of a sample mean?"
+title: "How can I estimate uncertainty in a sample mean?"
 ---
 
-## What the question asks
+## Question
 
-How do I calculate the standard error of a sample mean?
+How can I estimate uncertainty in a sample mean?
 
-## Steps in RStudio
+## Decide which method fits
 
-1. Count the usable observations.
+Identify one numeric variable; count usable observations and calculate sample standard deviation; divide that value by the square root of the sample size.
 
-2. Calculate their sample standard deviation.
-
-3. Divide sd by sqrt(n) and label it as an estimated standard error.
-
-## Runnable example
+## Worked example: iris
 
 ```{r}
-x <- c(11,12,14,16,17,18,19,21)
-n <- length(x)
-se <- sd(x)/sqrt(n)
-print(c(n=n,mean=mean(x),sample_sd=sd(x),SE=se))
+#| eval: false
+d <- ru_data("iris")
+result <- ru_apply("standard_error", d, x="Sepal.Length")
+stopifnot(result["estimated_se"]>0,result["n"]==150)
 ```
 
-## Interpret the result
+Standard error describes how a sample mean would vary across suitable repeated samples. It is not the same as standard deviation among flowers. The original Iris observations are not established as a random sample from every species population.
 
-Standard error is smaller than the sample standard deviation because it measures uncertainty in the sample mean, not the dispersion of the measurements.
+## Apply to another dataset
 
-## Check before using real data
+```r
+ru_apply("standard_error", data=your_data, x="numeric_column")
+```
 
-Standard error is not the spread of individual observations. Independence and sampling design matter.
+If the question asks how dispersed individual observations are, use sample_sd rather than standard_error.
 
-[Open standalone R script](../inst/examples/standard_error.R)
+Review assumptions and available input conditions with `ru_plan("standard_error")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../inst/examples/standard_error.R)

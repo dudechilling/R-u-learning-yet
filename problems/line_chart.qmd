@@ -1,36 +1,34 @@
 ---
-title: "How do I plot values across dates or ordered time points?"
+title: "How do I display measurements across ordered time points?"
 ---
 
 ## What the question asks
 
-How do I plot values across dates or ordered time points?
+How do I display measurements across ordered time points?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Sort observations by timestamp.
+Identify values and timestamps; sort by time; check for duplicate or irregular dates; connect observations only in meaningful chronological order.
 
-2. Plot with type='b' or type='l'.
-
-3. Label the time axis and the measurement units.
-
-## Runnable example
+## Worked example: Nile
 
 ```{r}
-days <- as.Date("2026-01-01") + 0:6
-temperature_c <- c(2,4,3,6,7,5,4)
-plot(days,temperature_c,type="b",pch=19,col="#3F78A8",
-     xlab="Date",ylab="Temperature (C)",
-     main="Week of measurements")
-grid(col="gray85")
+#| eval: false
+d <- ru_data("Nile")
+timeline <- ru_apply("line_chart", data=d, x="flow", time="year")
+stopifnot(nrow(timeline)==nrow(d))
 ```
 
-## Interpret the result
+The annual Nile flow measurements form a time series. The graph shows changes between recorded years but does not identify their causes.
 
-The line connects readings in chronological order. A visible rise over some days does not establish a long-term trend.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("line_chart", data=your_data, x="numeric_column", time="date_column")
+```
 
-Do not imply equal time intervals when dates are irregular. Missing periods should not be invented.
+If timestamps are irregular, connecting points can hide the unequal intervals. A moving average additionally assumes a meaningful window and regular spacing.
 
-[Open standalone R script](../inst/examples/line_chart.R)
+Use `ru_plan("line_chart")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/line_chart.R)

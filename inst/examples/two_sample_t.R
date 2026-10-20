@@ -1,8 +1,8 @@
-# How do I compare the means of two independent groups?
-# Standalone illustrative data and R commands.
-group_a <- c(8,9,11,10,12,9,13,11)
-group_b <- c(13,15,12,16,14,15,17,14)
-result <- t.test(group_a,group_b,var.equal=FALSE)
-print(result$estimate)
-print(result$conf.int)
-print(result$p.value)
+# How do I compare two independent groups using a t test?
+# Reference dataset: datasets::PlantGrowth (bundled with R).
+library(rulearn)
+d <- ru_data("PlantGrowth")
+two <- subset(d, group %in% c("ctrl","trt1"))
+fit <- ru_apply("two_sample_t", two,
+                x="weight", group="group", independent=TRUE, confidence=.95)
+stopifnot(is.finite(fit$p.value))

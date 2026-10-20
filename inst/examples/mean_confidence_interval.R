@@ -1,6 +1,8 @@
-# How do I calculate a confidence interval for a population mean?
-# Standalone illustrative data and R commands.
-x <- c(11,12,14,15,17,18,19,20)
-estimate <- t.test(x,conf.level=.95)
-print(estimate$estimate)
-print(estimate$conf.int)
+# How do I estimate a confidence interval for a population mean?
+# Reference dataset: datasets::PlantGrowth (bundled with R).
+library(rulearn)
+d <- ru_data("PlantGrowth")
+control <- subset(d, group=="ctrl")
+fit <- ru_apply("mean_confidence_interval", control,
+                x="weight", confidence=.95)
+stopifnot(length(fit$conf.int)==2L)

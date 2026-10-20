@@ -1,39 +1,35 @@
 ---
-title: "How do I estimate a value between two known measurements?"
+title: "How do I estimate a value between two recorded x positions?"
 ---
 
-## What the question asks
+## Question
 
-How do I estimate a value between two known measurements?
+How do I estimate a value between two recorded x positions?
 
-## Steps in RStudio
+## Decide which method fits
 
-1. Sort x and y pairs by x.
+Check that x and y are aligned, with unique x positions; confirm the requested target lies within observed x; interpolate between its neighbors.
 
-2. Check the target lies inside the observed x range.
-
-3. Use approx(x,y,xout=target) and label the estimate.
-
-## Runnable example
+## Worked example: Nile
 
 ```{r}
-time <- c(0,5,10,15)
-temperature <- c(10,16,22,21)
-target <- 7.5
-stopifnot(target>=min(time),target<=max(time))
-print(approx(time,temperature,xout=target))
-plot(time,temperature,type="b",pch=19,col="#3F78A8",
-     xlab="Minutes",ylab="Temperature (C)")
-points(target,approx(time,temperature,xout=target)$y,
-       col="#A35E20",pch=19,cex=1.5)
+#| eval: false
+d <- ru_data("Nile")
+estimate <- ru_apply("interpolation", d, x="year", y="flow",
+                     threshold=1900.5)
+stopifnot(is.finite(estimate$y))
 ```
 
-## Interpret the result
+The estimate connects recorded annual flow values with a straight line at a midway year. There is no actual half-year flow measurement here; interpolation is a mathematical approximation, not direct evidence.
 
-Between 5 and 10 minutes the modeled temperature changes linearly from 16°C to 22°C. At 7.5 minutes the interpolated value is 19°C.
+## Apply to another dataset
 
-## Check before using real data
+```r
+ru_apply("interpolation", your_data, x="position", y="value", threshold=your_position)
+```
 
-Interpolation assumes a straight change between known points. Do not confuse interpolation with extrapolation beyond them.
+Estimating beyond the observed range is extrapolation and requires a different justification. Duplicated x positions must be resolved first.
 
-[Open standalone R script](../inst/examples/interpolation.R)
+Review assumptions and available input conditions with `ru_plan("interpolation")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../inst/examples/interpolation.R)

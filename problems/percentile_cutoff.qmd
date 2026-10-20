@@ -1,32 +1,41 @@
 ---
-title: "What value marks the 75th percentile of my observations?"
+title: "What observed value corresponds to a requested percentile?"
 ---
 
-## What the question asks
+## The question
 
-What value marks the 75th percentile of my observations?
+What observed value corresponds to a requested percentile?
 
-## Steps in RStudio
+## What to check and do
 
-1. Enter numeric observations.
+1. Identify a numeric column. 2. Convert a percentage to a probability between 0 and 1. 3. Calculate the quantile and explain it as an observed-distribution threshold.
 
-2. Convert 75 percent to probability .75.
+## Worked example: quakes
 
-3. Run quantile(x,probs=.75).
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-x <- c(10,12,15,19,23,26,31,40)
-print(quantile(x,probs=.75))
+#| eval: false
+d <- ru_data("quakes")
+answer <- ru_apply("percentile_cutoff", data=d, x="mag", prob=.75)
+stopifnot(is.finite(answer),answer>=min(d$mag),answer<=max(d$mag))
 ```
 
-## Interpret the result
+This locates the 75th percentile of earthquake magnitudes in the supplied records. The result is a sample cutoff, not a population probability estimate.
 
-With R's default quantile method, the 75th-percentile cutoff is 27.25. It is an interpolated sample threshold and need not be one of the observed values.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Different percentile algorithms can give different thresholds for small samples. Do not confuse rank with value.
+```r
+ru_apply("percentile_cutoff", data=your_data, x="numeric_column", prob=.75)
+```
 
-[Open the standalone R script](../inst/examples/percentile_cutoff.R)
+If asked what percentile a particular measurement occupies, use an empirical distribution function rather than quantile() in reverse by eye.
+
+
+## Inspect conditions
+
+Use `ru_plan("percentile_cutoff")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/percentile_cutoff.R)

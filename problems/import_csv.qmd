@@ -1,40 +1,44 @@
 ---
-title: "How do I load a CSV into R and check that it worked?"
+title: "How do I import a CSV and confirm the fields were read correctly?"
 ---
 
-## What the question asks
+## The question
 
-How do I load a CSV into R and check that it worked?
+How do I import a CSV and confirm the fields were read correctly?
 
-## Steps in RStudio
+## What to check and do
 
-1. Identify the CSV file path.
+1. Locate an actual CSV. 2. Use read.csv() to load it as a data frame. 3. Inspect names, types, rows and missing values before calculating anything.
 
-2. Use read.csv() and store the result.
+## Worked example: iris
 
-3. Inspect head(), str(), names(), and nrow().
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-# Example: make a temporary CSV so this script runs anywhere.
-source_data <- data.frame(day=c(1,2,3), rainfall_mm=c(4,0,9))
-file <- tempfile(fileext=".csv")
-write.csv(source_data,file,row.names=FALSE)
-d <- read.csv(file)
-print(head(d))
-str(d)
-print(names(d))
-print(nrow(d))
-unlink(file)
+#| eval: false
+d <- ru_data("iris")
+csv <- tempfile(fileext=".csv")
+write.csv(d, csv, row.names=FALSE)
+imported <- ru_apply("import_csv", file=csv)
+stopifnot(nrow(imported)==150L, identical(names(imported),names(d)))
+unlink(csv)
 ```
 
-## Interpret the result
+The round-trip import retains the Iris flower measurements and species names. For an actual CSV, pass its real path instead of creating a temporary file.
 
-The sample has three rows and a numeric rainfall column. Replace the temporary file path with the location of your own CSV. Never assume the imported columns have the intended types.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Inspect the column names, data types, row count, and whether numbers were imported as text.
+```r
+ru_apply("import_csv", file="path/to/measurements.csv")
+```
 
-[Open the standalone R script](../inst/examples/import_csv.R)
+Questions about a broken file path require checking the working directory and file name before using any statistical function.
+
+
+## Inspect conditions
+
+Use `ru_plan("import_csv")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/import_csv.R)

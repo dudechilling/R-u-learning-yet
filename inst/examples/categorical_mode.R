@@ -1,6 +1,7 @@
-# Which category occurs most often, including ties?
-# Independent illustrative observations; replace deliberately.
-choice <- c("A","B","A","B","C","A","B")
-counts <- table(choice)
-print(counts)
-print(names(counts)[counts==max(counts)])
+# What is the most frequent category, including ties?
+# Source dataset: datasets::mtcars, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("mtcars")
+answer <- ru_apply("categorical_mode", data=d, x="cyl")
+stopifnot(length(answer)>=1L)

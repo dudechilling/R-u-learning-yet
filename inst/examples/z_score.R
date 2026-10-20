@@ -1,8 +1,7 @@
-# How far is one value from the sample mean in standard deviations?
-# Independent illustrative observations; replace deliberately.
-x <- c(10,12,14,16,18)
-chosen <- 18
-s <- sd(x)
-if (s==0) stop("No variation: z-score is undefined.")
-z <- (chosen-mean(x))/s
-print(z)
+# How many standard deviations is a specified value from the sample mean?
+# Source dataset: datasets::iris, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("iris")
+answer <- ru_apply("z_score", data=d, x="Sepal.Length", threshold=7)
+stopifnot(length(answer)==1L,is.finite(answer))

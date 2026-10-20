@@ -1,42 +1,44 @@
 ---
-title: "How do I plot two numeric variables with a trend line and point labels?"
+title: "How do I plot paired numeric variables and show a fitted line?"
 ---
 
 ## What the question asks
 
-How do I plot two numeric variables with a trend line and point labels?
+How do I plot paired numeric variables and show a fitted line?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Check every x has a corresponding y.
+Identify paired x and y measurements from the same rows; plot and label both axes; add a line only after inspecting curves and unusual points.
 
-2. Plot labeled axes and individual points.
-
-3. Overlay lm() and label an observation only when useful.
-
-## Runnable example
+## Worked example: cars
 
 ```{r}
-snow_cm <- c(10,15,20,25,30,40)
-visitors <- c(85,91,110,125,139,168)
-plot(snow_cm,visitors,type="n",xlab="Snow depth (cm)",
-     ylab="Visitors",main="Illustrative paired measurements")
-grid(col="gray85")
-points(snow_cm,visitors,col="#3F78A8",pch=19)
-fit <- lm(visitors ~ snow_cm)
-abline(fit,col="#A35E20",lwd=2,lty=2)
-text(snow_cm[6],visitors[6],labels="last observation",pos=2,cex=.75)
-legend("topleft",legend=c("Observations","Linear fit"),
-       pch=c(19,NA),lty=c(0,2),
-       col=c("#3F78A8","#A35E20"),bty="n")
+#| eval: false
+d <- ru_data("cars")
+fit <- ru_apply("scatterplot", data=d, x="speed", y="dist")
+stopifnot(inherits(fit,"lm"))
 ```
 
-## Interpret the result
+Speed and stopping distance are measured on different scales and show an association in the recorded cars. The fitted straight line summarizes a relationship; it does not establish causation or work equally well at unobserved speeds.
 
-The points show the observed pairs, while the dashed line summarizes one fitted linear trend. The line should not be used outside the observed range without a separate justification.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("scatterplot", data=your_data, x="predictor", y="response")
+```
 
-Plot paired rows only. A straight-line fit does not prove causation or rule out curved relationships.
+When the pattern is curved, compare a nonlinear model or descriptive smoothing before interpreting a Pearson coefficient.
 
-[Open standalone R script](../inst/examples/scatterplot.R)
+## Optional Palmer penguins example
+
+```r
+if (requireNamespace("palmerpenguins", quietly=TRUE)) {
+  penguins <- ru_data("penguins")
+  ru_apply("scatterplot", data=penguins,
+           x="bill_length_mm", y="bill_depth_mm")
+}
+```
+
+Use `ru_plan("scatterplot")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/scatterplot.R)

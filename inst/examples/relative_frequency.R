@@ -1,7 +1,7 @@
-# How do I turn category counts into relative frequencies and percentages?
-# Independent illustrative observations; replace deliberately.
-travel <- c("bus","walk","bus","car","walk","bus")
-counts <- table(travel)
-print(counts)
-print(prop.table(counts))
-print(100*prop.table(counts))
+# How do I convert observations into percentages by category?
+# Source dataset: datasets::mtcars, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("mtcars")
+answer <- ru_apply("relative_frequency", data=d, x="cyl")
+stopifnot(isTRUE(all.equal(sum(answer$proportion),1)))

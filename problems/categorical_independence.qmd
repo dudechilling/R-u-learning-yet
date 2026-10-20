@@ -2,36 +2,34 @@
 title: "How do I test whether two categories are associated?"
 ---
 
-## What the question asks
+## Question
 
 How do I test whether two categories are associated?
 
-## Steps in RStudio
+## Decide which method fits
 
-1. Create a contingency table of observed counts.
+Construct a contingency table of counts, weighting summarized rows if necessary; inspect expected counts; use chi-square or a suitable exact method and interpret association carefully.
 
-2. Inspect expected counts from chisq.test().
-
-3. Use the appropriate test and interpret p-value without implying causation.
-
-## Runnable example
+## Worked example: Titanic
 
 ```{r}
-counts <- matrix(c(24,15,18,27),nrow=2,byrow=TRUE,
-                 dimnames=list(setting=c("A","B"),outcome=c("Yes","No")))
-result <- chisq.test(counts,correct=FALSE)
-print(counts)
-print(result$expected)
-print(result$p.value)
-if (any(result$expected<5)) print(fisher.test(counts)$p.value)
+#| eval: false
+d <- ru_data("Titanic")
+fit <- ru_apply("categorical_independence", d,
+                x="Sex", y="Survived", weight="Freq")
+stopifnot(!is.null(fit))
 ```
 
-## Interpret the result
+The Titanic dataset stores historical counts in aggregated rows. Weighting by Freq is essential; treating each aggregated row as one person would give the wrong contingency table. Historical counts are not automatically a random sample from a broader population.
 
-The test asks whether the two categorical variables are independent in the sampled population under the sampling assumptions. It does not explain any observed association.
+## Apply to another dataset
 
-## Check before using real data
+```r
+ru_apply("categorical_independence", your_data, x="category_A", y="category_B", weight="frequency_column")
+```
 
-For sparse 2x2 tables, consider fisher.test(); expected-cell conditions and sampling design matter.
+If expected counts are small, the code uses Fisher's exact test for a 2×2 table or declines to select an unreliable chi-square approximation for a larger sparse table.
 
-[Open standalone R script](../inst/examples/categorical_independence.R)
+Review assumptions and available input conditions with `ru_plan("categorical_independence")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../inst/examples/categorical_independence.R)

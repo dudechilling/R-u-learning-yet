@@ -1,34 +1,41 @@
 ---
-title: "How do I find the mean and median, and which is more typical?"
+title: "Is the mean or median a better summary of a numeric variable?"
 ---
 
-## What the question asks
+## The question
 
-How do I find the mean and median, and which is more typical?
+Is the mean or median a better summary of a numeric variable?
 
-## Steps in RStudio
+## What to check and do
 
-1. Put the numeric values into c().
+1. Identify the observations and measurement units. 2. Calculate mean and median. 3. Inspect the distribution for skew or clusters before choosing a 'typical' value.
 
-2. Run mean() and median().
+## Worked example: faithful
 
-3. Compare the two and look for extreme values.
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-x <- c(12,13,14,15,56)
-print(mean(x))
-print(median(x))
-print(sort(x))
+#| eval: false
+d <- ru_data("faithful")
+answer <- ru_apply("mean_median", data=d, x="waiting")
+stopifnot(answer["mean"]>0,answer["median"]>0)
 ```
 
-## Interpret the result
+The mean and median summarize waiting time between geyser eruptions. Because the data have distinct clusters, neither number tells the entire story; inspect a histogram too.
 
-The mean is 22 and the median is 14. The single value 56 raises the mean; that does not prove it is an error.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Compare mean and median and examine unusually high or low observations instead of deleting them.
+```r
+ru_apply("mean_median", data=your_data, x="numeric_column")
+```
 
-[Open the standalone R script](../inst/examples/mean_median.R)
+If there are large outliers, compare median and mean rather than removing observations automatically.
+
+
+## Inspect conditions
+
+Use `ru_plan("mean_median")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/mean_median.R)

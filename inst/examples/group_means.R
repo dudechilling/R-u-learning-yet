@@ -1,6 +1,8 @@
-# How do I calculate an average separately for each group?
-# Independent illustrative observations; replace deliberately.
-group <- c("north","north","south","south","south")
-temperature_c <- c(7,9,11,15,13)
-print(table(group))
-print(tapply(temperature_c,group,mean))
+# How do I compare average values across categories?
+# Source dataset: datasets::iris, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("iris")
+answer <- ru_apply("group_means", data=d,
+                   x="Sepal.Length", group="Species")
+stopifnot(nrow(answer)==3, all(answer$n==50))

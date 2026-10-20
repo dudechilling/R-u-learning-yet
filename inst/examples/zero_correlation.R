@@ -1,11 +1,12 @@
-# If Pearson correlation is zero, does that mean there is no relationship?
-# Independent illustrative data.
-x <- -3:3
-y <- x^2
-print(cor(x,y))
-plot(x,y,pch=19,col="#3F78A8",xlab="X",ylab="Y",
-     main="Zero linear correlation, clear curved pattern")
-curve(x^2,from=-3,to=3,add=TRUE,col="#A35E20",lwd=2)
-legend("top",legend=c("Observed pairs","Curved pattern"),
-       pch=c(19,NA),lty=c(0,1),
-       col=c("#3F78A8","#A35E20"),bty="n")
+# Can a correlation statistic miss a strong nonlinear relationship?
+# Dataset: datasets::anscombe (included with R).
+library(rulearn)
+d <- ru_data("anscombe")
+# Anscombe's real x2 values; the square is a NEW, constructed response.
+constructed <- data.frame(deviation=d$x2-mean(d$x2))
+constructed$squared <- constructed$deviation^2
+r <- ru_apply("zero_correlation", data=constructed,
+              x="deviation", y="squared")
+stopifnot(abs(r)<1e-10)
+# Compare with one of the original Anscombe pairs:
+ru_apply("zero_correlation", data=d, x="x2", y="y2")

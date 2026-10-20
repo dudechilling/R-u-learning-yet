@@ -1,35 +1,41 @@
 ---
-title: "How do I find what columns and data types are in my dataset?"
+title: "Which columns are numeric, categorical, or missing?"
 ---
 
-## What the question asks
+## The question
 
-How do I find what columns and data types are in my dataset?
+Which columns are numeric, categorical, or missing?
 
-## Steps in RStudio
+## What to check and do
 
-1. Store the table in a data frame.
+1. Load your table. 2. Call ru_columns() to inspect names, data types and missing counts. 3. Select a method only after checking the relevant fields.
 
-2. Run names(), str(), head(), and summary().
+## Worked example: airquality
 
-3. Choose columns based on actual content, not their position alone.
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-d <- data.frame(site=c("A","B","C"), depth_cm=c(12,19,NA))
-print(names(d))
-str(d)
-print(head(d))
-print(summary(d))
+#| eval: false
+d <- ru_data("airquality")
+details <- ru_apply("inspect_columns", data=d)
+stopifnot(any(details$column=="Ozone"), any(details$missing>0))
 ```
 
-## Interpret the result
+The air-quality table contains numeric weather variables and missing measurements. A column's existence does not mean every row contains a usable value.
 
-Here site is text and depth_cm is numeric with one missing measurement. Summary reports the available values; the missing row must be handled explicitly.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Verify units and possible missing values. Numeric-looking text is not necessarily imported as numeric.
+```r
+ru_columns(your_data)
+```
 
-[Open the standalone R script](../inst/examples/inspect_columns.R)
+If the variable is stored as character text, correct the import or encoding; do not blindly coerce it to numeric.
+
+
+## Inspect conditions
+
+Use `ru_plan("inspect_columns")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/inspect_columns.R)

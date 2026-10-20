@@ -1,34 +1,36 @@
 ---
-title: "How do I estimate a population proportion with an interval?"
+title: "How do I calculate an interval for an observed yes/no proportion?"
 ---
 
-## What the question asks
+## Question
 
-How do I estimate a population proportion with an interval?
+How do I calculate an interval for an observed yes/no proportion?
 
-## Steps in RStudio
+## Decide which method fits
 
-1. Identify number of successes and number of independent trials.
+Define what counts as success; count successes and total eligible observations; choose the confidence level and inspect sampling assumptions.
 
-2. Check successes are between 0 and n.
-
-3. Use prop.test() and report the confidence level.
-
-## Runnable example
+## Worked example: mtcars
 
 ```{r}
-successes <- 26; n <- 50
-estimate <- prop.test(successes,n,conf.level=.95,correct=FALSE)
-print(estimate$estimate)
-print(estimate$conf.int)
+#| eval: false
+d <- ru_data("mtcars")
+successes <- sum(d$am==1)
+fit <- ru_apply("proportion_interval", successes=successes,
+                n=nrow(d), confidence=.95)
+stopifnot(is.finite(fit$estimate))
 ```
 
-## Interpret the result
+The calculation uses the proportion of cars marked as manual transmission among these recorded models. Because the sample is not established as representative, the interval is a mathematical illustration, not a justified estimate for all vehicles.
 
-The observed rate is 26/50 = 0.52, with an approximate 95% interval. That interval reflects sampling uncertainty under the model.
+## Apply to another dataset
 
-## Check before using real data
+```r
+ru_apply("proportion_interval", successes=your_success_count, n=your_sample_size, confidence=.95)
+```
 
-Check how the observations were sampled; for small samples or extreme rates consider binom.test() instead of an approximation.
+If the question asks only for the fraction in the observed dataset, divide successes by n and omit inference.
 
-[Open standalone R script](../inst/examples/proportion_interval.R)
+Review assumptions and available input conditions with `ru_plan("proportion_interval")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../inst/examples/proportion_interval.R)

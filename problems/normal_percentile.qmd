@@ -1,33 +1,37 @@
 ---
-title: "What cutoff marks a given percentage of a normal distribution?"
+title: "Which modeled value marks the pth percentile of a normal distribution?"
 ---
 
-## What the question asks
+## Question
 
-What cutoff marks a given percentage of a normal distribution?
+Which modeled value marks the pth percentile of a normal distribution?
 
-## Steps in RStudio
+## Work through it
 
-1. Convert the percentage to a probability between 0 and 1.
+Express the requested percentile as a probability between 0 and 1; choose justified normal mean and sd; use qnorm to get the threshold.
 
-2. Identify mean and positive sd.
-
-3. Run qnorm(probability,mean,sd).
-
-## Runnable example
+## Worked example: airquality
 
 ```{r}
-cutoff <- qnorm(0.9,mean=100,sd=15)
-print(cutoff)
-print(pnorm(cutoff,100,15))
+#| eval: false
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_percentile", mu=mu, sigma=sigma,
+                   prob=.9, assume_normal=TRUE)
+stopifnot(isTRUE(all.equal(pnorm(result,mu,sigma),.9)))
 ```
 
-## Interpret the result
+The result is the 90th-percentile cutoff under the chosen normal model. To find the 90th percentile of the recorded temperatures directly, use percentile_cutoff instead.
 
-The modeled 90th-percentile cutoff is about 119.22. By construction, the normal CDF at that value is 0.9.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("normal_percentile", mu=your_mean, sigma=your_sd, prob=.9, assume_normal=TRUE)
+```
 
-Use a probability between 0 and 1, not 90 to represent a 90th-percentile cutoff.
+A percentile rank is not interchangeable with the underlying measurement value; specify whether the question asks for a rank or a cutoff.
 
-[Open standalone script](../inst/examples/normal_percentile.R)
+Check the input conditions with `ru_plan("normal_percentile")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/normal_percentile.R)

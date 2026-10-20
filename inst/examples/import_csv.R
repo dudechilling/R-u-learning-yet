@@ -1,12 +1,10 @@
-# How do I load a CSV into R and check that it worked?
-# Independent illustrative observations; replace deliberately.
-# Example: make a temporary CSV so this script runs anywhere.
-source_data <- data.frame(day=c(1,2,3), rainfall_mm=c(4,0,9))
-file <- tempfile(fileext=".csv")
-write.csv(source_data,file,row.names=FALSE)
-d <- read.csv(file)
-print(head(d))
-str(d)
-print(names(d))
-print(nrow(d))
-unlink(file)
+# How do I import a CSV and confirm the fields were read correctly?
+# Source dataset: datasets::iris, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("iris")
+csv <- tempfile(fileext=".csv")
+write.csv(d, csv, row.names=FALSE)
+imported <- ru_apply("import_csv", file=csv)
+stopifnot(nrow(imported)==150L, identical(names(imported),names(d)))
+unlink(csv)

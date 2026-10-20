@@ -1,36 +1,34 @@
 ---
-title: "How do I make a bar chart with readable category labels and counts?"
+title: "How do I display and label the frequency of categories?"
 ---
 
 ## What the question asks
 
-How do I make a bar chart with readable category labels and counts?
+How do I display and label the frequency of categories?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Count categories with table().
+Identify the category column; count each category; use bars with a zero baseline, labels, and explicit frequency units.
 
-2. Call barplot() and capture bar-center positions.
-
-3. Use text() to show values above the bars.
-
-## Runnable example
+## Worked example: iris
 
 ```{r}
-responses <- c("bus","bike","bus","walk","walk","bus","bike")
-counts <- table(responses)
-at <- barplot(counts,col=c("#CDE1EF","#EAC99E","#B7D7C5"),
-              border="#244967",ylab="Responses",
-              main="Travel choices",ylim=c(0,max(counts)+2))
-text(at,counts,labels=counts,pos=3)
+#| eval: false
+d <- ru_data("iris")
+counts <- ru_apply("bar_chart", data=d, x="Species")
+stopifnot(sum(counts)==nrow(d))
 ```
 
-## Interpret the result
+The three flower species occur equally often in the provided Iris dataset. Bar charts compare categories; they do not imply species labels lie on a continuous axis.
 
-Each bar represents a named category and its number of responses. The values above the bars prevent readers from estimating counts by eye.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("bar_chart", data=your_data, x="category_column")
+```
 
-Explain whether the bars show counts or percentages and include an appropriate zero baseline.
+If you have pre-aggregated counts instead of one category per row, keep the frequencies as weights rather than treating every summary row as one occurrence.
 
-[Open standalone R script](../inst/examples/bar_chart.R)
+Use `ru_plan("bar_chart")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/bar_chart.R)

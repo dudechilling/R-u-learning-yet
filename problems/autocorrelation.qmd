@@ -1,35 +1,34 @@
 ---
-title: "How do I check whether a measurement resembles earlier observations?"
+title: "How do I check whether consecutive observations are related?"
 ---
 
 ## What the question asks
 
-How do I check whether a measurement resembles earlier observations?
+How do I check whether consecutive observations are related?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Keep observations in time order.
+Put measurements in time order; inspect trends and repeated cycles; use the autocorrelation function and interpret each lag carefully.
 
-2. Plot the series and inspect trends.
-
-3. Run acf() and describe which lags show a relationship.
-
-## Runnable example
+## Worked example: Nile
 
 ```{r}
-set.seed(25)
-x <- as.numeric(arima.sim(model=list(ar=.6),n=100))
-plot.ts(x,col="#3F78A8",ylab="Simulated value",
-        main="Example with time dependence")
-acf(x,main="Autocorrelation by lag",col="#A35E20")
+#| eval: false
+d <- ru_data("Nile")
+lags <- ru_apply("autocorrelation", data=d, x="flow", time="year")
+stopifnot(inherits(lags,"acf"))
 ```
 
-## Interpret the result
+Autocorrelation compares a series with lagged versions of itself. A positive lag-one value can signal persistence, but trend, seasonality and irregular time spacing also affect its interpretation.
 
-The simulation has positive serial dependence by design. The ACF displays lag-specific correlations; it does not certify that real observations are stationary.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("autocorrelation", data=your_data, x="numeric_column", time="date_column")
+```
 
-ACF values can be distorted by trend, seasonality, irregular intervals, and short samples; review the time series first.
+A raw ACF cannot establish stationarity; adjust the series or assess trend and changing variance where necessary.
 
-[Open standalone R script](../inst/examples/autocorrelation.R)
+Use `ru_plan("autocorrelation")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/autocorrelation.R)

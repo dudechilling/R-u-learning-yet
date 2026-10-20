@@ -1,5 +1,9 @@
-# What cutoff marks a given percentage of a normal distribution?
-# Independent illustrative data.
-cutoff <- qnorm(0.9,mean=100,sd=15)
-print(cutoff)
-print(pnorm(cutoff,100,15))
+# Which modeled value marks the pth percentile of a normal distribution?
+# Example source: datasets::airquality (included with R).
+library(rulearn)
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_percentile", mu=mu, sigma=sigma,
+                   prob=.9, assume_normal=TRUE)
+stopifnot(isTRUE(all.equal(pnorm(result,mu,sigma),.9)))

@@ -1,6 +1,8 @@
-# How do I estimate a population proportion with an interval?
-# Standalone illustrative data and R commands.
-successes <- 26; n <- 50
-estimate <- prop.test(successes,n,conf.level=.95,correct=FALSE)
-print(estimate$estimate)
-print(estimate$conf.int)
+# How do I calculate an interval for an observed yes/no proportion?
+# Reference dataset: datasets::mtcars (bundled with R).
+library(rulearn)
+d <- ru_data("mtcars")
+successes <- sum(d$am==1)
+fit <- ru_apply("proportion_interval", successes=successes,
+                n=nrow(d), confidence=.95)
+stopifnot(is.finite(fit$estimate))

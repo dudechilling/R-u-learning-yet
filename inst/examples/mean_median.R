@@ -1,6 +1,7 @@
-# How do I find the mean and median, and which is more typical?
-# Independent illustrative observations; replace deliberately.
-x <- c(12,13,14,15,56)
-print(mean(x))
-print(median(x))
-print(sort(x))
+# Is the mean or median a better summary of a numeric variable?
+# Source dataset: datasets::faithful, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("faithful")
+answer <- ru_apply("mean_median", data=d, x="waiting")
+stopifnot(answer["mean"]>0,answer["median"]>0)

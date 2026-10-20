@@ -1,37 +1,35 @@
 ---
-title: "How do I simulate a sampling distribution of means?"
+title: "How do sample means vary across repeated resampling?"
 ---
 
-## What the question asks
+## Question
 
-How do I simulate a sampling distribution of means?
+How do sample means vary across repeated resampling?
 
-## Steps in RStudio
+## Work through it
 
-1. Choose a model for observations and a sample size.
+Choose a numeric sample and a resample size; bootstrap from observed values with replacement; compare the distribution of resampled means with the original mean.
 
-2. Repeat random sampling many times and compute each mean.
-
-3. Plot the distribution of the sample means.
-
-## Runnable example
+## Worked example: iris
 
 ```{r}
-set.seed(42)
-means <- replicate(1000,mean(rexp(30,rate=1/5)))
-h <- hist(means,breaks=25,col="#CEE2F0",border="#244967",
-          xlab="Sample mean",main="Repeated means of skewed data")
-abline(v=5,col="#A35E20",lwd=2,lty=2)
-legend("topright",legend="Model mean = 5",lty=2,col="#A35E20",bty="n")
-print(c(mean_of_means=mean(means),sd_of_means=sd(means)))
+#| eval: false
+d <- ru_data("iris")
+means <- ru_apply("sampling_distribution", data=d,
+                  x="Sepal.Length", n=30, reps=500, seed=42)
+stopifnot(length(means)==500,all(is.finite(means)))
 ```
 
-## Interpret the result
+The histogram displays an empirical bootstrap distribution for 30-draw means from the recorded sepal lengths. It describes resampling from this dataset, not a guaranteed sampling distribution for all plants.
 
-Each histogram value is a mean from 30 independently simulated observations. The distribution of means is narrower than the original exponential model.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("sampling_distribution", data=your_data, x="numeric_column", n=30, reps=500, seed=42)
+```
 
-Simulation assumptions and sample size matter; a bell-shaped simulated result is not proof about an unrelated real dataset.
+If a question specifies a known probabilistic population model, simulate from that model instead of bootstrapping observed values.
 
-[Open standalone script](../inst/examples/sampling_distribution.R)
+Check the input conditions with `ru_plan("sampling_distribution")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/sampling_distribution.R)

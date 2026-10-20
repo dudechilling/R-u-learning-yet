@@ -1,39 +1,35 @@
 ---
-title: "How do I smooth noisy measurements with a moving average?"
+title: "How do I smooth a noisy time series with a moving average?"
 ---
 
 ## What the question asks
 
-How do I smooth noisy measurements with a moving average?
+How do I smooth a noisy time series with a moving average?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Ensure observations have a known regular spacing.
+Order the observations; confirm the sampling intervals and choose a window; plot both original and smoothed values to preserve context.
 
-2. Calculate a centered moving average with stats::filter().
-
-3. Draw both raw and smoothed lines with a legend.
-
-## Runnable example
+## Worked example: Nile
 
 ```{r}
-days <- 1:12
-x <- c(4,8,5,10,7,12,11,15,14,18,16,19)
-smooth <- as.numeric(stats::filter(x,rep(1/3,3),sides=2))
-plot(days,x,type="b",pch=19,col="#3F78A8",
-     xlab="Day",ylab="Measurement",
-     main="Original values and 3-day moving average")
-lines(days,smooth,col="#A35E20",lwd=3)
-legend("topleft",legend=c("Raw","3-day mean"),
-       col=c("#3F78A8","#A35E20"),lty=1,lwd=c(1,3),bty="n")
+#| eval: false
+d <- ru_data("Nile")
+smoothed <- ru_apply("moving_average", data=d, x="flow",
+                     time="year", window=7)
+stopifnot(nrow(smoothed)==nrow(d),anyNA(smoothed$smoothed))
 ```
 
-## Interpret the result
+The seven-observation window smooths annual flow measurements. It can hide brief peaks and introduces missing values at the centered window edges; the smoothed line is not additional observed data.
 
-The second line averages each observation with its immediate neighbors. It is undefined at the first and last day for this centered three-day window.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("moving_average", data=your_data, x="numeric_column", time="date_column", window=7)
+```
 
-Smoothing hides some detail and creates missing values at the edges; it is not evidence that fluctuations were errors.
+If measurements arrive at irregular intervals, a seven-observation moving average is not a seven-year moving average.
 
-[Open standalone R script](../inst/examples/moving_average.R)
+Use `ru_plan("moving_average")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/moving_average.R)

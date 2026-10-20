@@ -1,34 +1,35 @@
 ---
-title: "What is the probability of at least k successes?"
+title: "What is the chance of at least k successes in n trials?"
 ---
 
-## What the question asks
+## Question
 
-What is the probability of at least k successes?
+What is the chance of at least k successes in n trials?
 
-## Steps in RStudio
+## Work through it
 
-1. Identify n, p and minimum k.
+Check the binomial assumptions; identify k as an inclusive lower boundary; compute P(X >= k) as 1 - P(X <= k-1).
 
-2. Calculate P(X > k-1) with pbinom(k-1,n,p,lower.tail=FALSE).
-
-3. Explain the inclusive boundary.
-
-## Runnable example
+## Worked example: mtcars
 
 ```{r}
-n <- 10; p <- 0.3; k <- 5
-answer <- pbinom(k-1,size=n,prob=p,lower.tail=FALSE)
-print(answer)
-stopifnot(isTRUE(all.equal(answer,sum(dbinom(k:n,n,p)))))
+#| eval: false
+d <- ru_data("mtcars")
+p <- mean(d$am==1)
+result <- ru_apply("binomial_at_least", n=10, k=5, prob=p)
+stopifnot(isTRUE(all.equal(result, pbinom(4,10,p,lower.tail=FALSE))))
 ```
 
-## Interpret the result
+The output models the probability of five or more successes among ten independent hypothetical draws with fixed success probability. The model is illustrative, not an inference about all vehicles.
 
-The result is the chance of five or more successes. The expression adds probabilities for 5, 6, 7, 8, 9, and 10 successes.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("binomial_at_least", n=your_n, k=your_k, prob=your_p)
+```
 
-Use k-1 as the cutoff for 1-P(X <= k-1). Using k would answer a different question.
+If the question asks 'more than k', use the upper tail starting at k+1 rather than k.
 
-[Open standalone script](../inst/examples/binomial_at_least.R)
+Check the input conditions with `ru_plan("binomial_at_least")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/binomial_at_least.R)

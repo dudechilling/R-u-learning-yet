@@ -1,32 +1,37 @@
 ---
-title: "How do I find the probability above a threshold?"
+title: "Under a normal model, what proportion exceeds a cutoff?"
 ---
 
-## What the question asks
+## Question
 
-How do I find the probability above a threshold?
+Under a normal model, what proportion exceeds a cutoff?
 
-## Steps in RStudio
+## Work through it
 
-1. Check the mean, standard deviation, and threshold.
+Confirm mean and positive sd; mark the cutoff; compute the right-tail probability instead of the left-tail area.
 
-2. Call pnorm(threshold,mean,sd,lower.tail=FALSE).
-
-3. Interpret the result as the upper-tail probability.
-
-## Runnable example
+## Worked example: airquality
 
 ```{r}
-answer <- pnorm(120,mean=100,sd=15,lower.tail=FALSE)
-print(answer)
+#| eval: false
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_right_tail", mu=mu, sigma=sigma,
+                   threshold=90, assume_normal=TRUE)
+stopifnot(result>=0,result<=1)
 ```
 
-## Interpret the result
+This returns the modeled area above 90°F. It should be compared with the recorded fraction of days above 90°F before deciding whether the normal approximation fits.
 
-The modeled probability above 120 is about 0.091, or 9.1%, for a normal distribution centered at 100 with standard deviation 15.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("normal_right_tail", mu=your_mean, sigma=your_sd, threshold=your_cutoff, assume_normal=TRUE)
+```
 
-Distinguish P(X > a) from P(X < a); the two areas add to 1 for a continuous normal model.
+For a continuous normal model P(X>90) and P(X>=90) coincide. The distinction matters for discrete distributions.
 
-[Open standalone script](../inst/examples/normal_right_tail.R)
+Check the input conditions with `ru_plan("normal_right_tail")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/normal_right_tail.R)

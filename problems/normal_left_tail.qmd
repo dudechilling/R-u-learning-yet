@@ -1,33 +1,37 @@
 ---
-title: "How do I calculate the proportion below a cutoff in a normal model?"
+title: "Under a normal model, what proportion falls below a cutoff?"
 ---
 
-## What the question asks
+## Question
 
-How do I calculate the proportion below a cutoff in a normal model?
+Under a normal model, what proportion falls below a cutoff?
 
-## Steps in RStudio
+## Work through it
 
-1. Identify mean, positive standard deviation, and cutoff.
+Check whether a normal approximation is appropriate; specify mean, standard deviation and cutoff; compute the lower cumulative probability.
 
-2. Run pnorm(cutoff,mean,sd).
-
-3. Translate the returned number into an area or proportion.
-
-## Runnable example
+## Worked example: airquality
 
 ```{r}
-mu <- 100; sigma <- 15; cutoff <- 85
-answer <- pnorm(cutoff,mean=mu,sd=sigma)
-print(answer)
+#| eval: false
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_left_tail", mu=mu, sigma=sigma,
+                   threshold=75, assume_normal=TRUE)
+stopifnot(result>0,result<1)
 ```
 
-## Interpret the result
+The calculation fits illustrative normal parameters to recorded daily temperatures. It predicts a model area below 75°F, which need not equal the actual proportion below 75°F.
 
-The modeled probability below 85 is about 0.159 (15.9%) when the mean is 100 and standard deviation is 15.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("normal_left_tail", mu=your_mean, sigma=your_sd, threshold=your_cutoff, assume_normal=TRUE)
+```
 
-A standard deviation must be positive and the assumed normal model must suit the real variable.
+If you want the observed share instead of model probability, use mean(d$Temp<75,na.rm=TRUE).
 
-[Open standalone script](../inst/examples/normal_left_tail.R)
+Check the input conditions with `ru_plan("normal_left_tail")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/normal_left_tail.R)

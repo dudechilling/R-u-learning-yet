@@ -1,41 +1,34 @@
 ---
-title: "How do I explore whether a time series has a stable mean over time?"
+title: "How can I explore whether a time series is reasonably stable?"
 ---
 
 ## What the question asks
 
-How do I explore whether a time series has a stable mean over time?
+How can I explore whether a time series is reasonably stable?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Plot the measurements against time.
+Inspect a time plot; compare the mean and spread in similar early and late windows; look for trend, variance changes and dependence.
 
-2. Compare early and late windows of similar length.
-
-3. Inspect whether trend or changing spread contradicts a stable process.
-
-## Runnable example
+## Worked example: Nile
 
 ```{r}
-set.seed(3)
-stable <- rnorm(80,mean=8,sd=2)
-trending <- stable + seq(0,12,length.out=80)
-op <- par(mfrow=c(1,2))
-plot(stable,type="l",col="#3F78A8",ylab="Value",
-     main="Simulated stable process")
-plot(trending,type="l",col="#A35E20",ylab="Value",
-     main="Same noise with increasing trend")
-par(op)
-print(c(mean(stable[1:40]),mean(stable[41:80])))
-print(c(mean(trending[1:40]),mean(trending[41:80])))
+#| eval: false
+d <- ru_data("Nile")
+check <- ru_apply("stationarity", data=d, x="flow", time="year")
+stopifnot(nrow(check)==2L)
 ```
 
-## Interpret the result
+Window means and sample standard deviations describe the earlier and later sections of the records. They are diagnostic clues, not a definitive test that the generating process is stationary.
 
-The second series has an imposed upward trend and therefore does not have a constant mean. A stable-looking sample does not by itself prove stationarity.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("stationarity", data=your_data, x="numeric_column", time="date_column")
+```
 
-Two window means and a plot are preliminary checks, not proof of stationarity. Also consider variance and serial dependence.
+Stable variance alone does not imply a constant mean; stable means alone do not establish unchanging autocorrelation.
 
-[Open standalone R script](../inst/examples/stationarity.R)
+Use `ru_plan("stationarity")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/stationarity.R)

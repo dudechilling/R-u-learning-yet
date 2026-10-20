@@ -1,7 +1,7 @@
-# How do I calculate range, variance, and standard deviation?
-# Independent illustrative observations; replace deliberately.
-x <- c(4,6,8,10,12)
-print(range(x))
-print(diff(range(x)))
-print(var(x))
-print(sd(x))
+# How variable are measurements, and what units does standard deviation use?
+# Source dataset: datasets::iris, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("iris")
+answer <- ru_apply("sample_sd", data=d, x="Petal.Length")
+stopifnot(answer["sample_sd"]>0,answer["n"]==150)

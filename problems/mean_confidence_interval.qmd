@@ -1,34 +1,36 @@
 ---
-title: "How do I calculate a confidence interval for a population mean?"
+title: "How do I estimate a confidence interval for a population mean?"
 ---
 
-## What the question asks
+## Question
 
-How do I calculate a confidence interval for a population mean?
+How do I estimate a confidence interval for a population mean?
 
-## Steps in RStudio
+## Decide which method fits
 
-1. Verify the observations and whether a mean-based interval is sensible.
+Select the relevant sample, choose and disclose the confidence level; calculate a t interval and explain its repeated-sampling interpretation.
 
-2. Set the desired confidence level.
-
-3. Use t.test(x,conf.level=...) and report the estimated interval.
-
-## Runnable example
+## Worked example: PlantGrowth
 
 ```{r}
-x <- c(11,12,14,15,17,18,19,20)
-estimate <- t.test(x,conf.level=.95)
-print(estimate$estimate)
-print(estimate$conf.int)
+#| eval: false
+d <- ru_data("PlantGrowth")
+control <- subset(d, group=="ctrl")
+fit <- ru_apply("mean_confidence_interval", control,
+                x="weight", confidence=.95)
+stopifnot(length(fit$conf.int)==2L)
 ```
 
-## Interpret the result
+The interval concerns the mean weight of observations in the selected control group, under sampling and model assumptions. 95% is the long-run coverage of the procedure, not a probability that a fixed mean moves between endpoints.
 
-The printed endpoints form a 95% confidence interval for the population mean under the test's assumptions. A wider interval usually indicates more uncertainty.
+## Apply to another dataset
 
-## Check before using real data
+```r
+ru_apply("mean_confidence_interval", your_data, x="numeric_column", confidence=.95)
+```
 
-95% confidence describes the long-run coverage of the procedure, not a 95% probability about a fixed parameter after data are observed.
+If the question concerns a proportion rather than a numeric mean, use proportion_interval. If two groups are contrasted, check the design before selecting an appropriate two-sample method.
 
-[Open standalone R script](../inst/examples/mean_confidence_interval.R)
+Review assumptions and available input conditions with `ru_plan("mean_confidence_interval")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../inst/examples/mean_confidence_interval.R)

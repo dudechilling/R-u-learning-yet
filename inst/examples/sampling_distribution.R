@@ -1,9 +1,7 @@
-# How do I simulate a sampling distribution of means?
-# Independent illustrative data.
-set.seed(42)
-means <- replicate(1000,mean(rexp(30,rate=1/5)))
-h <- hist(means,breaks=25,col="#CEE2F0",border="#244967",
-          xlab="Sample mean",main="Repeated means of skewed data")
-abline(v=5,col="#A35E20",lwd=2,lty=2)
-legend("topright",legend="Model mean = 5",lty=2,col="#A35E20",bty="n")
-print(c(mean_of_means=mean(means),sd_of_means=sd(means)))
+# How do sample means vary across repeated resampling?
+# Example source: datasets::iris (included with R).
+library(rulearn)
+d <- ru_data("iris")
+means <- ru_apply("sampling_distribution", data=d,
+                  x="Sepal.Length", n=30, reps=500, seed=42)
+stopifnot(length(means)==500,all(is.finite(means)))

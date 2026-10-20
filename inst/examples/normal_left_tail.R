@@ -1,5 +1,9 @@
-# How do I calculate the proportion below a cutoff in a normal model?
-# Independent illustrative data.
-mu <- 100; sigma <- 15; cutoff <- 85
-answer <- pnorm(cutoff,mean=mu,sd=sigma)
-print(answer)
+# Under a normal model, what proportion falls below a cutoff?
+# Example source: datasets::airquality (included with R).
+library(rulearn)
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_left_tail", mu=mu, sigma=sigma,
+                   threshold=75, assume_normal=TRUE)
+stopifnot(result>0,result<1)

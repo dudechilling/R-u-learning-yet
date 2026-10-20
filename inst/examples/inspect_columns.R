@@ -1,7 +1,7 @@
-# How do I find what columns and data types are in my dataset?
-# Independent illustrative observations; replace deliberately.
-d <- data.frame(site=c("A","B","C"), depth_cm=c(12,19,NA))
-print(names(d))
-str(d)
-print(head(d))
-print(summary(d))
+# Which columns are numeric, categorical, or missing?
+# Source dataset: datasets::airquality, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("airquality")
+details <- ru_apply("inspect_columns", data=d)
+stopifnot(any(details$column=="Ozone"), any(details$missing>0))

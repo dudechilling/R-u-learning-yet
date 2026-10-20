@@ -1,41 +1,37 @@
 ---
-title: "How do I shade and label a probability under a normal curve?"
+title: "How do I visualize the probability below a cutoff under a normal model?"
 ---
 
 ## What the question asks
 
-How do I shade and label a probability under a normal curve?
+How do I visualize the probability below a cutoff under a normal model?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Specify the normal mean, standard deviation, and cutoff.
+Establish a modeling reason for treating the variable as normal; state the chosen mean, standard deviation and cutoff; shade the area that corresponds to the inequality.
 
-2. Calculate the tail area using pnorm().
-
-3. Plot dnorm() and shade the matching region.
-
-## Runnable example
+## Worked example: iris
 
 ```{r}
-mu <- 100; sigma <- 15; cutoff <- 85
-p <- pnorm(cutoff,mean=mu,sd=sigma)
-curve(dnorm(x,mu,sigma),from=40,to=160,lwd=2,col="#3F78A8",
-      xlab="Value",ylab="Density",main="Normal probability to the left")
-xs <- seq(40,cutoff,length.out=150)
-polygon(c(40,xs,cutoff),c(0,dnorm(xs,mu,sigma),0),
-        col="#CEE2F0",border=NA)
-abline(v=cutoff,col="#A35E20",lty=2,lwd=2)
-legend("topright",legend=paste0("P(X <= 85) = ",round(p,3)),
-       fill="#CEE2F0",bty="n")
-print(p)
+#| eval: false
+d <- ru_data("iris")
+mu <- mean(d$Sepal.Length)
+sigma <- sd(d$Sepal.Length)
+p <- ru_apply("normal_shaded_area", mu=mu, sigma=sigma,
+              threshold=6, assume_normal=TRUE)
+stopifnot(p>0,p<1)
 ```
 
-## Interpret the result
+This models sepal length with an illustrative normal approximation fitted to pooled flowers. The assumption is not established: the dataset combines distinct species. The shaded area is a model prediction, not the observed fraction below the cutoff.
 
-The shaded left-tail area equals pnorm(85,100,15), approximately 0.159. It is a probability for a normal model, not a guarantee about observations.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("normal_shaded_area", mu=mean(your_data$numeric_column), sigma=sd(your_data$numeric_column), threshold=6, assume_normal=TRUE)
+```
 
-Normal modeling requires a defensible distributional assumption. The shaded area changes with mean, sd, and cutoff.
+If asked for the empirical percentage below the cutoff, calculate mean(d$Sepal.Length < 6) rather than assuming a normal curve.
 
-[Open standalone R script](../inst/examples/normal_shaded_area.R)
+Use `ru_plan("normal_shaded_area")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/normal_shaded_area.R)

@@ -1,35 +1,34 @@
 ---
-title: "How do I draw a reproducible random sample without replacement?"
+title: "How do I select a reproducible random sample of records?"
 ---
 
-## What the question asks
+## Question
 
-How do I draw a reproducible random sample without replacement?
+How do I select a reproducible random sample of records?
 
-## Steps in RStudio
+## Work through it
 
-1. Define the population IDs and required sample size.
+Identify the full set of eligible rows; set a sample size no larger than the available rows; sample without replacement and report the selection method.
 
-2. Set a reproducible seed.
-
-3. Call sample(population,size=n,replace=FALSE) and check duplicates.
-
-## Runnable example
+## Worked example: iris
 
 ```{r}
-population_ids <- 1:50
-set.seed(12)
-selected <- sample(population_ids,size=8,replace=FALSE)
-print(selected)
-stopifnot(length(selected)==8L,!anyDuplicated(selected))
+#| eval: false
+d <- ru_data("iris")
+chosen <- ru_apply("sample_random", data=d, n=12, seed=42)
+stopifnot(nrow(chosen)==12, identical(names(chosen),names(d)))
 ```
 
-## Interpret the result
+The selected rows are a reproducible simple random subsample of the 150 Iris records. This random selection does not make the original collection representative of all flowers.
 
-The printed IDs form one eight-unit random sample from fifty possible IDs. A seed allows someone to reproduce the same demonstration.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("sample_random", data=your_data, n=12, seed=42)
+```
 
-Set the seed when you need repeatability; check that the requested sample is no larger than the population.
+With-replacement sampling uses a different rule and can select a record more than once; do not confuse it with sampling without replacement.
 
-[Open standalone script](../inst/examples/sample_random.R)
+Check the input conditions with `ru_plan("sample_random")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/sample_random.R)

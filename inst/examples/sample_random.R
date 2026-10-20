@@ -1,7 +1,6 @@
-# How do I draw a reproducible random sample without replacement?
-# Independent illustrative data.
-population_ids <- 1:50
-set.seed(12)
-selected <- sample(population_ids,size=8,replace=FALSE)
-print(selected)
-stopifnot(length(selected)==8L,!anyDuplicated(selected))
+# How do I select a reproducible random sample of records?
+# Example source: datasets::iris (included with R).
+library(rulearn)
+d <- ru_data("iris")
+chosen <- ru_apply("sample_random", data=d, n=12, seed=42)
+stopifnot(nrow(chosen)==12, identical(names(chosen),names(d)))

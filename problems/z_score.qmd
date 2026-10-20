@@ -1,36 +1,41 @@
 ---
-title: "How far is one value from the sample mean in standard deviations?"
+title: "How many standard deviations is a specified value from the sample mean?"
 ---
 
-## What the question asks
+## The question
 
-How far is one value from the sample mean in standard deviations?
+How many standard deviations is a specified value from the sample mean?
 
-## Steps in RStudio
+## What to check and do
 
-1. Calculate the sample mean and sd().
+1. Compute the observed mean and sample standard deviation. 2. Subtract the mean from the chosen value. 3. Divide by the standard deviation; stop if it is zero.
 
-2. Subtract the mean from the chosen value.
+## Worked example: iris
 
-3. Divide by sd() if it is positive.
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-x <- c(10,12,14,16,18)
-chosen <- 18
-s <- sd(x)
-if (s==0) stop("No variation: z-score is undefined.")
-z <- (chosen-mean(x))/s
-print(z)
+#| eval: false
+d <- ru_data("iris")
+answer <- ru_apply("z_score", data=d, x="Sepal.Length", threshold=7)
+stopifnot(length(answer)==1L,is.finite(answer))
 ```
 
-## Interpret the result
+A positive z-score places the chosen sepal length above the overall sample mean. Mixing distinct groups can make that overall comparison misleading.
 
-The chosen observation 18 is approximately 1.26 sample standard deviations above the sample mean 14.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Do not divide by zero when all observations are equal; a large magnitude does not establish that a measurement is an error.
+```r
+ru_apply("z_score", data=your_data, x="numeric_column", threshold=7)
+```
 
-[Open the standalone R script](../inst/examples/z_score.R)
+If you need one z-score for each observed value, omit threshold; if comparing within species, standardize separately within species.
+
+
+## Inspect conditions
+
+Use `ru_plan("z_score")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/z_score.R)

@@ -1,40 +1,43 @@
 ---
-title: "How do I fit a linear regression and explain the slope?"
+title: "How do I fit a regression line and interpret its slope?"
 ---
 
-## What the question asks
+## Question
 
-How do I fit a linear regression and explain the slope?
+How do I fit a regression line and interpret its slope?
 
-## Steps in RStudio
+## Decide which method fits
 
-1. Decide which variable is the predictor and which is the outcome.
+Choose a predictor and an outcome; check their units, paired rows and shape; fit a linear model and inspect the coefficients and residual assumptions.
 
-2. Fit lm(y
-
-x).
-
-3. Interpret coefficient units and inspect residuals.
-
-## Runnable example
+## Worked example: cars
 
 ```{r}
-rain_mm <- c(1,2,3,5,6,8,10)
-flow <- c(2,4,4,8,11,13,16)
-fit <- lm(flow ~ rain_mm)
-print(coef(fit))
-print(summary(fit)$r.squared)
-plot(rain_mm,flow,pch=19,col="#3F78A8",
-     xlab="Rainfall (mm)",ylab="Flow index")
-abline(fit,col="#A35E20",lty=2,lwd=2)
+#| eval: false
+d <- ru_data("cars")
+fit <- ru_apply("linear_regression", d, x="speed", y="dist")
+stopifnot(inherits(fit,"lm"),is.finite(coef(fit)[2]))
 ```
 
-## Interpret the result
+The slope estimates the change in expected stopping distance per additional speed unit within the linear model. Neither fitted association nor a high R-squared proves a causal relationship.
 
-The slope represents the modeled change in flow index per additional millimeter of rainfall. It is an association within this model, not a causal claim.
+## Apply to another dataset
 
-## Check before using real data
+```r
+ru_apply("linear_regression", your_data, x="predictor", y="outcome")
+```
 
-A fitted relationship is not automatically causal. Examine residuals and avoid extrapolation.
+When curvature dominates, assess model adequacy instead of interpreting the slope as constant across the whole range.
 
-[Open standalone R script](../inst/examples/linear_regression.R)
+## Optional Palmer penguins example
+
+```r
+if (requireNamespace("palmerpenguins", quietly=TRUE)) {
+  birds <- ru_data("penguins")
+  ru_apply("linear_regression", birds, x="bill_length_mm", y="body_mass_g")
+}
+```
+
+Review assumptions and available input conditions with `ru_plan("linear_regression")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../inst/examples/linear_regression.R)

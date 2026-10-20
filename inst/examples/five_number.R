@@ -1,6 +1,7 @@
-# How do I calculate quartiles, the five-number summary, and IQR?
-# Independent illustrative observations; replace deliberately.
-x <- c(2,4,6,8,10,12,14,16,18)
-print(quantile(x,probs=c(0,.25,.5,.75,1)))
-print(IQR(x))
-print(fivenum(x))
+# How do I get quartiles, an IQR, and a five-number summary?
+# Source dataset: datasets::mtcars, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("mtcars")
+answer <- ru_apply("five_number", data=d, x="mpg")
+stopifnot(answer$IQR>0, length(answer$quantile)==5)

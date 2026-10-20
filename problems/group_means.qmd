@@ -1,34 +1,52 @@
 ---
-title: "How do I calculate an average separately for each group?"
+title: "How do I compare average values across categories?"
 ---
 
-## What the question asks
+## The question
 
-How do I calculate an average separately for each group?
+How do I compare average values across categories?
 
-## Steps in RStudio
+## What to check and do
 
-1. Match each numeric value to one group label.
+1. Identify one numeric measurement and the group labels. 2. Check the number of observations in each group. 3. Calculate grouped means and compare the differences with units.
 
-2. Check group sizes with table().
+## Worked example: iris
 
-3. Use tapply() or aggregate() with mean().
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-group <- c("north","north","south","south","south")
-temperature_c <- c(7,9,11,15,13)
-print(table(group))
-print(tapply(temperature_c,group,mean))
+#| eval: false
+d <- ru_data("iris")
+answer <- ru_apply("group_means", data=d,
+                   x="Sepal.Length", group="Species")
+stopifnot(nrow(answer)==3, all(answer$n==50))
 ```
 
-## Interpret the result
+The output shows three flower-species averages. It describes those samples; it does not show that species membership caused a particular value.
 
-The example north mean is 8°C and south mean is 13°C. Different group sizes do not make either mean invalid, but they matter for uncertainty.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Count observations in each group and decide how missing measurements affect each average.
+```r
+ru_apply("group_means", data=your_data, x="numeric_column", group="category_column")
+```
 
-[Open the standalone R script](../inst/examples/group_means.R)
+If no group column exists, report only an overall mean. A question about difference significance requires a separate inferential method.
+
+## Optional Palmer penguins example
+
+This dataset requires the separately installed `palmerpenguins` package. It is not silently downloaded or substituted.
+
+```r
+if (requireNamespace("palmerpenguins", quietly=TRUE)) {
+  birds <- ru_data("penguins")
+  ru_apply("group_means", birds, x="bill_length_mm", group="species")
+}
+```
+
+## Inspect conditions
+
+Use `ru_plan("group_means")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/group_means.R)

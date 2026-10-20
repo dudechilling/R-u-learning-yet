@@ -1,4 +1,9 @@
-# How do I find the probability above a threshold?
-# Independent illustrative data.
-answer <- pnorm(120,mean=100,sd=15,lower.tail=FALSE)
-print(answer)
+# Under a normal model, what proportion exceeds a cutoff?
+# Example source: datasets::airquality (included with R).
+library(rulearn)
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_right_tail", mu=mu, sigma=sigma,
+                   threshold=90, assume_normal=TRUE)
+stopifnot(result>=0,result<=1)

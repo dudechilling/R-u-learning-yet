@@ -1,35 +1,35 @@
 ---
-title: "How do I estimate the probability of an event from observed trials?"
+title: "What fraction of recorded observations meets a condition?"
 ---
 
-## What the question asks
+## Question
 
-How do I estimate the probability of an event from observed trials?
+What fraction of recorded observations meets a condition?
 
-## Steps in RStudio
+## Work through it
 
-1. Count qualifying events and total trials.
+Define the event precisely; count TRUE among non-missing observations; divide by the number of usable observations and report that denominator.
 
-2. Divide successes by total when the denominator is positive.
-
-3. State the sample size and what counts as an event.
-
-## Runnable example
+## Worked example: airquality
 
 ```{r}
-events <- c(TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE)
-successes <- sum(events)
-trials <- length(events)
-p <- successes/trials
-print(c(successes=successes,trials=trials,rate=p))
+#| eval: false
+d <- ru_data("airquality")
+event <- d$Ozone > 60
+result <- ru_apply("event_probability", data=d, x=event, event=TRUE)
+stopifnot(result["events"]<=result["trials"])
 ```
 
-## Interpret the result
+The result is an observed proportion of days with ozone measurements above the chosen threshold, excluding days whose ozone value is missing. It is not necessarily the chance for a randomly selected day elsewhere.
 
-Five successes among eight recorded trials give an observed event proportion of 0.625, or 62.5%. This is an estimate for a broader chance only under suitable sampling conditions.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("event_probability", data=your_data, x=your_data$measurement>60, event=TRUE)
+```
 
-An observed proportion is not necessarily the true probability for the wider population, especially with a small or biased sample.
+If the question says 'given B', use conditional_probability, whose denominator is only the days satisfying B.
 
-[Open standalone script](../inst/examples/event_probability.R)
+Check the input conditions with `ru_plan("event_probability")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/event_probability.R)

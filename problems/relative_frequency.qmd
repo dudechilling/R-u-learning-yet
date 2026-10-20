@@ -1,35 +1,41 @@
 ---
-title: "How do I turn category counts into relative frequencies and percentages?"
+title: "How do I convert observations into percentages by category?"
 ---
 
-## What the question asks
+## The question
 
-How do I turn category counts into relative frequencies and percentages?
+How do I convert observations into percentages by category?
 
-## Steps in RStudio
+## What to check and do
 
-1. Count each category with table().
+1. Identify the category of each observation. 2. Count the categories and divide each count by the total. 3. Check missing values and rounding.
 
-2. Divide by the total using prop.table().
+## Worked example: mtcars
 
-3. Multiply by 100 for percentages.
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-travel <- c("bus","walk","bus","car","walk","bus")
-counts <- table(travel)
-print(counts)
-print(prop.table(counts))
-print(100*prop.table(counts))
+#| eval: false
+d <- ru_data("mtcars")
+answer <- ru_apply("relative_frequency", data=d, x="cyl")
+stopifnot(isTRUE(all.equal(sum(answer$proportion),1)))
 ```
 
-## Interpret the result
+The output reports what proportion of the cars in this dataset have each cylinder count. It does not describe all cars on the road.
 
-Bus accounts for 3 of 6 observations (50%); walking accounts for 2 of 6 (33.3%); car accounts for 1 of 6 (16.7%).
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Check the total and whether missing observations were excluded. Rounding may prevent percentages from summing to exactly 100.
+```r
+ru_apply("relative_frequency", data=your_data, x="category_column")
+```
 
-[Open the standalone R script](../inst/examples/relative_frequency.R)
+When a table already contains frequencies, weight its counts rather than counting each row once.
+
+
+## Inspect conditions
+
+Use `ru_plan("relative_frequency")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/relative_frequency.R)

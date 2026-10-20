@@ -1,36 +1,35 @@
 ---
-title: "How do I find the probability that A or B occurs without double-counting?"
+title: "How do I find the proportion where A or B happens, avoiding double-counting?"
 ---
 
-## What the question asks
+## Question
 
-How do I find the probability that A or B occurs without double-counting?
+How do I find the proportion where A or B happens, avoiding double-counting?
 
-## Steps in RStudio
+## Work through it
 
-1. Calculate the fraction for A and for B.
+Define both events on aligned rows; exclude incomplete pairs; calculate P(A), P(B), and P(A AND B); subtract the overlap or count logical OR.
 
-2. Calculate the overlap A AND B.
-
-3. Use P(A)+P(B)-P(A and B), then check that the result is at most 1.
-
-## Runnable example
+## Worked example: airquality
 
 ```{r}
-rain <- c(TRUE,TRUE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE)
-wind <- c(TRUE,FALSE,FALSE,TRUE,TRUE,FALSE,FALSE,TRUE)
-p_a <- mean(rain); p_b <- mean(wind); overlap <- mean(rain & wind)
-p_union <- p_a+p_b-overlap
-print(c(P_A=p_a,P_B=p_b,P_both=overlap,P_either=p_union))
-stopifnot(isTRUE(all.equal(p_union,mean(rain | wind))))
+#| eval: false
+d <- ru_data("airquality")
+result <- ru_apply("probability_union", data=d,
+                   x=d$Ozone>60, y=d$Temp>=80, event=TRUE, given=TRUE)
+stopifnot(result["either"]>=result["A"],result["either"]<=1)
 ```
 
-## Interpret the result
+The either-event fraction includes ozone readings above 60, temperatures at least 80°F, or both. Subtracting the overlap prevents counting the same day twice.
 
-Five of eight days had rain, four had wind, and three had both. The probability of either event in this sample is 6/8 = 0.75.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("probability_union", data=your_data, x=your_data$A, y=your_data$B, event=TRUE, given=TRUE)
+```
 
-The word 'or' is normally inclusive; confirm whether the question instead requires exactly one event.
+'Either but not both' is exclusive OR, a different question requiring a different calculation.
 
-[Open standalone script](../inst/examples/probability_union.R)
+Check the input conditions with `ru_plan("probability_union")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/probability_union.R)

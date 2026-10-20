@@ -1,6 +1,7 @@
-# How many measurements are missing and how do I exclude them from a mean?
-# Independent illustrative observations; replace deliberately.
-x <- c(8,12,NA,14,16,NA)
-print(sum(is.na(x)))
-print(sum(!is.na(x)))
-print(mean(x,na.rm=TRUE))
+# What should I do when some measurements are NA?
+# Source dataset: datasets::airquality, included with R.
+# Follow the steps, then substitute your own table and field names.
+library(rulearn)
+d <- ru_data("airquality")
+answer <- ru_apply("missing_values", data=d, x="Ozone")
+stopifnot(answer["missing"]>0, answer["available"]<answer["total"])

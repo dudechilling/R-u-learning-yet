@@ -1,7 +1,7 @@
-# How do I estimate the probability of an event from observed trials?
-# Independent illustrative data.
-events <- c(TRUE,FALSE,TRUE,TRUE,FALSE,TRUE,FALSE,TRUE)
-successes <- sum(events)
-trials <- length(events)
-p <- successes/trials
-print(c(successes=successes,trials=trials,rate=p))
+# What fraction of recorded observations meets a condition?
+# Example source: datasets::airquality (included with R).
+library(rulearn)
+d <- ru_data("airquality")
+event <- d$Ozone > 60
+result <- ru_apply("event_probability", data=d, x=event, event=TRUE)
+stopifnot(result["events"]<=result["trials"])

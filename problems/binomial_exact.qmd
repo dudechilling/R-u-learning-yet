@@ -2,32 +2,34 @@
 title: "What is the chance of exactly k successes in n independent trials?"
 ---
 
-## What the question asks
+## Question
 
 What is the chance of exactly k successes in n independent trials?
 
-## Steps in RStudio
+## Work through it
 
-1. Identify number of trials n, success probability p, and target k.
+Specify n, k, and success probability p; verify two outcomes, independent trials, and constant p; compute dbinom(k,n,p).
 
-2. Check n and k are whole numbers with 0 <= k <= n.
-
-3. Run dbinom(k,size=n,prob=p).
-
-## Runnable example
+## Worked example: mtcars
 
 ```{r}
-n <- 10; p <- 0.3; k <- 3
-answer <- dbinom(k,size=n,prob=p)
-print(answer)
+#| eval: false
+d <- ru_data("mtcars")
+p <- mean(d$am==1)
+result <- ru_apply("binomial_exact", n=10, k=4, prob=p)
+stopifnot(result>0,result<1)
 ```
 
-## Interpret the result
+The observed share of cars with manual transmissions supplies a **hypothetical** success probability for ten independent draws. That illustrative binomial model does not establish a population transmission rate.
 
-For ten independent trials with success probability 0.3, dbinom(3,10,0.3) gives about 0.267 for exactly three successes.
+## Adapt to another question
 
-## Check before using your own data
+```r
+ru_apply("binomial_exact", n=your_n, k=your_k, prob=your_p)
+```
 
-If independence or constant probability is implausible, do not use the binomial model without justification.
+If a question asks 'at least k', use binomial_at_least; 'exactly k' is one count, not a cumulative tail.
 
-[Open standalone script](../inst/examples/binomial_exact.R)
+Check the input conditions with `ru_plan("binomial_exact")` before treating a calculation as an inference.
+
+[Run the standalone script](../inst/examples/binomial_exact.R)

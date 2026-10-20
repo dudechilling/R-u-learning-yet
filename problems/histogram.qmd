@@ -1,40 +1,34 @@
 ---
-title: "How do I draw a histogram with counts, units, mean, and median?"
+title: "How do I display the distribution of numerical observations?"
 ---
 
 ## What the question asks
 
-How do I draw a histogram with counts, units, mean, and median?
+How do I display the distribution of numerical observations?
 
-## Steps in RStudio
+## Steps to decide and solve
 
-1. Make sure you have individual numeric measurements, not just category counts.
+Check that the variable is numeric; choose sensible bins and units; display counts and use mean/median reference lines only when useful.
 
-2. Choose labeled axes and a reasonable bin width.
-
-3. Draw the histogram and annotate counts, mean, and median.
-
-## Runnable example
+## Worked example: faithful
 
 ```{r}
-rainfall_mm <- c(0,1,1,2,3,4,4,5,6,8,9,12)
-h <- hist(rainfall_mm,breaks=5,plot=FALSE)
-hist(rainfall_mm,breaks=h$breaks,col="#CEE2F0",border="#244967",
-     main="Rainfall observations",xlab="Rainfall (mm)",ylab="Frequency",
-     ylim=c(0,max(h$counts)+3))
-text(h$mids,h$counts,labels=h$counts,pos=3)
-abline(v=mean(rainfall_mm),col="#215E92",lwd=2)
-abline(v=median(rainfall_mm),col="#A35E20",lwd=2,lty=2)
-legend("topright",legend=c("Mean","Median"),
-       col=c("#215E92","#A35E20"),lty=c(1,2),bty="n")
+#| eval: false
+d <- ru_data("faithful")
+h <- ru_apply("histogram", data=d, x="eruptions")
+stopifnot(sum(h$counts)==nrow(d))
 ```
 
-## Interpret the result
+Geyser eruption durations are clustered, so the histogram reveals features that a single mean conceals. Bar height measures the count of observations in each interval, not the probability of an exact duration.
 
-Bars count observations in numerical intervals. The labeled reference lines show the mean and median; their separation may suggest skew, but inspect the underlying values.
+## Apply it to another question
 
-## Check before applying to real data
+```r
+ru_apply("histogram", data=your_data, x="numeric_column")
+```
 
-Inspect the bin boundaries. The mean and median lines are reference values, not fitted distributions.
+If the question asks for counts by distinct labels rather than numerical intervals, select bar_chart. If it asks to compare groups, use grouped_boxplot or comparable histograms.
 
-[Open standalone R script](../inst/examples/histogram.R)
+Use `ru_plan("histogram")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../inst/examples/histogram.R)

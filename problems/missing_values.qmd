@@ -1,34 +1,41 @@
 ---
-title: "How many measurements are missing and how do I exclude them from a mean?"
+title: "What should I do when some measurements are NA?"
 ---
 
-## What the question asks
+## The question
 
-How many measurements are missing and how do I exclude them from a mean?
+What should I do when some measurements are NA?
 
-## Steps in RStudio
+## What to check and do
 
-1. Count is.na(x).
+1. Count missing values. 2. Check why they are missing. 3. Report how many observations the calculation uses and apply a justified missing-data rule.
 
-2. Decide whether the remaining observations answer the question.
+## Worked example: airquality
 
-3. Compute mean(x,na.rm=TRUE) and report the denominator.
-
-## Runnable example
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
 
 ```{r}
-x <- c(8,12,NA,14,16,NA)
-print(sum(is.na(x)))
-print(sum(!is.na(x)))
-print(mean(x,na.rm=TRUE))
+#| eval: false
+d <- ru_data("airquality")
+answer <- ru_apply("missing_values", data=d, x="Ozone")
+stopifnot(answer["missing"]>0, answer["available"]<answer["total"])
 ```
 
-## Interpret the result
+The reported mean uses available ozone observations only. Dropping observations is not automatically unbiased when missingness is systematic.
 
-Two of six observations are missing; the observed-value mean is 12.5, calculated from four values. It is not the mean of all six measurements.
+## Apply the method to another question
 
-## Check before applying this to real data
+Replace the data frame and column names with those in your own file:
 
-Report how many values were missing. Do not treat an unavailable observation as zero.
+```r
+ru_apply("missing_values", data=your_data, x="measurement_column")
+```
 
-[Open the standalone R script](../inst/examples/missing_values.R)
+For relationships between two columns, exclude or model missing pairs jointly rather than deleting NA values independently from each variable.
+
+
+## Inspect conditions
+
+Use `ru_plan("missing_values")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../inst/examples/missing_values.R)
