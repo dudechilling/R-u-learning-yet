@@ -1,10 +1,11 @@
 Package: rulearn
 Title: Searchable RStudio Problem Bank
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("R-u-learning-yet", "Contributors", email="244890287+dudechilling@users.noreply.github.com", role=c("aut","cre"))
-Description: Find question-based R examples, inspect conditional solution steps, and run self-contained demonstrations from the console using base R.
+Description: Find question-based R examples, inspect conditional solution steps, and apply methods to new datasets by supplying column names. Use included R datasets or optional Palmer penguins.
 License: file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1)
 Imports: graphics, grDevices, stats, utils
+Suggests: palmerpenguins
 NeedsCompilation: no
