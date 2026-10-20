@@ -63,4 +63,8 @@ if (requireNamespace("palmerpenguins",quietly=TRUE)) {
   groups <- ru_apply("group_means",birds,x="body_mass_g",group="species")
   stopifnot(nrow(groups)==3L)
 }
-cat("Dataset-adaptation tests passed.\n")
+hits <- ru_find("penguins", n=20)
+stopifnot("grouped_boxplot" %in% hits$id,
+          "linear_regression" %in% hits$id)
+stopifnot("group_means" %in% ru_find("iris", n=30)$id)
+cat("Dataset-adaptation tests passed.\\n")
