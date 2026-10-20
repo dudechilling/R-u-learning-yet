@@ -8,7 +8,7 @@
 \concept{spread}
 \concept{dispersion}
 \title{Variance and Standard Deviation}
-\description{Variance describes the average squared departure of observations from a mean under a stated denominator convention. Standard deviation is the square root of variance. It returns the spread to the original measurement units.}
+\description{Standard deviation tells how spread out numerical observations are around their mean (average). It is measured in the original units. Variance measures spread using squared distances from the mean and has squared units; R uses the sample formula unless stated otherwise.}
 \section{Explanation}{For a sample, R's \code{var(x)} divides the sum of squared deviations from the sample mean by \code{n - 1}; \code{sd(x)} takes its square root. A larger standard deviation indicates more spread around the mean, not necessarily more measurement error. Because squaring gives extra weight to extreme departures, both measures respond strongly to outliers. A standard deviation of zero means all usable values are identical.}
 \section{Practical example}{Use \code{iris$Petal.Length}, measured in centimetres. The sample variance is expressed in squared centimetres; the sample standard deviation is in centimetres. Compare distributions by species before assuming the pooled spread describes one homogeneous group.}
 \section{Important distinctions}{The \emph{range} is maximum minus minimum. The \emph{interquartile range} is the distance between the third and first quartiles. The \emph{standard error of the mean} estimates sampling uncertainty of an average, and is not the same quantity as the standard deviation of individual observations. Population variance uses a different denominator when all population units are actually known.}

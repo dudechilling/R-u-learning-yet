@@ -18,7 +18,7 @@
     "with","what","are","does","on","by","and","from","using","for",
     "define","definition","does","work","works","function","between",
     "make","create","calculate","find","show","draw","have",
-    "different","two","me","please","tell","about")))
+    "different","two","me","please","tell","about","as")))
 }
 
 # Deterministic, conservative spelling repair using the words already
@@ -100,7 +100,7 @@
   corrected <- .ru_correct_tokens(.ru_words(q),catalog)
   tokens <- corrected$words
   intent_concept <- grepl(
-    "^(what is|what are|define|definition|meaning of|explain|when is|can i use|should i use)\\b",
+    "^(what is|what are|define|definition|meaning of|when is|can i use|should i use)\\b",
     tolower(trimws(query)),perl=TRUE) ||
     grepl("\\bmean[?]?$",tolower(trimws(query)),perl=TRUE)
   intent_function <- grepl(
@@ -111,6 +111,12 @@
   intent_walkthrough <- grepl(
     "^(how do i|how can i|how to|steps to|when should|create|import|inspect|calculate|investigate|compare|plot|draw|make)\\b",
     tolower(trimws(query)),perl=TRUE)
+  intent_error <- grepl(
+    "\\b(wrong|error|failed|cannot|invalid|troubleshoot)\\b|not found",
+    tolower(query),perl=TRUE) &&
+    !grepl(
+      "\\b(standard error|sampling error|margin of error|type [i1] error)\\b",
+      tolower(query),perl=TRUE)
   score <- vapply(seq_len(nrow(catalog)),function(i) {
     item <- catalog[i,]
     heading <- tolower(paste(item$id,item$title))
@@ -131,9 +137,18 @@
       hit <- hit + 22L
     if(nzchar(q) && grepl(q,tolower(item$keywords),fixed=TRUE))
       hit <- hit + 18L
+    # When the learner names an R method explicitly, favor references to
+    # that named method over a generic nearby task such as grouped means.
+    method_terms <- intersect(tokens,c(
+      "boxplot","histogram","barplot","scatterplot","stem","quantile",
+      "median","sd","acf","csv"))
+    if(length(method_terms) &&
+       any(method_terms %in% title_words))
+      hit <- hit + 18L
     if(intent_concept && item$type=="concept") hit <- hit + 17L
     if(intent_function && item$type=="function") hit <- hit + 20L
     if(intent_walkthrough && item$type=="walkthrough") hit <- hit + 8L
+    if(intent_error && item$id=="r_errors") hit <- hit + 21L
     # Intent alone is not evidence of a topical match.
     if (!length(tokens) || !any(vapply(tokens,function(k)
       k %in% keys,logical(1))))

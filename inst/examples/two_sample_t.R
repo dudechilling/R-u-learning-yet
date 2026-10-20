@@ -1,3 +1,8 @@
+## ---- quick-two-sample-t
+data(PlantGrowth)
+d <- subset(PlantGrowth, group %in% c("ctrl","trt1"))
+t.test(weight ~ group, data=d)  # Welch: check independence first
+
 ## ---- worked-two-sample-t
 # THE QUESTION: Do two independent groups have different mean weights?
 # Dataset: PlantGrowth, included with R. Weight is the response.

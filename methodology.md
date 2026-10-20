@@ -35,6 +35,8 @@ reference topics, not independently edited copies.
 
 ## Standard shape of a problem
 
+For a revised guide, show the **shortest defensible native R command first**, followed by which data/units to replace and which assumptions to check. Make the longer worked example optional, explain the output's limits, and offer an optional changed-dataset practice task. The short and full sections should come from one canonical editable script where practical.
+
 Each guide should contain:
 
 1. A realistic question in everyday language.

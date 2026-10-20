@@ -1,5 +1,5 @@
 id,type,title,keywords,topic,package
-population_sample,concept,Population and sample,population sample census sampling frame inference units participants individuals representative target population difference between,population_sample,rulearn
+population_sample,concept,Population and sample,population sample census sampling frame inference units participants individuals representative target population difference between why do we use samples in statistics why sample instead of census reasons for sample samples impractical population why use samples reason select samples study sampling practical census population estimates statistics,population_sample,rulearn
 mean_median,concept,Mean and median,mean average arithmetic center central tendency median typical value middle,mean_median,rulearn
 variance_sd,concept,Variance and standard deviation,standard deviation sd std dev stdev variance variability spread dispersion how far from average,variance_sd,rulearn
 percentiles_quantiles,concept,"Percentiles, quartiles and quantiles",percentile quantile quartile rank cutoffs threshold 25th 50th 75th iqr,percentiles_quantiles,rulearn
@@ -23,4 +23,9 @@ r_cor,function,cor(),cor correlation Pearson Spearman coefficient,r_cor,rulearn
 r_t_test,function,t.test(),t.test test ttest hypothesis pvalue independent paired means,r_t_test,rulearn
 r_acf,function,acf(),acf autocorrelation lag function,r_acf,rulearn
 r_table,function,table(),table categorical frequency counts relative proportion categories,r_table,rulearn
-r_errors,concept,Common R errors and how to recover,object not found failed error missing column name names spelling typo non-numeric numeric data imported as text character factor function not found invalid incorrect NA cannot find object couldn't find function recovery errors,r_errors,rulearn
+r_errors,concept,Common R errors and how to recover,object not found failed error missing column name names spelling typo non-numeric numeric data imported as text character factor function not found invalid incorrect NA cannot find object couldn't find function recovery errors wrong csv path invalid file path file not found cannot open file wrong working directory getwd file.exists missing file import error recover from csv import error,r_errors,rulearn
+descriptive_inferential,concept,Descriptive and inferential statistics,descriptive statistics inferential statistics description describe data infer inference summarize population from sample what is statistics,descriptive_inferential,rulearn
+measurement_scales,concept,Measurement scales and variable types,measurement scale scale of measurement age date birth clothing size nominal ordinal interval ratio numerical numeric centimetres centimeters units categorical better scale more precise,measurement_scales,rulearn
+probability_events,concept,Experiments sample spaces and events,statistical experiment experiment sample space possible outcomes event complement favorable probability of odd club card die outcomes union intersection probability model,probability_events,rulearn
+conditional_independence,concept,Conditional probability and independent events,conditional probability independent mutually exclusive independence event given overlap intersection disjoint without replacement chance draws card probability probability of events,conditional_independence,rulearn
+r_stem,function,stem() - Stem-and-leaf plot,stem stem leaf stem-and-leaf plot diagram stemplot stem and leaf display R function numeric distribution,r_stem,rulearn

@@ -2,40 +2,49 @@
 title: "Is the mean or median a better summary of a numeric variable?"
 ---
 
-## The question
+## Immediate answer
 
-Is the mean or median a better summary of a numeric variable?
-
-## What to check and do
-
-1. Identify the observations and measurement units. 2. Calculate mean and median. 3. Inspect the distribution for skew or clusters before choosing a 'typical' value.
-
-## Worked example: faithful
-
-This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
-
-```{r}
-#| eval: false
-d <- ru_data("faithful")
-answer <- ru_apply("mean_median", data=d, x="waiting")
-stopifnot(answer["mean"]>0,answer["median"]>0)
+```{r setup-quick-mean-median, include=FALSE}
+knitr::read_chunk('../examples/mean_median.R')
 ```
 
-The mean and median summarize waiting time between geyser eruptions. Because the data have distinct clusters, neither number tells the entire story; inspect a histogram too.
-
-## Apply the method to another question
-
-Replace the data frame and column names with those in your own file:
-
-```r
-ru_apply("mean_median", data=your_data, x="numeric_column")
+```{r quick-mean-median}
+#| echo: true
+#| eval: true
 ```
 
-If there are large outliers, compare median and mean rather than removing observations automatically.
+## What to change
 
+Replace `faithful$waiting` with your **numeric measurement** column. The example records time in minutes; replace the unit with the one your dataset actually records. `mean(x,trim=.1)` computes a **10% trimmed mean** by dropping approximately 10% from each end before averaging; `median(x)` selects the middle ordered value.
 
-## Inspect conditions
+## What to check
 
-Use `ru_plan("mean_median")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+Verify numerical type and missing values. A mean is pulled toward extreme measurements; the median is less affected. Neither is always the "correct" single summary when there are clusters. A 10% trimmed mean is not the mean after deleting arbitrary outliers.
 
-[Standalone R script](../examples/mean_median.R)
+## Complete walkthrough (optional)
+
+This is the native R example. It shows the calculation, reports excluded measurements, and puts mean and median markers on the same histogram. `ru_edit("mean_median")` makes an editable copy.
+
+```{r setup-worked-mean-median, include=FALSE}
+knitr::read_chunk('../examples/mean_median.R')
+```
+
+```{r worked-mean-median}
+#| echo: true
+#| eval: true
+#| fig-alt: "Histogram of recorded geyser waiting times in minutes, with separate vertical reference lines marking the sample mean and median. Two groupings of waiting times are visible."
+```
+
+## Interpretation
+
+An arithmetic mean adds all usable observations and divides by their number. A median marks the halfway point in ordered measurements. A **quartile** marks a quarter-position cutoff in the sample. These describe the recorded cases; population inference requires evidence about how those cases were selected.
+
+## Retention practice (optional)
+
+Using the built-in `airquality` dataset, find the mean, median, and 10% trimmed mean of usable `Wind` measurements. Check the original unit and decide whether a single average describes the observed distribution well.
+
+## Related concepts and sources
+
+Read `help("mean_median",package="rulearn")`, `help("percentiles_quantiles",package="rulearn")`, `?mean` and `?median`. `ru_plan("mean_median")` describes evidence requirements and stopping points. [Official R mean documentation](https://search.r-project.org/R/refmans/base/html/mean.html).
+
+[Open the standalone R script](../examples/mean_median.R)

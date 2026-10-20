@@ -25,6 +25,8 @@ ru_find("Define standard deviation")
 ru_find("What does a p-value mean?")
 ru_find("How do I make a histogram?")
 ru_find("How does the sd function work?")
+ru_find("What is a sample space?")
+ru_find("Stem and leaf plot")
 ```
 
 Search results distinguish **Concept**, **Function**, and **Walkthrough**, and provide the direct command to open each entry. Search is deterministic and runs locally after installation. No chatbot or live service is involved.
@@ -56,7 +58,8 @@ R's own help remains the authoritative reference for syntax and supported argume
 ru_find("How do I customize a histogram?", type="walkthrough")
 ru_guide("histogram")   # read the complete guide offline
 ru_code("histogram")    # print ordinary R commands
-ru_edit("histogram")    # create an editable R script in your project
+ru_edit("histogram", mode="quick")   # only the immediate, editable answer
+ru_edit("histogram")                 # detailed, editable walkthrough
 ```
 
 The histogram example uses `faithful` and teaches `hist()`, `breaks`, `col`, `main`, `xlab`, `ylab`, `text()`, `abline()`, and `legend()` without requiring `ru_apply()`. Change `faithful$eruptions` to a suitable numerical column in your own data, then run one line at a time using **Ctrl+Enter**.
@@ -65,7 +68,7 @@ Two other fully annotated examples demonstrate grouped boxplots with `iris` and 
 
 ## Reference collection
 
-The package currently contains **16 concept references**, **9 beginner-oriented function references**, and **46 existing question-led walkthroughs**. The three fully revised examples set the standard for improving the remaining walkthroughs; the others remain available for use and future revision.
+The package currently contains **20 concept references**, **10 beginner-oriented function references**, and **46 existing question-led walkthroughs**. Four fully revised examples set the standard for improving the remaining walkthroughs; the others remain available for use and future revision.
 
 - **Concepts:** population and sample; center and spread; probability and sampling distributions; correlation and autocorrelation; stationarity, trend and seasonality; inference, intervals and study design.
 - **Functions:** `mean()`, `median()`, `sd()`, `hist()`, `quantile()`, `cor()`, `t.test()`, `acf()`, and `table()`.

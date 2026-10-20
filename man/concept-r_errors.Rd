@@ -13,6 +13,11 @@ An error such as \code{object 'height' not found} usually means that R cannot fi
 
 Use \code{names(measurements)} to see actual columns, \code{ls()} for available objects, and \code{str(measurements)} for types. Do not invent a column based on what you expected to be in the data.
 }
+\section{CSV file not found and wrong working directory}{
+When \code{read.csv("data.csv")} reports that the file cannot be opened, inspect \code{getwd()} (the current folder) and \code{file.exists("data.csv")}. A relative path is interpreted from R's \emph{working directory}, not necessarily from the folder shown in the Files pane. If the file is in the project, use a correct relative path; avoid embedding a personal computer's drive-letter path in a reusable example.
+
+Once loaded, inspect \code{names(data)} and \code{str(data)}. A CSV exported with trailing empty fields can produce entirely empty extra columns; verify which columns actually contain data before analysis. Do not interpret an imported object with \code{?object_name} as if it were automatically an installed help topic; data imported from disk generally have no package help page.
+}
 \section{Numeric data imported as text}{
 A \code{non-numeric argument} or \code{argument is not numeric or logical} message can mean that measurements were imported as character strings. Check \code{str(data)} and \code{unique(data$column)}. Commas, units, missing-value markers, and inconsistent decimal separators may need to be resolved at import.
 

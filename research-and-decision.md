@@ -172,7 +172,7 @@ Native R references provide the definition independently of code execution and l
 
 Changes reused from previously reviewed uncommitted work and isolated on this task's branch:
 
-- Native `.Rd` concept and function help, indexed for local search, with direct `help()` and ``?` / ``??` access.
+- Native `.Rd` concept and function help, indexed for local search, with direct `help()`, `?` and `??` access.
 - Local query search `ru_find()` returning concept, function and walkthrough types, `ru_open()` for a direct result, and `ru_guide()`/`ru_edit()` for portable content.
 - 46 question-led walkthroughs preserved in `inst/guides/` and runnable example scripts in `inst/examples/`.
 - Flagship examples for histogram, grouped boxplot and Welch independent-groups t-test using authentic datasets and ordinary R.
@@ -183,7 +183,7 @@ Changes reused from previously reviewed uncommitted work and isolated on this ta
 
 **Further accessibility improvement:** Flagship guides use explicit quick answers, question/data/method, one canonical commented R script (loaded with `knitr::read_chunk()`), interpretation, mistakes, alternative decision, related R Help, descriptive plot alt text, and optional independent transfer prompts.
 
-**Phase 5 unknown:** The other 43 guides remain primarily convenience-wrapper demonstrations until they are carefully converted in place; this limitation is deliberate rather than disguised by a larger article count.
+**Phase 5 unknown:** The other 39 guides remain primarily convenience-wrapper demonstrations until they are carefully converted in place; this limitation is deliberate rather than disguised by a larger article count.
 
 
 
@@ -256,3 +256,224 @@ The repository license is deliberately unchanged; no external instructional book
 6. **Blocked by authorization:** No push/merge/deployment/default-branch change was approved in the latest specification. Keep changes on the isolated development branch and present the evidence before any release.
 
 The core test remains whether a student can **locate, understand, adapt, execute, interpret and later reproduce** ordinary R code without depending on `ru_apply()`. Feature count is not a substitute for that outcome.
+---
+
+## Private undergraduate statistics replay — 2026-10-20
+
+**Purpose:** Test whether a novice can get from real, unfamiliar assessment wording to an appropriate native R function, editable code, and a defensible explanation. This follow-up revisits the prior `2ba9861` review candidate rather than assuming that software success already proves learning.
+
+**Evidence boundary:** The user authorized read-only examination of a private course folder on a mapped drive. That folder contained one **graded, nonstatistical orientation response**; one **completed-looking numerical/statistical analysis PDF** in a submission/feedback folder alongside a later-edited Quarto draft and CSV; and seminar worksheets, starter projects, and source files labeled “Filled.” The seminar READMEs explicitly identify “Filled” materials as instructor examples. **No separate student-completed seminar lab or instructor evaluation of the numerical report could be confirmed.** Folder placement is not evidence of a Moodle submission or grade. The later Quarto draft is not necessarily identical to the earlier PDF.
+
+The original assignment prompts, student identity, submitted text, instructor-authored source material and complete student datasets were read **in place only**, and were not placed in this repository. Below, original task types are **paraphrased** into general educational language, not quoted or reproduced. Embedded AI-directed fragments in source materials were treated as untrusted input, not followed as instructions. Source/answer separation was implemented in the scripted method-selection test, which used task wording and a pre-selected topic mapping; this was **not** a blinded human study.
+
+### Authentic question inventory and reference mapping
+
+| Private case | Paraphrased real task from the available material | Source classification | Best reference or native R command | Trial outcome / limitation |
+|---|---|---|---|---|
+| A01 | Distinguish describing recorded data from making a population inference | Learner report | `descriptive_inferential`, `population_sample` | Correct native help now found |
+| A02 | Say why researchers sample a defined population | Learner report | `population_sample` | Correct first result after search indexing fix |
+| A03 | Contrast ordered category sizes with numeric measurements | Learner report | `measurement_scales` | Plain-language and technical distinction available |
+| A04 | Define a probability experiment, full outcome space, complement and events | Learner report | `probability_events` | New native help; simple independent demonstration |
+| A05 | Differentiate independent events, mutually exclusive events and conditional probabilities | Learner report | `conditional_independence` | New help corrects the conceptual confusion without using a solver |
+| A06 | Inspect the rows, columns, types and numeric variable of a built-in dataset | Learner report | `inspect_columns`, `names()`, `str()` | Native inspection executed |
+| A07 | Make and interpret a stem-and-leaf display of a numerical measurement | Learner report | `r_stem`, `stem()` | Added native function introduction; code executed |
+| A08 | Create an individual boxplot, histogram, and category-separated boxplots | Learner report | `boxplot`, `histogram`, `grouped_boxplot` | Plots executed on the actual specified variables |
+| A09 | Load a CSV, inspect a numeric measurement and summarize its distribution | Learner report | `import_csv`, `r_errors`, `histogram` | Real CSV imported; four extra empty columns noticed |
+| A10 | Calculate a mean, median, quartiles, trimmed mean, variance and standard deviation | Learner report | `mean_median`, `percentiles_quantiles`, `variance_sd`, `r_mean`, `r_sd` | Native summaries independently reproduced |
+| A11 | Plot categorical frequencies and sample proportions | Learner report | `bar_chart`, `r_table`; native `table()`, `prop.table()`, `barplot()` | Older wrapper-only walkthrough revised in place |
+| A12 | Determine probabilities for combined chance events, including draws without replacement | Learner report | `probability_events`, `conditional_independence` | Event arithmetic checked against independently enumerated classical models |
+| S01 | Draw numerical and category summaries of wage and occupation records | Instructor worksheet, **not verified student-completed** | `histogram`, `bar_chart`, `grouped_boxplot` | R replay executed against its existing input file |
+| S02 | Compare dependent/independent events and classify discrete probability models | Instructor worksheet, **not verified student-completed** | `conditional_independence`, `probability_distributions` | Concept coverage audited, no student result available |
+
+The built-in dataset used for the first visual tasks contained 150 rows, four numeric flower measurements, and one categorical species label. The private CSV used for the second analysis contained 333 actual records with seven substantive columns and four extra, entirely empty columns created by import. Computations from the saved input gave mean body mass **4,207.057 g**, median **4,050 g**, 10% trimmed mean **4,159.457 g**, and category shares approximately **43.8%, 20.4%, 35.7%**. Numeric R calculations agreed with those parts of the saved report. The actual minimum and maximum flipper measurements were **172 and 231 mm**; the report used a looser approximately **170–235 mm** statement, apparently read from plot limits. That difference motivates the distinction between observed extrema and an axis range. It is **not** an instructor-graded finding.
+
+A response about conditional probability suggested that conditioning requires two events to overlap. The corrected reference now states the actual rule: the chance of A given B equals `P(A and B) / P(B)` when `P(B)>0`. An empty intersection yields a conditional probability of zero; no “mutually inclusive” requirement is imposed. This finding is a **reviewed conceptual mismatch**, not a reported faculty deduction. Compound chances were independently reproduced under the questions’ stated fair/equally likely and without-replacement assumptions. No probabilistic calculations were added to the package's `ru_apply()` catalogue.
+
+### Trial A — Historical replay results
+
+1. Source classification: the orientation assessment has a verifiable passing grade; the analysis report is authored and rendered but a grade and actual submission state are **unconfirmed**; instructor-filled seminar materials are **not** proof of learner completion.
+2. Search baseline: native `help.search(full_sentence, package=c("base","stats","graphics","utils","datasets"))` returned no results for the 22 full natural-language trial phrasings. This does **not** measure native help's performance when the learner knows a function name (e.g., `?hist`), and external online guides were **not timed or operated** in this replay.
+3. Review candidate `rulearn 0.3.0` from before this correction: **11/22** task phrasings returned the predefined relevant topic first.
+4. Corrected local package: **22/22** selected trial phrasings returned the predefined relevant topic first. Ranking was deterministic and local. This is a small task-derived test set and can overfit; it is **not** a general language-understanding score or a human usability finding.
+5. Native R replay: dataset inspection, stem display, histogram, boxplots, descriptive numeric statistics, proportions, and model-event arithmetic **executed successfully** against available files or established built-in R datasets. The original learner answers were used only later to identify agreements and interpretation differences; no instructor solution or grading result was invented.
+
+**Verified correction failure:** In the original detailed histogram script, changing only the stated interval width from 0.5 to 5 left the interval endpoints calculated in half-unit increments, producing the R error that some values could not be counted. The corrected script derives **both** endpoints and bin steps from one adjustable `bin_width` value, including cases where all usable observations are identical. It rejects empty observations and an excessive number of bins with explicit messages. The corrected 5 mm example counts all 333 recorded observations.
+
+### Corrections to the learning experience
+
+- The three previously revised flagship guides now begin with **Immediate answer** containing a short, executable native R example; then **What to change**, **What to check**, and an explicitly **optional complete walkthrough**, interpretation, and optional retention practice.
+- Short and detailed examples continue to come from **one canonical R source file** per guide through existing Quarto chunk support. `ru_guide()` expands both for offline console reading; it no longer shows an empty or duplicated help section.
+- `ru_edit(topic, mode="quick")` copies only the immediate answer. The default `ru_edit(topic)` copies only the detailed code (as before the fast-answer section was introduced); `mode="both"` is available. A learner no longer has to edit two copies of the dataset reference to run one approach.
+- The detailed grouped-boxplot script now has explicit, editable measurement-unit, axis and title variables so a changed dataset does not silently retain “cm” labels.
+- Four additional native concept references address **descriptive versus inferential statistics**, **measurement scales**, **event/sample-space/complement definitions**, and **conditional probability versus independent/mutually exclusive events**. One introductory function reference addresses `stem()`. The opening lines of the standard-deviation and sampling-distribution definitions now introduce the plain meaning before the formal description. Mathematical caveats remain.
+- The existing `bar_chart` reference has been upgraded in place: native `table()`, `prop.table()`, `barplot()`, labeled units and category percentages, instead of making `ru_apply()` compulsory. No statistical operation catalogue was expanded.
+- The existing error reference now explains `getwd()`, `file.exists()`, imported field names, extra empty CSV columns, and why `?some_imported_dataframe` does not magically create installed package documentation. Search ranking distinguishes “wrong CSV path” from a request to import a file and a graph-selection question from a question about a population.
+
+No new package framework, GUI shell, calculator, background service, telemetry or mandatory learning gate was added. The earlier 46 walkthroughs remain indexed; full native-code conversion of the other legacy wrapper-based guides remains future work only where trials justify it.
+
+### Trial B — Verified changed-task transfer
+
+| Variation | Relevant statistical task | Executed result |
+|---|---|---|
+| A different built-in weather dataset and measurement column | Histogram distribution and adjustable intervals | Passed; actual observations retained in bins |
+| A different built-in biological dataset with two groups | Grouped boxplot with changed numeric measurement, categories and units | Passed; checked group totals, counts and labels |
+| A different comparison group within an existing plant-growth dataset | Welch's independent two-sample test | Passed R calculations; still not an inferential method taught by the available completed report |
+| A different built-in automobile dataset with numerically coded categories | Native frequency table, proportions and bar chart | Passed; treating category codes as groups rather than continuous measurements |
+| The user's existing penguin CSV | Short and full histogram + grouped-boxplot methods, with real variable substitutions | Passed all four copied native scripts; corrected bin width and gram/mm labels |
+
+A successful script demonstrates *software transfer*, not a student's independent ability to transfer what was learned.
+
+### Trial C — Windows RStudio supervised application and retention protocol (not yet run)
+
+**Preparation:** Human evaluator uses a copy of the authorized task wording and verified dataset locally. Keep prior answers and rubrics hidden during the attempt. Prepare two matched sets of problems that cover definitions, choosing the appropriate graph or calculation, interpreting units/output and recovering from an error. Use only data the learner is allowed to access. Use built-in datasets for the transformed set; document the expected method and verify calculations in advance.
+
+**Candidate installation:** Obtain the approved local `rulearn_0.3.0.tar.gz` source package from the review environment, not the older `main` release on GitHub. In RStudio on Windows, select a trial-only package library and run `install.packages("C:/path/to/rulearn_0.3.0.tar.gz", repos=NULL, type="source", lib=trial_library)`, then `library(rulearn, lib.loc=trial_library)`. Confirm `help("measurement_scales",package="rulearn")` and `ru_find("What is a sample space?")` work without internet. Windows installation and Help-pane interaction remain **unverified** until the learner/evaluator performs them.
+
+**Session 1, application:** Randomize or alternate which matched tasks start with condition A (native RStudio Help + established available online resources) or condition B (the candidate library). Start each question at identical RStudio Console state with dataset supplied and no prior answer shown. Record the learner's exact initial search wording, whether the first retrieved result is appropriate, help pages/commands opened, time to defensible method, time to working adapted R code, R errors and recovery steps, number of prompts/help requests, and whether the learner explains axes/units/assumptions correctly. Record both successful and unsuccessful attempts. Unnecessary clicks and interruptions matter, but **a fast incorrect answer is a failure**.
+
+**Session 2, about 24 hours later:** Present a matched question with different column names/data. First request an **independent attempt without the worked example**. Score method choice, code recalled, interpretation and identification of a wrong method. After scoring, allow access to the reference to complete the exercise. Record what assistance was required.
+
+**Session 3, about seven days later:** Repeat with another verified novel dataset/question, balancing order and previous exposure. Score independent concept explanation, method selection, correct R command, dataset adaptation and limits of inference. Compare delayed performance to the baseline condition, rather than using the post-example quiz alone.
+
+**Privacy and accessibility:** Participation is voluntary and consented. Record task barriers such as losing the place after switching panes, difficulty identifying numerical units, dense text, or confusion over formula symbols; do **not** assume a diagnosis determines a response format. No diagnoses, student IDs, raw assignments, medical information, cloud telemetry or personal learner activity logs belong in the Git repository. Confirm usability in real Windows RStudio with adjustable font size, narrow Help pane, keyboard navigation and optional assistive technology separately. A passed static HTML check is not WCAG 2.2 AA conformance.
+
+**Outcome status:** No learner has completed these supervised sessions in the current execution. Application-time advantage, independence after 24 hours, seven-day retention, actual Windows RStudio accessibility and real-world preference remain **UNVERIFIED**. The earlier 20% time-reduction target remains a provisional target only.
+
+### Acceptance and release gate for this follow-up
+
+- **RLY-01:** **PARTIAL** — the private folder and student report were located; instructor-filled lab answers were not wrongly treated as completed student labs. No separate student-completed seminar lab could be verified.
+- **RLY-02:** **PASS for available authentic material** — real question types were mapped to explicit references without copying original questions; student-completed lab status is incomplete.
+- **RLY-03:** **PASS** — three required guides present immediate native R before optional detail, with their quick chunks verified.
+- **RLY-04:** **PASS** — dataset, column, group, unit, title, and bin-width substitutions are identified and tested.
+- **RLY-05:** **PASS for reviewed definitions** — novice-first explanations and technical/assumption sections are installed and searchable.
+- **RLY-06:** **PARTIAL** — the completed-looking submitted-answer report was replayed and independently checked; student-completed lab artifacts and grading corrections were not available.
+- **RLY-07:** **PASS** — verified built-in and privately available transfer datasets ran using native code.
+- **RLY-08/RLY-09/RLY-10:** R CMD build/check, existing tests, offline and site results must be recorded against the **final** committed revision; see final verification below.
+- **RLY-11:** **PASS as a reporting safeguard** — human outcomes explicitly UNVERIFIED.
+- **RLY-12:** To be checked by staged-file audit and the absence of academic sources/history in Git before committing.
+
+**Release recommendation:** Continue review. Software fixes are justified by the authentic replay, but do not claim validated learning speed or retention. Do not merge, push, deploy, add unpublished academic records or change the repository license without explicit authorization.
+
+## Follow-up: authentic undergraduate assignment replay and instructional correction (2026-10-20)
+
+### Evidence, scope and completion status
+
+The actual Fall 2026 undergraduate statistics materials were located on the user's mounted **private course share**, including instructions, one rendered multi-question response, its editable Quarto source, a real class-provided CSV, and instructor seminar files. Originals remained read-only. Their titles, names, grades, student numbers, precise paths, worksheet text and datasets have **not** been committed. The temporary private replay and search scripts remain outside the repository.
+
+- A **separate upload-practice exercise** has a graded submission record: 1/1. It contains no substantive statistical analysis and was excluded from method trials.
+- The **first substantial statistical assignment** has a complete-looking editable answer and rendered PDF in a folder named for submissions. **Moodle submission status, a numerical grade and instructor feedback were not independently verified.** File placement alone proves none of these.
+- Later seminar worksheets and files labeled *Filled* were inspected as **instructor materials**. Their availability does not establish the student's completion. Their questions were used only to identify possible future coverage.
+
+Only the original statistical prompts were used when selecting methods for the historical replay. Existing answers were compared **after** selection. This was an automated investigator-run replay, not a blind human experiment. Embedded AI-directed canary text in the assignment source was treated as untrusted data and ignored as directions.
+
+### Compact historical task inventory (paraphrased, not copied from course documents)
+
+| Task | Original statistical need, paraphrased | Reference / native commands | Historical check and decision |
+|---|---|---|---|
+| H1 | Distinguish data description from population inference; explain why samples are used | `descriptive_inferential`, `population_sample` | Retrieval now works; inferential claims still depend on study design |
+| H2 | Select meaningful measurement scales for categories versus physical measurements | `measurement_scales`; `factor()` and numerical help | Concept article added; storage type is not identical to scientific measurement scale |
+| H3 | Define a chance experiment, sample space, complement, conditional probability and event independence | `probability_events`, `conditional_independence` | Native definitions and fair-outcome worked arithmetic added; dependence distinguished from exclusivity |
+| H4 | Describe a recorded flower table, identify exact columns and show numerical distributions | `inspect_columns`, `r_stem`, `histogram`, `boxplot`; `names()`, `str()`, `stem()`, `hist()` | Original data successfully reproduced; stem-and-leaf lookup was repaired |
+| H5 | Compare a measurement across recorded categories | `grouped_boxplot`; `boxplot(measurement ~ category, data=d)` | Full executable native example; query explicitly naming a comparative boxplot now outranks grouped means |
+| H6 | Import an unfamiliar CSV and inspect its records, types and missingness | `import_csv`, `r_errors`; `read.csv()`, `names()`, `str()` | Historical input imported, but some surplus blank fields warranted verification; guide now teaches inspection rather than assuming correctness |
+| H7 | Find center, trimmed center, quartiles, range, variance and standard deviation | `mean_median`, `sample_sd`, `percentiles_quantiles`, `variance_sd`; `mean()`, `median()`, `quantile()`, `range()`, `var()`, `sd()` | Demonstration scripts now expose the actual R operations and state the units; correct numerical outputs alone do not prove interpretation |
+| H8 | Count categories, report proportions and compare distributions by category | `bar_chart` and `grouped_boxplot`; `table()`, `prop.table()`, `barplot()`, `boxplot()` | Checked against original recorded data without copying source rows into tests |
+| H9 | Combine chance events, including successive selections without replacement | `probability_events` and `conditional_independence`; base R arithmetic | Original calculated probabilities independently verified under the given equally likely model; conditional denominator explained |
+| H10 | Format and render a document in the usual RStudio workflow | Existing RStudio/Quarto tools, **not a `rulearn` calculation or lesson** | Explicit out-of-scope case; do not create a duplicate Quarto system |
+
+**Numerical replay details (not stored as public fixtures):** the original flower measurements, imported animal-measurement CSV and basic chance-event models were independently recomputed with base R. Recorded numerical summaries and categorical proportions were reproducible. A narrative range in the rendered response resembled histogram-scale endpoints rather than exact recorded extrema, motivating the added `range(values)` check. A prompt requested additional spread statistics whose results were not located in that rendered response; **no grading judgment is inferred**. One imported file had surplus fully missing columns, motivating `names()`/`str()`/`colSums(is.na())` and explicit delimiter checks.
+
+Inference tests were **not** introduced as historic assignment tasks because the verified completed statistical assignment did not cover them. The existing independent two-sample t-test example was retained and checked solely as a product regression.
+
+### Trial A: method retrieval from original question wording
+
+A private 19-question replay used actual problem wording with instructions to coding agents removed. The expected reference or intentional out-of-scope destination was recorded for each question.
+
+| Mechanical comparison | Executed outcome |
+|---|---:|
+| In-scope original questions with the relevant first `rulearn` result | **18 / 18** |
+| Explicitly out-of-scope document-rendering question correctly returning no `rulearn` result | **1 / 1** |
+| Native R `help.search()` using the entire natural-language sentence as-is | **0 / 19** with a match |
+| Native R `help.search()` using a suitable technical keyword chosen by the investigator | **19 / 19** with one or more matches |
+
+**Caution:** these are search-return counts, not observed learner success, comprehension, navigational effort or historical completion speed. The index was revised after examining these prompts, so the 18/18 is an **in-sample development check** rather than performance on unseen questions. Native `help.search()` can be effective once the correct term is known; the chosen short-keyword comparison demonstrates this. ModernDive, MOSAIC and live external-web search were not operated against the same 19 private questions and cannot be assigned comparative accuracy or times.
+
+Three historically observed instructional barriers were targeted: the first result selecting grouped means instead of grouped boxplots, interpreting “standard error” as an R programming error, and retrieving a misleading answer for out-of-scope Quarto tasks. Regression checks now distinguish these requests. Generalization beyond the observed phrases is still uncertain.
+
+### Trial B: changed-data transfer (automated, executed)
+
+The new **`tests/transfer.R`** contains no student data or copied assignment wording. It checks alternative public R datasets and a clearly labeled constructed equally likely model:
+
+- `airquality$Ozone`: numeric histogram, 37 missing observations excluded and 116 finite values correctly counted.
+- `ToothGrowth$len` by `supp`: two genuinely different grouping levels, 30 usable observations each, appropriate grouped boxplot and ordered numeric summaries.
+- `mtcars$cyl`: categorical counts and proportions, despite numeric storage of group codes.
+- A constructed six-sided die plus fair-coin outcome space: intersections, unions, complements and conditional probabilities computed by native logical operations; a second constructed deck example distinguishes drawing with and without replacement.
+- Direct help and search for the applicable concepts/functions, plus valid native R stem-and-leaf output.
+
+This establishes that **the verified commands and test cases execute on other data**, not that a learner could independently choose and reproduce them after a delay. The separate package regression suite tests edited versions of the flagship scripts with other named R datasets.
+
+### What was corrected after authentic replay
+
+The original `rulearn 0.3.0` local review commit had 16 concept and nine function references, and three flagship plots/tests. This continuation:
+
+- Added **four concise native concept articles** and a beginner-oriented native `stem()` function reference, bringing the installed collection to **20 concepts, 10 function references and 46 retained guides/scripts**. No new statistical calculation wrappers.
+- Reworked the three required flagship guides — histogram, grouped boxplot and independent two-sample test — with short native code first, followed by what to change, what to check, complete optional implementation, interpretation, and optional independent transfer.
+- Converted three additional high-use legacy `ru_apply()` guide/script pairs — CSV import, mean/median, and sample spread — to immediate native commands plus optional full workflows. The previously corrected categorical bar-chart guide remains native too. **Seven guides are now substantially native-code-first; 39 remain for staged correction.**
+- Reused the native R Help infrastructure and the existing executable Quarto guide source. An editable `ru_edit(..., mode="quick")` script can be requested for the supported guides; full mode preserves the checks. No custom tutorial, calculator or GUI was added.
+- Fixed deterministic search ranking for explicit named methods, sampling reasons, common probability wording and statistical-versus-programming errors; unsupported external-document questions return no inappropriate help match.
+- Added generic regression tests for immediate/full example execution, help lookup, retrieval choices, and changed-dataset methods.
+
+The principal instructional finding is practical: **an answer and even a correct plot do not show that the learner knows which command to change or what the plotted labels mean.** Shortest valid commands must appear before optional detail, and assumptions must remain visible beside or immediately after that quick answer.
+
+### Trial C: supervised Windows RStudio procedure — prepared, NOT executed
+
+This protocol tests real application and retention once the user chooses to participate. Use the actual locally reviewed candidate, **not the older package from public GitHub main**. A trusted copy of the local source archive must first be made available on the Windows computer; installation and UI behavior on that computer are presently unverified.
+
+**Set up:** In RStudio, install the authorized local `rulearn_0.3.0.tar.gz` candidate (e.g. `install.packages("C:/path/rulearn_0.3.0.tar.gz",repos=NULL,type="source")`, with suitable Windows build tooling if required). Confirm `packageVersion("rulearn")` is `0.3.0` and read `ru_find("sample space")`. Keep the source worktree, any private coursework and participant responses separate. Do **not** install from the current GitHub default branch for this trial.
+
+**Session 1 — application:** Use two equivalent task sets and vary the order of conditions A and B to reduce practice effects. Condition A allows native RStudio Help, standard R documentation, and pre-agreed accessible public references without the package. Condition B allows `ru_find()`, `help(...,package="rulearn")`, `ru_guide()` and `ru_edit()`. If internet sites are permitted, keep that rule consistent in both conditions or analyze website use separately.
+
+Task pair examples (all public or constructed, not drawn verbatim from coursework):
+- Explain what a sample can establish, using a recorded dataset; compare a different sample/population context in the other condition.
+- Plot an appropriate numeric distribution for `airquality$Ozone` after checking missing values, versus `faithful$waiting` in the alternate condition.
+- Compare numeric distributions between `ToothGrowth` supplement categories, versus the built-in `iris` species categories.
+- Count categorical records with `factor(mtcars$cyl)` versus a different recorded category; explain why a histogram differs from a bar chart.
+- Explain a fair-outcome sample space and one dependent selection sequence without relying on a solver.
+
+Record the question shown, condition/order, search phrase typed, actual reference opened, time to **defensible method**, time to **correctly adapted code**, errors, recovery, any assistance, and whether an explanation identifies axes/units and limits. A fast wrong answer is a failed application, not a speed gain. Do not take timings from the previously completed coursework.
+
+**Session 2 — approximately 24 hours:** Use matched but unpracticed data and variable names. Request an independent first attempt **before** revealing the guide; then allow the reference as needed. Record independent method choice, code adaptation and explanation accuracy separately from assistance and time.
+
+**Session 3 — approximately seven days:** Repeat with another equivalent task set and a changed order. Ask the learner to explain why the method fits, execute native R without `ru_apply()`, and state what the result cannot establish. After the independent attempt, allow all normal learning resources so the exercise can be completed.
+
+**Scoring:** Record method choice (0 inappropriate / 1 partial / 2 defensible), executable native code (0 broken / 1 corrected with help / 2 independent), interpretation (0 false / 1 partial / 2 accurate with limits), independent delayed method reuse (same scale) and time-to-correct-result in seconds. Record omissions and hints, rather than giving a single opaque achievement score. Application and retention carry equal weight in the release decision. Keep all responses private with the participant's consent; do not collect diagnoses or hidden telemetry.
+
+**Limits:** One student's experience cannot establish benefit for all learners with dyslexia, dyscalculia or ADHD. A mechanical terminal test cannot verify screen-reader focus order, Windows Help pane readability, keyboard-only use, or reduced task-switching burden. **Human speed, 24-hour recall, seven-day retention, user independence and assistive-technology conformance remain UNVERIFIED.**
+
+### Follow-up acceptance status
+
+| Requirement | Status and evidence |
+|---|---|
+| RLY-01, genuine lab sources and completion status | **PARTIAL**: source materials and a completed-looking substantial statistical response were found; submission/grading of that work and completion of individual seminar labs could not be verified. A separate upload-practice exercise was graded 1/1 |
+| RLY-02, authentic question-to-topic mapping | **PASS**: task inventory above; no copyrighted question files redistributed |
+| RLY-03/04, immediate native answer and adaptable inputs | **PASS**: three flagship guides plus targeted native-source improvements; quick/full code is executable |
+| RLY-05, understandable and technically defensible definitions | **PASS for inspected concepts**: 20 installed local concept articles, including corrected foundational and probability distinctions. Human comprehension **UNVERIFIED** |
+| RLY-06, replay without fabricated measurements | **PASS for selected work**: original recorded data and event assumptions verified; no invented answers treated as instructor feedback |
+| RLY-07, transferred method execution | **PASS**: alternate authentic datasets and constructed discrete model, via `tests/transfer.R` and existing regression scripts |
+| RLY-08/09/10, offline access and clean package verification | **PASS**: R CMD build and check, six executable test suites, site rendering and offline socket-blocked reference checks |
+| RLY-11, truthful human trial status | **PASS labeling**: human application and retention outcomes **UNVERIFIED** |
+| RLY-12, no academic material committed | **PASS**: 169 tracked/untracked source files and 34 staged change files inspected; no private academic documents or specified identifiers staged |
+
+### Executed follow-up software verification (local candidate)
+
+- `HOME=/home/earl R CMD build <TASK_WORKTREE>` from `/tmp`: **PASS**, producing `rulearn_0.3.0.tar.gz` with no build warnings.
+- `HOME=/home/earl R CMD check --no-manual rulearn_0.3.0.tar.gz`: **PASS**, `Status: OK` with zero errors, warnings or notes. Six tests ran: `consistency.R`, `data-adaptation.R`, `reference.R`, `review-regressions.R`, `smoke.R` and `transfer.R`.
+- `quarto render` using local Quarto 1.10.19: **PASS**, 51 pages. Static parser: 51/51 pages include page language and an H1, zero broken local assets/links, zero missing or empty alt descriptions on eight image references. Static checks are **not** a WCAG 2.2 conformance certificate.
+- Reinstalled candidate into an isolated test R library. With outgoing IPv4/IPv6 socket calls blocked by a temporary preload shim, `help()`, `ru_find()`, `ru_guide()` and `ru_edit(...,mode="quick")`: **PASS**.
+- Historical numerical replay from private source folders: **PASS for the audited data and event calculations**; original input files were not modified. Query-retrieval comparison: **18/18 expected in-scope top results**, plus one deliberate out-of-scope no-match; the method index was fitted during the review, so the results are not independent generalization evidence.
+- Generic transfer on R's packaged data and constructed chance experiments: **PASS**, no assessment questions, individual answers, source files, grades or third-party slides copied into public fixtures.
+- Source and staged privacy audits: **PASS**, 169 tracked/untracked working-tree files and 34 staged changes inspected. No course codes, student identifiers, original assignment texts, restricted files or generated outputs staged for the local commit.
+
+These checks replace the earlier preliminary implementation's 16-concept/nine-function snapshot. The current candidate has **20 concept references, 10 function introductions, 46 guides, seven native-code-first lessons and 39 older guides**. The package's public calculation catalogue was not enlarged.
+
+**Review recommendation:** Hold release until the consented user trials are complete. The targeted improvements justify continued testing, **not a claim that application became faster or that retention improved**. No default-branch merge, push, deployment or public course-material publication is authorized.

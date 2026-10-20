@@ -2,43 +2,50 @@
 title: "How do I import a CSV and confirm the fields were read correctly?"
 ---
 
-## The question
+## Immediate answer
 
-How do I import a CSV and confirm the fields were read correctly?
+To load your own CSV in RStudio, you can use `d <- read.csv(file.choose())` and select the file. The self-contained example below first creates a temporary CSV from recorded `iris` data so that it runs without a file you must download.
 
-## What to check and do
-
-1. Locate an actual CSV. 2. Use read.csv() to load it as a data frame. 3. Inspect names, types, rows and missing values before calculating anything.
-
-## Worked example: iris
-
-This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
-
-```{r}
-#| eval: false
-d <- ru_data("iris")
-csv <- tempfile(fileext=".csv")
-write.csv(d, csv, row.names=FALSE)
-imported <- ru_apply("import_csv", file=csv)
-stopifnot(nrow(imported)==150L, identical(names(imported),names(d)))
-unlink(csv)
+```{r setup-quick-import-csv, include=FALSE}
+knitr::read_chunk('../examples/import_csv.R')
 ```
 
-The round-trip import retains the Iris flower measurements and species names. For an actual CSV, pass its real path instead of creating a temporary file.
-
-## Apply the method to another question
-
-Replace the data frame and column names with those in your own file:
-
-```r
-ru_apply("import_csv", file="path/to/measurements.csv")
+```{r quick-import-csv}
+#| echo: true
+#| eval: true
 ```
 
-Questions about a broken file path require checking the working directory and file name before using any statistical function.
+## What to change
 
+For a real file, replace the demo's `read.csv(csv_file)` with `read.csv(file.choose())`, or supply its actual full path. Use your own data-frame name instead of `d` if that is clearer. Do not assume the file is in the working directory. This worked example writes a **temporary copy of an existing R dataset**; it is not a newly observed study.
 
-## Inspect conditions
+## What to check
 
-Use `ru_plan("import_csv")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+After loading, run `names(d)` to see the exact column names and `str(d)` for types. Run `dim(d)` and `colSums(is.na(d))` for rows, columns and missing entries. Unexpected blank columns, commonly named `X`, `X.1` and similar, may mean the CSV had extra delimiters; inspect the original before deciding to remove anything. R's `?help` does not automatically know what an arbitrary CSV variable means.
 
-[Standalone R script](../examples/import_csv.R)
+## Complete walkthrough (optional)
+
+The next example runs the same native `read.csv()` operation, then checks that the file exists and inspects the imported structure. The displayed code is also the script you can edit with `ru_edit("import_csv")`.
+
+```{r setup-worked-import-csv, include=FALSE}
+knitr::read_chunk('../examples/import_csv.R')
+```
+
+```{r worked-import-csv}
+#| echo: true
+#| eval: true
+```
+
+## Interpretation
+
+An imported table is not necessarily a correctly sampled population. R's guessed column types may need checking; converting factor codes or non-numeric text blindly is unsafe. If the file cannot be found, check its location before calculating a statistic.
+
+## Retention practice (optional)
+
+Without copying the complete example, use `write.csv(mtcars, tempfile(fileext=".csv"),row.names=FALSE)` to create a separate practice file, then import it with `read.csv()` and explain how you verified rows, columns and types. Or choose an existing permitted local CSV in RStudio.
+
+## Related concepts and sources
+
+Use `?read.csv`, `?str`, `help("r_errors",package="rulearn")`, and `ru_plan("import_csv")` for required-input decisions. [Official R file import reference](https://search.r-project.org/R/refmans/utils/html/read.table.html).
+
+[Open the standalone R script](../examples/import_csv.R)

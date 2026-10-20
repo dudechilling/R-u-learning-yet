@@ -1,3 +1,8 @@
+## ---- quick-histogram
+data(faithful)
+hist(faithful$eruptions, breaks=10, col="lightblue",
+     main="Eruption durations", xlab="Duration (minutes)")
+
 ## ---- worked-histogram
 # THE QUESTION: What is the distribution of eruption durations?
 # Dataset: faithful, included with R. "eruptions" is measured in minutes.
@@ -13,10 +18,25 @@ units <- "Eruption duration (minutes)"
 excluded <- sum(!is.finite(values))
 values <- values[is.finite(values)]
 cat("Usable observations:", length(values), "Excluded:", excluded, "\n")
+cat("Observed minimum and maximum:", range(values), units, "\n")
 
 # 3. CALCULATE: choose the edges of the histogram's intervals.
-# Here each bar spans 0.5 minutes. Change by= to test other bin widths.
-edges <- seq(floor(min(values)*2)/2, ceiling(max(values)*2)/2, by=0.5)
+# Bin width and endpoints MUST use the same units and increment.
+# For a different column, select a suitable bin_width (e.g., 5 mm).
+if (!length(values)) stop("No usable finite numeric observations.")
+bin_width <- 0.5  # minutes for faithful$eruptions
+stopifnot(length(bin_width)==1L, is.finite(bin_width), bin_width>0)
+low <- floor(min(values)/bin_width)*bin_width
+high <- ceiling(max(values)/bin_width)*bin_width
+if (low==high) {
+  low <- low-bin_width/2
+  high <- high+bin_width/2
+}
+edges <- seq(low,high,by=bin_width)
+if (tail(edges,1L)<max(values))
+  edges <- c(edges,tail(edges,1L)+bin_width)
+if (length(edges)>201L)
+  stop("Too many bins. Choose a larger bin_width for these units.")
 counts <- hist(values, breaks=edges, plot=FALSE)
 average <- mean(values)
 middle <- median(values)
