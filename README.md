@@ -1,57 +1,99 @@
 # R-u-learning-yet
 
-A searchable **problem and solution bank for RStudio**. Search for the question you are trying to answer. Read the steps, see which measurements are needed, and run an independent example before applying the method to your own data.
+A searchable, question-first collection of RStudio solutions. Each worked problem uses a **real, named dataset** where that makes sense, shows how the method works, and gives an equivalent call for **your own data and columns**.
 
-## Search directly from the RStudio Console
+Search from the RStudio **Console**. No browser or internet access is needed after installing the package.
 
-Run this once to install:
+## Install once
 
 ```r
 install.packages("remotes")
 remotes::install_github("dudechilling/R-u-learning-yet")
+library(rulearn)
 ```
 
-Then, in any RStudio project:
+## Find the right method
 
 ```r
-library(rulearn)
+ru_find("How can I show the distribution and mark the mean?")
+ru_find("Do two groups have different means?")
+ru_find("Does a zero correlation mean no relationship?")
+ru_topics()
+ru_plan("histogram")
+```
 
-ru_find("show a distribution with a histogram")
-ru_plan("histogram", have=c("numeric","units"), missing="groups")
+A problem plan separates **available**, **explicitly missing**, and **unknown** information:
+
+```r
+ru_plan("histogram", have=c("numeric", "units"), missing="groups")
 ru_code("histogram")
 ru_run("histogram")
 ```
 
-The `ru_plan()` function makes a critical distinction: **available**, **absent**, and **unknown** information. It displays conditional steps without making up data. When prerequisites are missing, it tells you what to obtain rather than pretending the result can be calculated.
+`ru_code()` prints the example script; `ru_run()` executes it in a separate environment. These commands do **not** operate on your open dataset or insert invented values into it.
 
-Search other questions using `ru_find("mean")`, `ru_find("outliers")`, `ru_find("p-value")`, `ru_find("CSV")`, or `ru_topics()`. Use `ru_inputs()` to see recognized input labels.
-
-## Better plots with your own data
-
-The bank includes base-R graph helpers:
+## Practice on named datasets
 
 ```r
-rainfall <- c(0,1,2,2,3,5,8,10,11)
-ru_hist(rainfall, units="Rainfall (mm)", title="Observed rainfall")
-ru_bar(c("bus","walk","bus","bike","walk"))
-ru_box(c(3,4,5,6,7,9,24), units="Depth (cm)")
-ru_scatter(1:6, c(3,4,7,9,9,14),
-           xlab="Distance (km)", ylab="Travel time (min)")
+ru_datasets()
+flowers <- ru_data("iris")
+ru_columns(flowers)
+
+ru_apply("mean_median", data=flowers, x="Sepal.Length")
+ru_apply("group_means", data=flowers, x="Sepal.Length", group="Species")
+ru_apply("histogram", data=flowers, x="Petal.Length")
+ru_apply("grouped_boxplot", data=flowers, x="Sepal.Length", group="Species")
 ```
 
-These display counts, labels, reference lines, or legends as appropriate. The underlying worked scripts also show how to use `hist()`, `plot()`, `col`, `text()`, `legend()`, and `abline()` directly.
+Other included-R datasets cover missing values (`airquality`), speed and stopping distance (`cars`), fuel economy (`mtcars`), time series (`Nile` and `AirPassengers`), historical frequency tables (`Titanic`), and paired observations (`sleep`). **The underlying tables remain in R; the repository does not duplicate their raw data.**
 
-## How examples are organized
+Palmer penguins is optional, not an automatic download:
 
-- `problems/`: searchable pages, each phrased as a question with numbered instructions, examples and limitations.
-- `inst/examples/`: independent, runnable R scripts that install with the package.
-- `R/`: console search, conditional routing and plot helpers.
-- `inst/extdata/`: the public question index and explicit decision rules.
+```r
+install.packages("palmerpenguins")  # only if you want penguin examples
+penguins <- ru_data("penguins")
+ru_columns(penguins)
+ru_apply("grouped_boxplot", data=penguins,
+         x="body_mass_g", group="species")
+ru_apply("scatterplot", data=penguins,
+         x="bill_length_mm", y="bill_depth_mm")
+```
 
-All examples use independently created illustrative data. They are **not** answers about your own observations, and they do not substitute for checking whether a method fits your question.
+Palmer penguins' source data are distributed under CC0. Some fields have missing observations; the functions disclose omitted measurements.
 
-## Website
+## Use the same methods with your own file
 
-The same pages can be published as a searchable Quarto website. Website deployment is independent of the RStudio console package; the console works without a browser or live network connection after installation.
+```r
+mine <- read.csv("measurements.csv")
+ru_columns(mine)
+ru_find("quartiles")
+ru_apply("five_number", data=mine, x="your_numeric_column")
+ru_apply("scatterplot", data=mine,
+         x="your_predictor_column", y="your_outcome_column")
+```
 
-Report a reproducible error through [GitHub Issues](https://github.com/dudechilling/R-u-learning-yet/issues). See [editorial standards](methodology.md) before adding a problem.
+The column names above are placeholders that you replace after checking `ru_columns(mine)`. The library does **not** infer your variables, their units, or the sampling design.
+
+Frequency tables require special care. A row with `Freq=100` represents 100 observations, not one:
+
+```r
+ship <- ru_data("Titanic")
+ru_apply("relative_frequency", ship, x="Survived", weight="Freq")
+ru_apply("bar_chart", ship, x="Survived", weight="Freq")
+```
+
+## Choosing a method is not validating its assumptions
+
+- A histogram, boxplot or mean describes the recorded values. It does not establish population representativeness.
+- Two-sample and paired tests require a defensible study design. Mark independence or pairing explicitly when applying them.
+- A normal curve is a **model assumption**, not a property automatically established by an observed sample.
+- The empirical bootstrap describes resampling from available observations. It does not correct a biased sample.
+- Missing measurements, unknown units, model fit and time spacing can change the meaning of a result.
+
+The repository includes **46 question-led guides** in [`problems/`](problems/index.qmd), with runnable scripts in [`inst/examples/`](inst/examples/). Those guides explain method choice, RStudio steps, interpretation and important exceptions. The search system is an inspectable keyword index and conditional decision rules—not a language model.
+
+## Development and verification
+
+This is an R package built around base R, with optional penguin data. To test a local copy, use `R CMD build` and `R CMD check --no-manual`, or install it and run the included smoke and dataset-adaptation tests.
+
+Source and editorial rules are in [methodology.md](methodology.md). A searchable Quarto website is configured, but its deployment is separate from the working RStudio console interface.

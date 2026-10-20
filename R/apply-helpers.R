@@ -88,3 +88,46 @@
   message("Check sampling, independence and model assumptions before ",
           "generalizing beyond the observed data.")
 }
+
+
+# A frequency column describes observations, not one observation per row.
+.ru_counts <- function(a) {
+  x <- .ru_column(a,"x")
+  if (is.null(a$weight)) {
+    counts <- table(x,useNA="no")
+    if (!length(counts) || sum(counts)==0L)
+      stop("No observed categories to summarize.",call.=FALSE)
+    return(counts)
+  }
+  weights <- .ru_column(a,"weight",numeric=TRUE)
+  if (length(weights)!=length(x))
+    stop("Frequency weights must align with categories.",call.=FALSE)
+  usable <- !is.na(x)
+  if (!any(usable))
+    stop("No observed categories to summarize.",call.=FALSE)
+  if (any(!is.finite(weights[usable])))
+    stop("Every observed category needs a finite frequency weight.",call.=FALSE)
+  if (any(weights[usable]<0) || any(weights[usable]!=floor(weights[usable])))
+    stop("Frequency weights must be nonnegative whole counts.",call.=FALSE)
+  totals <- tapply(weights[usable],as.character(x[usable]),sum)
+  counts <- as.numeric(totals)
+  names(counts) <- names(totals)
+  if (sum(counts)==0) stop("Total frequency must exceed zero.",call.=FALSE)
+  counts
+}
+
+# Reproducibility without changing the RNG state of the caller.
+.ru_seeded <- function(seed,expr) {
+  seed <- .ru_integer(seed,"seed")
+  existed <- exists(".Random.seed",envir=.GlobalEnv,inherits=FALSE)
+  if (existed) old <- get(".Random.seed",envir=.GlobalEnv,inherits=FALSE)
+  on.exit({
+    if (existed) {
+      assign(".Random.seed",old,envir=.GlobalEnv)
+    } else if (exists(".Random.seed",envir=.GlobalEnv,inherits=FALSE)) {
+      rm(list=".Random.seed",envir=.GlobalEnv)
+    }
+  },add=TRUE)
+  set.seed(seed)
+  force(expr)
+}

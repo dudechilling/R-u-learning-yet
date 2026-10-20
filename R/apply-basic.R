@@ -74,8 +74,7 @@
     print(out); return(out)
   }
   if (id %in% c("relative_frequency","categorical_mode")) {
-    z <- .ru_column(a,"x")
-    count <- table(z,useNA="no")
+    count <- .ru_counts(a)
     if (!length(count)) stop("No categories to count.")
     if (id=="categorical_mode") {
       result <- names(count)[count==max(count)]

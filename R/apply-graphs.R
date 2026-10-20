@@ -7,7 +7,7 @@
                  title="Distribution of observed measurements"))
   }
   if (id=="bar_chart") {
-    z <- .ru_column(a,"x")
+    z <- if (is.null(a$weight)) .ru_column(a,"x") else .ru_counts(a)
     return(ru_bar(z,title="Observed category counts",
                   xlab=if (is.character(a$x)&&length(a$x)==1L)
                   a$x else "Category"))

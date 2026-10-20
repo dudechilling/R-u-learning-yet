@@ -81,8 +81,7 @@
     if (!is.data.frame(a$data)) stop("Supply data= with population rows.")
     n <- .ru_integer(a$n,"n",min=1L)
     if (n>nrow(a$data)) stop("n exceeds available rows.")
-    set.seed(.ru_integer(a$seed,"seed"))
-    idx <- sample.int(nrow(a$data),n,replace=FALSE)
+    idx <- .ru_seeded(a$seed,sample.int(nrow(a$data),n,replace=FALSE))
     message("Randomly sampled rows from the supplied table; ",
             "this does not make the original table representative.")
     return(a$data[idx,,drop=FALSE])
@@ -92,8 +91,7 @@
     n <- if (is.null(a$n)) length(z) else .ru_integer(a$n,"n",min=2L)
     reps <- .ru_integer(a$reps,"reps",min=50L)
     if (reps>20000L) stop("Limit reps to 20000 for an interactive exercise.")
-    set.seed(.ru_integer(a$seed,"seed"))
-    means <- replicate(reps,mean(sample(z,n,replace=TRUE)))
+    means <- .ru_seeded(a$seed,replicate(reps,mean(sample(z,n,replace=TRUE))))
     if (isTRUE(a$show_plot)) {
       graphics::hist(means,col="#CEE2F0",border="#244967",
                      main="Bootstrap distribution of sample means",
