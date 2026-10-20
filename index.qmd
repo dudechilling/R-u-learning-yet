@@ -1,0 +1,9 @@
+---
+title: "Find the question. Run the solution."
+---
+
+Search for the task you need to complete, such as "find the average", "make a histogram", or "interpret a correlation".
+
+Every worked problem includes numbered RStudio steps, runnable example code, and a plain-language explanation.
+
+[Browse all problems](problems/index.qmd)

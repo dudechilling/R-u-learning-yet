@@ -1,0 +1,28 @@
+---
+title: "How do I calculate relative frequencies?"
+---
+
+## The question
+
+Six people report how they traveled: bus, walk, bus, car, walk, bus. Find the proportion using each mode.
+
+## Steps in RStudio
+
+1. Put the responses in a character vector.
+2. Count each category with `table()`.
+3. Divide each count by the total with `prop.table()`.
+4. Multiply by 100 if percentages are requested.
+
+```{r}
+travel <- c("bus", "walk", "bus", "car", "walk", "bus")
+counts <- table(travel)
+counts
+prop.table(counts)
+100 * prop.table(counts)
+```
+
+## Interpret the result
+
+Three of six used the bus: **0.5**, or **50%**. Two of six walked: about **33.3%**. One of six used a car: about **16.7%**. Rounded percentages may not sum to exactly 100%.
+
+[Runnable script](../R/relative-frequencies.R)

@@ -1,0 +1,11 @@
+---
+title: "Problem bank"
+---
+
+Choose the question that resembles the one you need to answer.
+
+- [How do I calculate a mean and a median?](mean-median.qmd)
+- [How do I calculate relative frequencies?](relative-frequencies.qmd)
+- [How do I explain a correlation close to zero?](zero-correlation.qmd)
+
+Each page links to a standalone R script. More questions will be added as they are checked.

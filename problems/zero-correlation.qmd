@@ -1,0 +1,30 @@
+---
+title: "Does a correlation near zero mean no relationship exists?"
+---
+
+## The question
+
+Two numerical variables have a Pearson correlation of zero. Can you conclude they are unrelated?
+
+## Steps in RStudio
+
+1. Put paired measurements into two vectors.
+2. Plot the data before choosing an interpretation.
+3. Use `cor()` to calculate Pearson's correlation.
+4. Compare the plotted shape with what the coefficient measures: a **linear** relationship.
+
+```{r}
+x <- -3:3
+y <- x^2
+plot(x, y, main = "A clear curved pattern", pch = 19,
+     xlab = "X", ylab = "Y")
+cor(x, y)
+```
+
+## Interpret the result
+
+The correlation is **0**, but the plotted points follow a U-shaped curve. Pearson's correlation measures linear association; it does not rule out a nonlinear pattern.
+
+Do not interpret a near-zero correlation as proof that two variables have no relationship.
+
+[Runnable script](../R/zero-correlation.R)

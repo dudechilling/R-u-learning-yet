@@ -1,0 +1,19 @@
+project:
+  type: website
+  output-dir: _site
+website:
+  title: "R-u-learning-yet"
+  search: true
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: problems/index.qmd
+        text: Problem bank
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-copy: true
+execute:
+  freeze: auto
