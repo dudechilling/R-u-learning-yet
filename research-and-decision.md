@@ -466,8 +466,8 @@ Record the question shown, condition/order, search phrase typed, actual referenc
 
 ### Executed follow-up software verification (local candidate)
 
-- `HOME=/home/earl R CMD build <TASK_WORKTREE>` from `/tmp`: **PASS**, producing `rulearn_0.3.0.tar.gz` with no build warnings.
-- `HOME=/home/earl R CMD check --no-manual rulearn_0.3.0.tar.gz`: **PASS**, `Status: OK` with zero errors, warnings or notes. Six tests ran: `consistency.R`, `data-adaptation.R`, `reference.R`, `review-regressions.R`, `smoke.R` and `transfer.R`.
+- `HOME=<USER_HOME> R CMD build <TASK_WORKTREE>` from `/tmp`: **PASS**, producing `rulearn_0.3.0.tar.gz` with no build warnings.
+- `HOME=<USER_HOME> R CMD check --no-manual rulearn_0.3.0.tar.gz`: **PASS**, `Status: OK` with zero errors, warnings or notes. Six tests ran: `consistency.R`, `data-adaptation.R`, `reference.R`, `review-regressions.R`, `smoke.R` and `transfer.R`.
 - `quarto render` using local Quarto 1.10.19: **PASS**, 51 pages. Static parser: 51/51 pages include page language and an H1, zero broken local assets/links, zero missing or empty alt descriptions on eight image references. Static checks are **not** a WCAG 2.2 conformance certificate.
 - Reinstalled candidate into an isolated test R library. With outgoing IPv4/IPv6 socket calls blocked by a temporary preload shim, `help()`, `ru_find()`, `ru_guide()` and `ru_edit(...,mode="quick")`: **PASS**.
 - Historical numerical replay from private source folders: **PASS for the audited data and event calculations**; original input files were not modified. Query-retrieval comparison: **18/18 expected in-scope top results**, plus one deliberate out-of-scope no-match; the method index was fitted during the review, so the results are not independent generalization evidence.
@@ -477,3 +477,47 @@ Record the question shown, condition/order, search phrase typed, actual referenc
 These checks replace the earlier preliminary implementation's 16-concept/nine-function snapshot. The current candidate has **20 concept references, 10 function introductions, 46 guides, seven native-code-first lessons and 39 older guides**. The package's public calculation catalogue was not enlarged.
 
 **Review recommendation:** Hold release until the consented user trials are complete. The targeted improvements justify continued testing, **not a claim that application became faster or that retention improved**. No default-branch merge, push, deployment or public course-material publication is authorized.
+
+## Candidate reconciliation and QA freeze — 2026-10-20
+
+This is a **local, human-QA-only** release candidate. The existing reference
+collection is preserved, not redesigned. GitHub main remains on the older
+commit, and no remote branch has been published.
+
+- Candidate **A** (`c4c48b1d9e2d7d14bf5daa1c9a00ea0e6dce45a4`) and
+  **B** (`b2e6561e11958a0ac4e6a7b21496081dfa4f654d`) both descend from
+  `2ba986164556d756f7498592e995b3e96084d5f5`.
+- A versus B differs on 13 paths; B deletes none of A's files. B preserves
+  A's four native-code-first guides and improves three more: CSV import,
+  mean/median and sample variance/standard deviation. The original 46 guides
+  and examples remain, with 20 concept and 10 function references.
+- Both candidates installed in separate temporary R libraries. A/B search
+  checks found 21/22 versus 22/22 correct top results on a 22-question
+  reference benchmark and 17/19 versus 18/19 on a task-derived benchmark.
+  The last task was out of scope (rendering Quarto PDF documents) and should
+  produce no misleading statistics result. These are **not** human usability
+  outcomes and are in-sample checks.
+- A separate post-installation test uncovered a **shared flaw** in the exact
+  question "How do I calculate mean and median?". Both variants favored a
+  single-function or histogram result above the relevant combined guide.
+  The task-owned `steward/f3f86112/qa-reconcile` branch descends from B and
+  fixes only local search disambiguation and its regression test.
+- The corrected local search preserved the 22/22 and 18/19 benchmarks, and
+  returned the combined walkthrough for both "mean and median" and "mean,
+  median and quartiles". It did not add functions, datasets or a tutorial
+  framework.
+- The exact release-source archive, the supervised Windows RStudio learner
+  test, and the evaluator's expected results are **outside this Git
+  repository** on the owner's private shared RStudio drive. They must not
+  be added to public Git history.
+
+**Reconciliation decision:** Use the QA branch for subsequent supervised
+testing; preserve A and B as unchanged earlier candidates. Do not push, merge,
+delete either worktree, or deploy without explicit authorization. The
+package's LICENSE still does not grant redistribution rights; a public
+distribution decision requires the author's explicit action.
+
+**Human evidence remains outstanding:** actual Windows installation and
+Help-pane interaction, initial application time and accuracy, error-recovery
+difficulty, independent 24-hour transfer, seven-day retention, keyboard and
+assistive-technology accessibility. Software checks cannot satisfy these.

@@ -106,7 +106,7 @@
   intent_function <- grepl(
     "\\b(function|syntax|arguments?|returns?|code for)\\b",
     tolower(query),perl=TRUE) ||
-    grepl("^(how does|how do)\\b.*\\b(sd|mean|median|hist|cor|acf|quantile|table|t[.]test)\\b",
+    grepl("^(how does|how do)\\s+(sd|mean|median|hist|cor|acf|quantile|table|t[.]test)\\b",
           tolower(query),perl=TRUE)
   intent_walkthrough <- grepl(
     "^(how do i|how can i|how to|steps to|when should|create|import|inspect|calculate|investigate|compare|plot|draw|make)\\b",
@@ -145,6 +145,13 @@
     if(length(method_terms) &&
        any(method_terms %in% title_words))
       hit <- hit + 18L
+    # A request for both mean AND median needs their combined reference,
+    # not the histogram article that happens to demonstrate both markers.
+    # Only use this disambiguation when no plot method was requested.
+    if (all(c("mean","median") %in% tokens) &&
+        !any(c("histogram","boxplot","plot","graph","chart") %in% tokens) &&
+        item$id=="mean_median")
+      hit <- hit + 30L
     if(intent_concept && item$type=="concept") hit <- hit + 17L
     if(intent_function && item$type=="function") hit <- hit + 20L
     if(intent_walkthrough && item$type=="walkthrough") hit <- hit + 8L

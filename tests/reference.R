@@ -58,6 +58,14 @@ for (q in names(replay_topics)) {
   stopifnot(nrow(found)>0L,
             identical(found$id[1L],replay_topics[[q]]))
 }
+# Composite application questions should open the complete worked topic,
+# not an unrelated graph or only one of the named R functions.
+invisible(capture.output(both <- ru_find(
+  "How do I calculate mean and median?",n=3L)))
+stopifnot(nrow(both)>0L,
+          identical(both$id[1L],"mean_median"),
+          identical(both$type[1L],"walkthrough"))
+
 # Distinguish an ordinary R programming error from "standard error",
 # which names the estimated variability of a sample statistic.
 invisible(capture.output(se <- ru_find(
