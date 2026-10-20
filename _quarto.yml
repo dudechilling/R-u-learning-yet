@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: _site
+  resources:
+    - "R/*.R"
 website:
   title: "R-u-learning-yet"
   search: true
