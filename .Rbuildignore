@@ -1,6 +1,12 @@
 ^_quarto\.yml$
 ^index\.qmd$
-^problems$
 ^methodology\.md$
 ^_site$
 ^\.github$
+^_freeze$
+^concepts$
+^functions$
+^\.quarto$
+^rulearn_.*[.]tar[.]gz$
+^rulearn[.]Rcheck$
+^\.git$

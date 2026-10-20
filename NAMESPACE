@@ -31,3 +31,6 @@ export(ru_apply)
 
 importFrom(stats,aggregate)
 importFrom(utils,tail)
+export(ru_guide)
+export(ru_edit)
+export(ru_open)

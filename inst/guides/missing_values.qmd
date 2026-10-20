@@ -1,0 +1,41 @@
+---
+title: "What should I do when some measurements are NA?"
+---
+
+## The question
+
+What should I do when some measurements are NA?
+
+## What to check and do
+
+1. Count missing values. 2. Check why they are missing. 3. Report how many observations the calculation uses and apply a justified missing-data rule.
+
+## Worked example: airquality
+
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
+
+```{r}
+#| eval: false
+d <- ru_data("airquality")
+answer <- ru_apply("missing_values", data=d, x="Ozone")
+stopifnot(answer["missing"]>0, answer["available"]<answer["total"])
+```
+
+The reported mean uses available ozone observations only. Dropping observations is not automatically unbiased when missingness is systematic.
+
+## Apply the method to another question
+
+Replace the data frame and column names with those in your own file:
+
+```r
+ru_apply("missing_values", data=your_data, x="measurement_column")
+```
+
+For relationships between two columns, exclude or model missing pairs jointly rather than deleting NA values independently from each variable.
+
+
+## Inspect conditions
+
+Use `ru_plan("missing_values")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../examples/missing_values.R)

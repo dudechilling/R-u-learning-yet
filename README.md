@@ -1,99 +1,98 @@
 # R-u-learning-yet
 
-A searchable, question-first collection of RStudio solutions. Each worked problem uses a **real, named dataset** where that makes sense, shows how the method works, and gives an equivalent call for **your own data and columns**.
+**An offline reference library for learning statistics and R in RStudio.**
 
-Search from the RStudio **Console**. No browser or internet access is needed after installing the package.
+Start with a question, not a function name. Find a definition, consult R's native help, read a practical walkthrough, then write and modify ordinary R code. You do **not** need to use a custom calculation wrapper to work through a problem.
 
-## Install once
+## Release status
+
+These reference-library changes are currently **local development work**. The public
+GitHub `main` branch does not yet contain them. Until an authorized review and
+merge, the GitHub installation command below installs the older release.
+
+To test an approved local checkout, run `R CMD INSTALL .` in a terminal from
+the repository root, then load `library(rulearn)` in RStudio.
+
+## Install from GitHub after release
 
 ```r
-install.packages("remotes")
+install.packages("remotes") # only needed once for installation
 remotes::install_github("dudechilling/R-u-learning-yet")
 library(rulearn)
+
+ru_find("What is stationarity?")
+ru_find("Define standard deviation")
+ru_find("What does a p-value mean?")
+ru_find("How do I make a histogram?")
+ru_find("How does the sd function work?")
 ```
 
-## Find the right method
+Search results distinguish **Concept**, **Function**, and **Walkthrough**, and provide the direct command to open each entry. Search is deterministic and runs locally after installation. No chatbot or live service is involved.
+
+## 1. Understand a concept
 
 ```r
-ru_find("How can I show the distribution and mark the mean?")
-ru_find("Do two groups have different means?")
-ru_find("Does a zero correlation mean no relationship?")
-ru_topics()
-ru_plan("histogram")
+help("stationarity", package="rulearn")
+ru_open("stationarity")
+help("standard_deviation", package="rulearn")
 ```
 
-A problem plan separates **available**, **explicitly missing**, and **unknown** information:
+The reference articles open in R's usual Help system, including RStudio's Help pane. They explain a definition, its meaning, a practical example, important distinctions, limitations, relevant R code and related concepts. Use `??stationarity` to search installed R help more broadly.
+
+## 2. Learn the R function
 
 ```r
-ru_plan("histogram", have=c("numeric", "units"), missing="groups")
-ru_code("histogram")
-ru_run("histogram")
+ru_find("How does the sd function work?", type="function")
+ru_open("sd")                      # beginner-friendly function reference
+help("sd", package="stats")       # official R function documentation
+?sd                                  # R's ordinary help shortcut
 ```
 
-`ru_code()` prints the example script; `ru_run()` executes it in a separate environment. These commands do **not** operate on your open dataset or insert invented values into it.
+R's own help remains the authoritative reference for syntax and supported arguments.
 
-## Practice on named datasets
+## 3. Follow a worked problem and edit the code
 
 ```r
-ru_datasets()
-flowers <- ru_data("iris")
-ru_columns(flowers)
-
-ru_apply("mean_median", data=flowers, x="Sepal.Length")
-ru_apply("group_means", data=flowers, x="Sepal.Length", group="Species")
-ru_apply("histogram", data=flowers, x="Petal.Length")
-ru_apply("grouped_boxplot", data=flowers, x="Sepal.Length", group="Species")
+ru_find("How do I customize a histogram?", type="walkthrough")
+ru_guide("histogram")   # read the complete guide offline
+ru_code("histogram")    # print ordinary R commands
+ru_edit("histogram")    # create an editable R script in your project
 ```
 
-Other included-R datasets cover missing values (`airquality`), speed and stopping distance (`cars`), fuel economy (`mtcars`), time series (`Nile` and `AirPassengers`), historical frequency tables (`Titanic`), and paired observations (`sleep`). **The underlying tables remain in R; the repository does not duplicate their raw data.**
+The histogram example uses `faithful` and teaches `hist()`, `breaks`, `col`, `main`, `xlab`, `ylab`, `text()`, `abline()`, and `legend()` without requiring `ru_apply()`. Change `faithful$eruptions` to a suitable numerical column in your own data, then run one line at a time using **Ctrl+Enter**.
 
-Palmer penguins is optional, not an automatic download:
+Two other fully annotated examples demonstrate grouped boxplots with `iris` and a Welch two-sample t-test with `PlantGrowth`.
+
+## Reference collection
+
+The package currently contains **16 concept references**, **9 beginner-oriented function references**, and **46 existing question-led walkthroughs**. The three fully revised examples set the standard for improving the remaining walkthroughs; the others remain available for use and future revision.
+
+- **Concepts:** population and sample; center and spread; probability and sampling distributions; correlation and autocorrelation; stationarity, trend and seasonality; inference, intervals and study design.
+- **Functions:** `mean()`, `median()`, `sd()`, `hist()`, `quantile()`, `cor()`, `t.test()`, `acf()`, and `table()`.
+- **Walkthroughs:** browse [the question-led index](inst/guides/index.qmd), or search from the RStudio console.
+
+The source of a concept or function reference is its native [R help file](man/). The longer tutorials remain in [`inst/guides/`](inst/guides/); their scripts are in [`inst/examples/`](inst/examples/). These are different types of content, not independent copies of an article.
+
+## Using authentic datasets
+
+R already includes `iris`, `faithful`, `airquality`, `mtcars`, `PlantGrowth`, `sleep`, `Nile`, `Titanic` and other relevant datasets.
 
 ```r
-install.packages("palmerpenguins")  # only if you want penguin examples
-penguins <- ru_data("penguins")
-ru_columns(penguins)
-ru_apply("grouped_boxplot", data=penguins,
-         x="body_mass_g", group="species")
-ru_apply("scatterplot", data=penguins,
-         x="bill_length_mm", y="bill_depth_mm")
+data(iris)
+names(iris)
+mean(iris$Sepal.Length)
+hist(iris$Sepal.Length,
+     xlab="Sepal length (cm)", main="Recorded flowers")
 ```
 
-Palmer penguins' source data are distributed under CC0. Some fields have missing observations; the functions disclose omitted measurements.
+Optional Palmer penguins data require a separately installed `palmerpenguins` package. Hypothetical model inputs and constructed variables are labeled as such. The data remain in their respective source packages; they are not copied into this repository.
 
-## Use the same methods with your own file
+## Compatibility and limitations
 
-```r
-mine <- read.csv("measurements.csv")
-ru_columns(mine)
-ru_find("quartiles")
-ru_apply("five_number", data=mine, x="your_numeric_column")
-ru_apply("scatterplot", data=mine,
-         x="your_predictor_column", y="your_outcome_column")
-```
+The older `ru_apply()`, `ru_plan()`, `ru_run()` and plotting helpers remain available for existing users. They are not the primary learning path. Method-specific options that were previously ignored now produce clear errors when unsupported; frequency-weighted probabilities and statistical test alternatives have been corrected. Conventional autocorrelation rejects irregular timestamps.
 
-The column names above are placeholders that you replace after checking `ru_columns(mine)`. The library does **not** infer your variables, their units, or the sampling design.
+The existing Quarto site is for longer walkthroughs. Concepts and function references are also available offline through native R help and do not require Quarto. The website is not required to use the installed reference library.
 
-Frequency tables require special care. A row with `Freq=100` represents 100 observations, not one:
+See the [competitive research and decision record](research-and-decision.md) for verified capabilities, alternative products, evidence limits, and the learner-testing protocol.
 
-```r
-ship <- ru_data("Titanic")
-ru_apply("relative_frequency", ship, x="Survived", weight="Freq")
-ru_apply("bar_chart", ship, x="Survived", weight="Freq")
-```
-
-## Choosing a method is not validating its assumptions
-
-- A histogram, boxplot or mean describes the recorded values. It does not establish population representativeness.
-- Two-sample and paired tests require a defensible study design. Mark independence or pairing explicitly when applying them.
-- A normal curve is a **model assumption**, not a property automatically established by an observed sample.
-- The empirical bootstrap describes resampling from available observations. It does not correct a biased sample.
-- Missing measurements, unknown units, model fit and time spacing can change the meaning of a result.
-
-The repository includes **46 question-led guides** in [`problems/`](problems/index.qmd), with runnable scripts in [`inst/examples/`](inst/examples/). Those guides explain method choice, RStudio steps, interpretation and important exceptions. The search system is an inspectable keyword index and conditional decision rules—not a language model.
-
-## Development and verification
-
-This is an R package built around base R, with optional penguin data. To test a local copy, use `R CMD build` and `R CMD check --no-manual`, or install it and run the included smoke and dataset-adaptation tests.
-
-Source and editorial rules are in [methodology.md](methodology.md). A searchable Quarto website is configured, but its deployment is separate from the working RStudio console interface.
+See [editorial and verification rules](methodology.md). Source redistribution rights have not been changed.

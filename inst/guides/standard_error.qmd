@@ -1,0 +1,34 @@
+---
+title: "How can I estimate uncertainty in a sample mean?"
+---
+
+## Question
+
+How can I estimate uncertainty in a sample mean?
+
+## Decide which method fits
+
+Identify one numeric variable; count usable observations and calculate sample standard deviation; divide that value by the square root of the sample size.
+
+## Worked example: iris
+
+```{r}
+#| eval: false
+d <- ru_data("iris")
+result <- ru_apply("standard_error", d, x="Sepal.Length")
+stopifnot(result["estimated_se"]>0,result["n"]==150)
+```
+
+Standard error describes how a sample mean would vary across suitable repeated samples. It is not the same as standard deviation among flowers. The original Iris observations are not established as a random sample from every species population.
+
+## Apply to another dataset
+
+```r
+ru_apply("standard_error", data=your_data, x="numeric_column")
+```
+
+If the question asks how dispersed individual observations are, use sample_sd rather than standard_error.
+
+Review assumptions and available input conditions with `ru_plan("standard_error")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../examples/standard_error.R)

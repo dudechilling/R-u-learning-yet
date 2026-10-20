@@ -1,14 +1,28 @@
-# Time-series questions: descriptive checks, not formal stationarity claims.
+# Time-series questions: lags require regular observation spacing.
 .ru_apply_time <- function(id,a) {
-  d <- .ru_time(a,minimum=if(id=="line_chart") 2L else 8L)
+  d <- .ru_time(a,minimum=if (id=="line_chart") 2L else 8L)
   v <- d$value; t <- d$time
-  nm <- if(is.character(a$x)&&length(a$x)==1L) a$x else "Measurement"
+  spacing <- attr(d,"time_spacing")
+  xlab <- .ru_text(a$xlab,"Time")
+  ylab <- .ru_axis(a,"x","Measurement")
+  title <- .ru_text(a$title, switch(id,
+    line_chart="Measurements over time",
+    moving_average="Original measurements and moving average",
+    autocorrelation="Autocorrelation by equal-spaced observation lag",
+    stationarity="Exploratory stability check"))
+  col <- .ru_text(a$col,"#3F78A8")
   if (id=="line_chart") {
-    if (isTRUE(a$show_plot))
-      graphics::plot(t,v,type=if(length(v)<=32L) "b" else "l",
-                     pch=19,col="#3F78A8",
-                     main="Measurements over time",xlab="Time",ylab=nm)
+    if (isTRUE(a$show_plot)) {
+      graphics::plot(t,v,type=if (length(v)<=32L) "b" else "l",
+                     pch=19,col=col,main=title,xlab=xlab,ylab=ylab)
+    }
     return(d)
+  }
+  if (id %in% c("moving_average","autocorrelation") && !spacing$regular) {
+    stop("Regularly spaced observations are required for ",id,
+         ". A lag counts observations, not equal elapsed-time intervals. ",
+         "Resample onto a justified time grid or choose a method for ",
+         "unevenly spaced observations.",call.=FALSE)
   }
   if (id=="moving_average") {
     window <- .ru_integer(a$window,"window",min=2L)
@@ -17,24 +31,21 @@
       message("Even centered windows are not symmetric about one point.")
     smoothed <- as.numeric(stats::filter(v,rep(1/window,window),sides=2))
     if (isTRUE(a$show_plot)) {
-      graphics::plot(t,v,type="l",col="#3F78A8",
-                     main=paste(window,"observation moving average"),
-                     xlab="Time",ylab=nm)
-      graphics::lines(t,smoothed,col="#A35E20",lwd=2,lty=2)
+      graphics::plot(t,v,type="l",col=col,
+                     main=title,xlab=xlab,ylab=ylab)
+      graphics::lines(t,smoothed,col="#A35E20",lwd=3,lty=2)
       graphics::legend("topleft",legend=c("Original","Moving average"),
-                       col=c("#3F78A8","#A35E20"),
-                       lty=c(1,2),lwd=c(1,2),bty="n")
+                       col=c(col,"#A35E20"),
+                       lty=c(1,2),lwd=c(1,3),bty="n")
     }
-    message("The window counts observations, not elapsed time. ",
-            "Verify regular sampling intervals.")
+    message("The window is ",window," regularly spaced observations (",
+            spacing$label, "), not a new set of measured values.")
     return(data.frame(time=t,raw=v,smoothed=smoothed))
   }
   if (id=="autocorrelation") {
-    if (isTRUE(a$show_plot))
-      stats::acf(v,main="Autocorrelation by observation lag",
-                 col="#3F78A8")
-    out <- stats::acf(v,plot=FALSE)
-    message("Trend, seasonality and irregular spacing can distort interpretation.")
+    out <- stats::acf(v,plot=isTRUE(a$show_plot),main=title,col=col)
+    message("Lags count equal-spaced observations (",spacing$label,
+            "). Trend and seasonality can affect the ACF.")
     return(out)
   }
   if (id=="stationarity") {
@@ -47,21 +58,21 @@
       mean=c(mean(first),mean(last)),
       sample_sd=c(stats::sd(first),stats::sd(last)))
     if (isTRUE(a$show_plot)) {
-      graphics::plot(t,v,type="l",col="#3F78A8",
-                     main="Exploratory stability check",
-                     xlab="Time",ylab=nm)
+      graphics::plot(t,v,type="l",col=col,
+                     main=title,xlab=xlab,ylab=ylab)
       graphics::segments(t[1],mean(first),t[middle],mean(first),
                          lwd=2,lty=2,col="#A35E20")
-      graphics::segments(t[length(v)-middle+1],mean(last),
+      graphics::segments(t[length(v)-middle+1L],mean(last),
                          t[length(v)],mean(last),
                          lwd=2,lty=3,col="#51775B")
       graphics::legend("topleft",legend=c("Observed","Early mean","Late mean"),
-        col=c("#3F78A8","#A35E20","#51775B"),
+        col=c(col,"#A35E20","#51775B"),
         lty=c(1,2,3),bty="n",cex=.8)
     }
     print(summary,row.names=FALSE)
-    message("Similar window statistics cannot prove stationarity. ",
-            "Consider dependence, seasonality, changing variance and trends.")
+    message("Exploratory only: similar means and sample deviations cannot ",
+            "prove stationarity. Inspect trends, variance, seasonality, ",
+            "dependence and sampling intervals.")
     return(summary)
   }
   stop("Unknown temporal problem.")

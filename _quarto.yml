@@ -1,8 +1,14 @@
 project:
   type: website
   output-dir: _site
+  render:
+    - index.qmd
+    - methodology.md
+    - concepts/index.qmd
+    - functions/index.qmd
+    - "/inst/guides/*.qmd"
   resources:
-    - "inst/examples/*.R"
+    - "/inst/examples/*.R"
 website:
   title: "R-u-learning-yet"
   search: true
@@ -10,8 +16,12 @@ website:
     left:
       - href: index.qmd
         text: Start
-      - href: problems/index.qmd
-        text: All problems
+      - href: concepts/index.qmd
+        text: Concepts
+      - href: functions/index.qmd
+        text: Functions
+      - href: inst/guides/index.qmd
+        text: Walkthroughs
       - href: methodology.md
         text: Standards
 format:

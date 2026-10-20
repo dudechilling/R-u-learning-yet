@@ -1,0 +1,41 @@
+---
+title: "Is the mean or median a better summary of a numeric variable?"
+---
+
+## The question
+
+Is the mean or median a better summary of a numeric variable?
+
+## What to check and do
+
+1. Identify the observations and measurement units. 2. Calculate mean and median. 3. Inspect the distribution for skew or clusters before choosing a 'typical' value.
+
+## Worked example: faithful
+
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
+
+```{r}
+#| eval: false
+d <- ru_data("faithful")
+answer <- ru_apply("mean_median", data=d, x="waiting")
+stopifnot(answer["mean"]>0,answer["median"]>0)
+```
+
+The mean and median summarize waiting time between geyser eruptions. Because the data have distinct clusters, neither number tells the entire story; inspect a histogram too.
+
+## Apply the method to another question
+
+Replace the data frame and column names with those in your own file:
+
+```r
+ru_apply("mean_median", data=your_data, x="numeric_column")
+```
+
+If there are large outliers, compare median and mean rather than removing observations automatically.
+
+
+## Inspect conditions
+
+Use `ru_plan("mean_median")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../examples/mean_median.R)

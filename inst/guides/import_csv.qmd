@@ -1,0 +1,44 @@
+---
+title: "How do I import a CSV and confirm the fields were read correctly?"
+---
+
+## The question
+
+How do I import a CSV and confirm the fields were read correctly?
+
+## What to check and do
+
+1. Locate an actual CSV. 2. Use read.csv() to load it as a data frame. 3. Inspect names, types, rows and missing values before calculating anything.
+
+## Worked example: iris
+
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
+
+```{r}
+#| eval: false
+d <- ru_data("iris")
+csv <- tempfile(fileext=".csv")
+write.csv(d, csv, row.names=FALSE)
+imported <- ru_apply("import_csv", file=csv)
+stopifnot(nrow(imported)==150L, identical(names(imported),names(d)))
+unlink(csv)
+```
+
+The round-trip import retains the Iris flower measurements and species names. For an actual CSV, pass its real path instead of creating a temporary file.
+
+## Apply the method to another question
+
+Replace the data frame and column names with those in your own file:
+
+```r
+ru_apply("import_csv", file="path/to/measurements.csv")
+```
+
+Questions about a broken file path require checking the working directory and file name before using any statistical function.
+
+
+## Inspect conditions
+
+Use `ru_plan("import_csv")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../examples/import_csv.R)

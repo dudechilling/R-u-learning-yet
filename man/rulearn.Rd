@@ -10,11 +10,11 @@
 \alias{ru_bar}
 \alias{ru_box}
 \alias{ru_scatter}
-\title{Find and solve RStudio problems}
-\description{Search practical questions, follow evidence-dependent steps, and run standalone examples. Plot helpers use base R.}
+\title{Search and Read RStudio References}
+\description{Search locally across statistical concepts, R functions, and practical walkthroughs, and retrieve native R help articles or editable scripts. Existing plotting and method helpers remain available.}
 \usage{
 ru(query, have = NULL, missing = NULL)
-ru_find(query, n = 10L)
+ru_find(query, n = 10L, type = NULL)
 ru_plan(query, have = NULL, missing = NULL)
 ru_run(query)
 ru_code(query)
@@ -24,16 +24,17 @@ ru_hist(x, units = "Value", title = "Distribution", breaks = "Sturges",
         col = "#CEE2F0", show_mean = TRUE, show_median = TRUE)
 ru_bar(x, title = "Category counts", xlab = "Category",
        col = "#9DC6E2")
-ru_box(x, groups = NULL, units = "Value", title = "Spread and outliers")
+ru_box(x, groups = NULL, units = "Value", title = "Spread and outliers", col = NULL)
 ru_scatter(x, y, xlab = "X", ylab = "Y",
            title = "Paired measurements", show_fit = TRUE,
            labels = NULL, col = "#3F78A8")
 }
 \arguments{
-\item{query}{Plain-language question, keyword, or exact problem ID.}
+\item{query}{Plain-language question, search keyword, or exact reference or walkthrough ID.}
 \item{have}{Known available input labels.}
 \item{missing}{Input labels confirmed absent. Unmentioned inputs stay unknown.}
-\item{n}{Maximum number of matching problems to display.}
+\item{n}{Maximum number of matching local reference entries to display.}
+\item{type}{Optional content filter: \code{"concept"}, \code{"function"}, or \code{"walkthrough"}.}
 \item{x}{Numeric observations or categories appropriate to the plot type.}
 \item{y}{A second numeric vector, aligned one-to-one with x.}
 \item{units}{Units for the measured quantity.}
@@ -48,8 +49,9 @@ ru_scatter(x, y, xlab = "X", ylab = "Y",
 \item{show_fit}{Whether to draw a straight-line regression fit.}
 \item{labels}{Optional text labels aligned with original observations.}
 }
-\details{These scripts use invented data. Console searches do not use a network connection. Inspect assumptions before applying any example to a real dataset.}
+\details{Scripts use named datasets and explicitly labeled hypothetical models. Console searches do not use a network connection. Inspect assumptions before applying any example to a real dataset.}
 \examples{
-ru_find("histogram")
+ru_find("What is stationarity?")
+ru_find("How do I make a histogram?")
 ru_plan("histogram",have=c("numeric","units"),missing="groups")
 }

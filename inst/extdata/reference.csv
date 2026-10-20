@@ -1,0 +1,26 @@
+id,type,title,keywords,topic,package
+population_sample,concept,Population and sample,population sample census sampling frame inference units participants individuals representative target population difference between,population_sample,rulearn
+mean_median,concept,Mean and median,mean average arithmetic center central tendency median typical value middle,mean_median,rulearn
+variance_sd,concept,Variance and standard deviation,standard deviation sd std dev stdev variance variability spread dispersion how far from average,variance_sd,rulearn
+percentiles_quantiles,concept,"Percentiles, quartiles and quantiles",percentile quantile quartile rank cutoffs threshold 25th 50th 75th iqr,percentiles_quantiles,rulearn
+probability_distributions,concept,Probability distributions,random variable discrete continuous binomial normal density probability mass distribution probability,probability_distributions,rulearn
+sampling_distributions,concept,Sampling distribution and standard error,sampling distribution sample means bootstrap central limit theorem standard error uncertainty se,sampling_distributions,rulearn
+correlation,concept,Correlation and association,pearson r spearman correlation linear related linked relationship regression causation,correlation,rulearn
+autocorrelation,concept,Autocorrelation and time lags,serial correlation lag dependence autocorrelation acf time series,autocorrelation,rulearn
+stationarity,concept,Stationarity,stationarity stationary stable mean variance autocovariance weak covariance stable process time,stationarity,rulearn
+hypothesis_tests_pvalues,concept,Hypothesis tests and p-values,p-value pvalue p value pvalues null hypothesis significance significance testing test hypothesis pvalue meaning,hypothesis_tests_pvalues,rulearn
+confidence_intervals,concept,Confidence intervals,confidence interval ci 95 percent uncertainty margin of error estimate inference,confidence_intervals,rulearn
+independent_paired,concept,Independent versus paired observations,paired independent repeated measures before after matching groups subjects difference,independent_paired,rulearn
+time_series,concept,Time series,time series measurements dates temporal interval chronological ordered observations,time_series,rulearn
+trend,concept,Trend,trend drift change increasing decreasing slope linear over time,trend,rulearn
+seasonality,concept,Seasonality,seasonality seasonal annual monthly repeat recurring cycle periodic yearly,seasonality,rulearn
+r_mean,function,mean(),mean average arithmetic calculate,r_mean,rulearn
+r_median,function,median(),median middle value ordered observations,r_median,rulearn
+r_sd,function,sd(),sd standard deviation std dev stdev spread standard deviation function sample,r_sd,rulearn
+r_hist,function,hist(),hist histogram bins breaks col main xlab ylab customize plot function chart,r_hist,rulearn
+r_quantile,function,quantile(),quantile percentile quartile cutoffs probs,r_quantile,rulearn
+r_cor,function,cor(),cor correlation Pearson Spearman coefficient,r_cor,rulearn
+r_t_test,function,t.test(),t.test test ttest hypothesis pvalue independent paired means,r_t_test,rulearn
+r_acf,function,acf(),acf autocorrelation lag function,r_acf,rulearn
+r_table,function,table(),table categorical frequency counts relative proportion categories,r_table,rulearn
+r_errors,concept,Common R errors and how to recover,object not found failed error missing column name names spelling typo non-numeric numeric data imported as text character factor function not found invalid incorrect NA cannot find object couldn't find function recovery errors,r_errors,rulearn

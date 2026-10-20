@@ -1,0 +1,19 @@
+---
+title: "R function reference"
+---
+
+The package offers short learner-oriented introductions to native R functions, alongside R's authoritative documentation. The actual functions are built into R; the package does not replace them with a custom operation.
+
+| Function | Beginner reference | Official R help |
+|---|---|---|
+| Average: `mean()` | `help("r_mean", package="rulearn")` | `?mean` |
+| Middle value: `median()` | `help("r_median", package="rulearn")` | `?median` |
+| Standard deviation: `sd()` | `help("r_sd", package="rulearn")` | `?sd` |
+| Histogram: `hist()` | `help("r_hist", package="rulearn")` | `?hist` |
+| Percentiles: `quantile()` | `help("r_quantile", package="rulearn")` | `?quantile` |
+| Correlation: `cor()` | `help("r_cor", package="rulearn")` | `?cor` |
+| Mean testing: `t.test()` | `help("r_t_test", package="rulearn")` | `?t.test` |
+| Autocorrelation: `acf()` | `help("r_acf", package="rulearn")` | `?acf` |
+| Frequency counts: `table()` | `help("r_table", package="rulearn")` | `?table` |
+
+Try `ru_find("How does the sd function work?", type="function")`. Each introduction discusses syntax, arguments, return values, errors, and modifying ordinary R code.

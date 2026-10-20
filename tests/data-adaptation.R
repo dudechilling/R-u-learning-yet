@@ -52,7 +52,7 @@ d <- ru_data("cars")
 fit <- ru_apply("linear_regression",d,x="speed",y="dist",show_plot=FALSE)
 stopifnot(inherits(fit,"lm"))
 pred <- ru_apply("predict_regression",d,x="speed",y="dist",
-                 new_x=15.5,confidence=.95,show_plot=FALSE)
+                 new_x=15.5,confidence=.95)
 stopifnot(nrow(pred)==1L)
 temporal <- ru_apply("moving_average",ru_data("Nile"),x="flow",time="year",
                      window=7,show_plot=FALSE)

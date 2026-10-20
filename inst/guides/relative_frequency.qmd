@@ -1,0 +1,41 @@
+---
+title: "How do I convert observations into percentages by category?"
+---
+
+## The question
+
+How do I convert observations into percentages by category?
+
+## What to check and do
+
+1. Identify the category of each observation. 2. Count the categories and divide each count by the total. 3. Check missing values and rounding.
+
+## Worked example: mtcars
+
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
+
+```{r}
+#| eval: false
+d <- ru_data("mtcars")
+answer <- ru_apply("relative_frequency", data=d, x="cyl")
+stopifnot(isTRUE(all.equal(sum(answer$proportion),1)))
+```
+
+The output reports what proportion of the cars in this dataset have each cylinder count. It does not describe all cars on the road.
+
+## Apply the method to another question
+
+Replace the data frame and column names with those in your own file:
+
+```r
+ru_apply("relative_frequency", data=your_data, x="category_column")
+```
+
+When a table already contains frequencies, weight its counts rather than counting each row once.
+
+
+## Inspect conditions
+
+Use `ru_plan("relative_frequency")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../examples/relative_frequency.R)

@@ -1,20 +1,22 @@
 ---
-title: "Find the question. Run the solution."
+title: "Learn statistics and R from the question"
 ---
 
-Search by what you need to do: **calculate an average**, **identify an outlier**, **make a readable graph**, **estimate a probability**, or **interpret a statistical result**.
-
-Each problem has numbered RStudio steps, an independently runnable R script, a plain-language interpretation, and a warning about what the result does *not* establish.
-
-## Search from RStudio itself
+Search for a concept, an R function, or a practical task. The installed package provides the complete reference locally from the RStudio console and Help pane.
 
 ```r
 library(rulearn)
-ru_find("histogram")
-ru_plan("histogram", have=c("numeric", "units"), missing="groups")
-ru_run("histogram")
+ru_find("What is stationarity?")
+ru_open("stationarity")
+ru_find("How do I make a histogram?")
+ru_guide("histogram")
+ru_edit("histogram")
 ```
 
-[Browse the complete question bank](problems/index.qmd)
+## Three ways to learn
 
-The question bank uses fictional practice measurements. Do not substitute example output for calculations using your own data.
+- **[Concepts](concepts/index.qmd):** Definitions, why they matter, and related ideas. Read them with R's native `help()`.
+- **[R functions](functions/index.qmd):** How to use and interpret commands such as `sd()`, `hist()`, and `t.test()`, with links to official R help.
+- **[Worked walkthroughs](inst/guides/index.qmd):** RStudio steps, data examples, editable native R commands, and checks.
+
+The tutorials use recorded datasets or clearly labeled models. A functioning calculation does not prove that its assumptions or sampling design are valid.

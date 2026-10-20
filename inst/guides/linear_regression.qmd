@@ -1,0 +1,43 @@
+---
+title: "How do I fit a regression line and interpret its slope?"
+---
+
+## Question
+
+How do I fit a regression line and interpret its slope?
+
+## Decide which method fits
+
+Choose a predictor and an outcome; check their units, paired rows and shape; fit a linear model and inspect the coefficients and residual assumptions.
+
+## Worked example: cars
+
+```{r}
+#| eval: false
+d <- ru_data("cars")
+fit <- ru_apply("linear_regression", d, x="speed", y="dist")
+stopifnot(inherits(fit,"lm"),is.finite(coef(fit)[2]))
+```
+
+The slope estimates the change in expected stopping distance per additional speed unit within the linear model. Neither fitted association nor a high R-squared proves a causal relationship.
+
+## Apply to another dataset
+
+```r
+ru_apply("linear_regression", your_data, x="predictor", y="outcome")
+```
+
+When curvature dominates, assess model adequacy instead of interpreting the slope as constant across the whole range.
+
+## Optional Palmer penguins example
+
+```r
+if (requireNamespace("palmerpenguins", quietly=TRUE)) {
+  birds <- ru_data("penguins")
+  ru_apply("linear_regression", birds, x="bill_length_mm", y="body_mass_g")
+}
+```
+
+Review assumptions and available input conditions with `ru_plan("linear_regression")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../examples/linear_regression.R)

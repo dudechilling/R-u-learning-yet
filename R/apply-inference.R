@@ -15,7 +15,7 @@
     } else {
       reference <- .ru_required(a$reference,"reference")
       fit <- stats::t.test(z,mu=reference,conf.level=confidence,
-                           alternative=a$alternative)
+                           alternative=.ru_alternative(a$alternative))
     }
     print(fit)
     return(fit)
@@ -26,7 +26,8 @@
     d <- .ru_groups(a,two=TRUE)
     if (any(table(d$group)<2L)) stop("Each group needs at least two observations.")
     .ru_warn_inference()
-    out <- stats::t.test(value~group,data=d,conf.level=.ru_level(a))
+    out <- stats::t.test(value~group,data=d,conf.level=.ru_level(a),
+                         alternative=.ru_alternative(a$alternative))
     print(out); return(out)
   }
   if (id=="paired_t") {
@@ -37,7 +38,8 @@
     if (stats::sd(differences)==0)
       stop("No variation in paired differences; this t test is undefined.")
     .ru_warn_inference()
-    out <- stats::t.test(d$y,d$x,paired=TRUE,conf.level=.ru_level(a))
+    out <- stats::t.test(d$y,d$x,paired=TRUE,conf.level=.ru_level(a),
+                         alternative=.ru_alternative(a$alternative))
     cat("Mean second minus first: ",mean(differences),"\n",sep="")
     print(out); return(out)
   }
@@ -48,8 +50,10 @@
     .ru_warn_inference()
     out <- if (id=="correlation_test")
       stats::cor.test(d$x,d$y,method="pearson",
-                      conf.level=.ru_level(a)) else
-      stats::cor.test(d$x,d$y,method="spearman",exact=FALSE)
+                      conf.level=.ru_level(a),
+                      alternative=.ru_alternative(a$alternative)) else
+      stats::cor.test(d$x,d$y,method="spearman",exact=FALSE,
+                      alternative=.ru_alternative(a$alternative))
     print(out); return(out)
   }
   if (id %in% c("linear_regression","predict_regression")) {
@@ -61,8 +65,10 @@
     if (id=="linear_regression") {
       print(summary(fit))
       if (isTRUE(a$show_plot))
-        ru_scatter(d$x,d$y,xlab="Predictor",ylab="Response",
-                   title="Linear regression: observed and fitted")
+        ru_scatter(d$x,d$y,xlab=.ru_axis(a,"x","Predictor"),
+                   ylab=.ru_axis(a,"y","Response"),
+                   title=.ru_text(a$title,"Linear regression: observed and fitted"),
+                   col=.ru_text(a$col,"#3F78A8"))
       return(fit)
     }
     nx <- .ru_required(a$new_x,"new_x")
@@ -83,9 +89,11 @@
       stop("The target is outside the observed range: extrapolation is not interpolation.")
     out <- stats::approx(d$x,d$y,xout=target)
     if (isTRUE(a$show_plot)) {
-      graphics::plot(d$x,d$y,type="b",pch=19,col="#3F78A8",
-                     xlab="Known X",ylab="Measured Y",
-                     main="Linear interpolation within observed range")
+      graphics::plot(d$x,d$y,type="b",pch=19,
+                     col=.ru_text(a$col,"#3F78A8"),
+                     xlab=.ru_axis(a,"x","Known X"),
+                     ylab=.ru_axis(a,"y","Measured Y"),
+                     main=.ru_text(a$title,"Linear interpolation within observed range"))
       graphics::points(out$x,out$y,pch=19,cex=1.5,col="#A35E20")
       graphics::legend("topleft",
         legend=c("Observations","Interpolated value"),

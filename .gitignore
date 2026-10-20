@@ -5,3 +5,12 @@ _site/
 .RData
 .Ruserdata
 .DS_Store
+
+/.quarto/
+**/*.quarto_ipynb
+
+# Quarto executable cache; rebuilt locally
+_freeze/
+# R package build and check products
+/rulearn_*.tar.gz
+/rulearn.Rcheck/

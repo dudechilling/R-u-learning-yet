@@ -1,37 +1,57 @@
 # Explicit probability calculations with documented inputs and assumptions.
 .ru_apply_probability <- function(id,a) {
   if (id %in% c("event_probability","conditional_probability","probability_union")) {
-    v <- .ru_column(a,"x")
+    value <- .ru_column(a, "x")
     event <- a$event
     if (is.null(event)) {
-      if (!is.logical(v)) stop("Supply event= (which value counts as A).")
+      if (!is.logical(value)) stop("Supply event= (which value counts as A).")
       event <- TRUE
     }
-    A <- v==event
+    if (length(event)!=1L || is.na(event))
+      stop("event= must identify one non-missing value.")
+    A <- value == event
+    weights <- if (is.null(a$weight)) rep(1, length(value)) else
+      .ru_column(a, "weight", numeric=TRUE)
+    if (length(weights)!=length(value))
+      stop("Frequency weights must align with event observations.")
+    if (any(!is.finite(weights)) ||
+        any(weights<0) || any(weights!=floor(weights)))
+      stop("Frequency weights must be finite nonnegative whole counts.")
+
     if (id=="event_probability") {
-      A <- A[!is.na(A)]
-      if (!length(A)) stop("No observed events.")
-      out <- c(events=sum(A),trials=length(A),proportion=mean(A))
+      ok <- !is.na(A)
+      if (sum(!ok)) message("Excluded ",sum(!ok)," missing event rows.")
+      if (!any(ok) || sum(weights[ok])==0)
+        stop("No observed events with positive total frequency.")
+      events <- sum(weights[ok] * A[ok])
+      total <- sum(weights[ok])
+      out <- c(events=events, trials=total, proportion=events/total)
       print(out); return(out)
     }
-    w <- .ru_column(a,"y")
-    if (length(v)!=length(w)) stop("Event conditions must be paired.")
-    if (is.null(a$given) || length(a$given)!=1L)
-      stop("Supply given= (the B event value).")
-    B <- w==a$given
-    ok <- !is.na(A)&!is.na(B)
-    A <- A[ok]; B <- B[ok]
-    if (!length(A)) stop("No complete event observations.")
+    other <- .ru_column(a, "y")
+    if (length(other)!=length(value))
+      stop("Event conditions must be paired.")
+    if (length(a$given)!=1L || is.na(a$given))
+      stop("Supply given= with one non-missing value defining event B.")
+    B <- other==a$given
+    ok <- !is.na(A) & !is.na(B)
+    if (sum(!ok)) message("Excluded ",sum(!ok)," incomplete event pairs.")
+    if (!any(ok) || sum(weights[ok])==0)
+      stop("No complete event pairs with positive total frequency.")
+    A <- A[ok]; B <- B[ok]; weights <- weights[ok]
     if (id=="conditional_probability") {
-      denominator <- sum(B)
-      if (!denominator) stop("No observations satisfy the given event.")
-      out <- c(both=sum(A&B),given=denominator,
-               probability=sum(A&B)/denominator)
+      denominator <- sum(weights[B])
+      if (denominator==0)
+        stop("No observed weight satisfies the given event.")
+      joint <- sum(weights[A & B])
+      out <- c(both=joint, given=denominator,
+               probability=joint/denominator)
     } else {
-      out <- c(A=mean(A),B=mean(B),both=mean(A&B),
-               either=mean(A|B))
-      stopifnot(isTRUE(all.equal(unname(out["either"]),
-                                   unname(out["A"]+out["B"]-out["both"]))))
+      total <- sum(weights)
+      out <- c(A=sum(weights[A])/total,
+               B=sum(weights[B])/total,
+               both=sum(weights[A & B])/total,
+               either=sum(weights[A | B])/total)
     }
     print(out); return(out)
   }

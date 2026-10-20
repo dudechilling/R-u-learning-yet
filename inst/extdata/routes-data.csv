@@ -1,28 +1,28 @@
-"id","route","have","missing","steps"
-"import_csv","Required data available","file","","1. Identify the CSV file path. ~ 2. Use read.csv() and store the result. ~ 3. Inspect head(), str(), names(), and nrow()."
-"import_csv","Required data missing","","file","1. Stop before computing; file was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"import_csv","No file yet","","file","1. Obtain the file or create a clearly labeled practice dataset. ~ 2. Do not interpret results as real observations."
-"inspect_columns","Required data available","table","","1. Store the table in a data frame. ~ 2. Run names(), str(), head(), and summary(). ~ 3. Choose columns based on actual content, not their position alone."
-"inspect_columns","Required data missing","","table","1. Stop before computing; table was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"missing_values","Required data available","numeric","","1. Count is.na(x). ~ 2. Decide whether the remaining observations answer the question. ~ 3. Compute mean(x,na.rm=TRUE) and report the denominator."
-"missing_values","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"filter_rows","Required data available","table","","1. Read the actual column names. ~ 2. Write the condition with >, >=, ==, or %in%. ~ 3. Inspect the remaining rows and count them."
-"filter_rows","Required data missing","","table","1. Stop before computing; table was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"group_means","Required data available","numeric;groups","","1. Match each numeric value to one group label. ~ 2. Check group sizes with table(). ~ 3. Use tapply() or aggregate() with mean()."
-"group_means","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"group_means","Group labels not supplied","numeric","groups","1. You can calculate the overall mean. ~ 2. You cannot compute group-specific means without matching group labels."
-"mean_median","Required data available","numeric","","1. Put the numeric values into c(). ~ 2. Run mean() and median(). ~ 3. Compare the two and look for extreme values."
-"mean_median","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"sample_sd","Required data available","numeric","","1. Check for missing values. ~ 2. Run range(), var(), and sd(). ~ 3. Interpret the standard deviation in the original measurement units."
-"sample_sd","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"five_number","Required data available","numeric","","1. Sort the data to see their order. ~ 2. Run quantile(x,probs=c(0,.25,.5,.75,1)). ~ 3. Calculate IQR() as Q3 minus Q1."
-"five_number","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"percentile_cutoff","Required data available","numeric;probability","","1. Enter numeric observations. ~ 2. Convert 75 percent to probability .75. ~ 3. Run quantile(x,probs=.75)."
-"percentile_cutoff","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"relative_frequency","Required data available","categories","","1. Count each category with table(). ~ 2. Divide by the total using prop.table(). ~ 3. Multiply by 100 for percentages."
-"relative_frequency","Required data missing","","categories","1. Stop before computing; categories was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"relative_frequency","Counts already supplied","counts","categories","1. Add the counts to get the total. ~ 2. Divide each count by the total. ~ 3. Do not fabricate individual responses."
-"categorical_mode","Required data available","categories","","1. Count categories with table(). ~ 2. Find max(counts). ~ 3. Return every category whose count matches that maximum."
-"categorical_mode","Required data missing","","categories","1. Stop before computing; categories was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
-"z_score","Required data available","numeric","","1. Calculate the sample mean and sd(). ~ 2. Subtract the mean from the chosen value. ~ 3. Divide by sd() if it is positive."
-"z_score","Required data missing","","numeric","1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data."
+id,route,have,missing,steps
+import_csv,Required data available,file,,"1. Identify the CSV file path. ~ 2. Use read.csv() and store the result. ~ 3. Inspect head(), str(), names(), and nrow()."
+import_csv,Required data missing,,file,1. Stop before computing; file was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+inspect_columns,Required data available,table,,"1. Store the table in a data frame. ~ 2. Run names(), str(), head(), and summary(). ~ 3. Choose columns based on actual content, not their position alone."
+inspect_columns,Required data missing,,table,1. Stop before computing; table was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+missing_values,Required data available,numeric,,"1. Count is.na(x). ~ 2. Decide whether the remaining observations answer the question. ~ 3. Compute mean(x,na.rm=TRUE) and report the denominator."
+missing_values,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+filter_rows,Required data available,table,,"1. Read the actual column names. ~ 2. Write the condition with >, >=, ==, or %in%. ~ 3. Inspect the remaining rows and count them."
+filter_rows,Required data missing,,table,1. Stop before computing; table was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+group_means,Required data available,numeric;groups,,1. Match each numeric value to one group label. ~ 2. Check group sizes with table(). ~ 3. Use tapply() or aggregate() with mean().
+group_means,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+group_means,Group labels not supplied,numeric,groups,1. You can calculate the overall mean. ~ 2. You cannot compute group-specific means without matching group labels.
+mean_median,Required data available,numeric,,1. Put the numeric values into c(). ~ 2. Run mean() and median(). ~ 3. Compare the two and look for extreme values.
+mean_median,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+sample_sd,Required data available,numeric,,"1. Check for missing values. ~ 2. Run range(), var(), and sd(). ~ 3. Interpret the standard deviation in the original measurement units."
+sample_sd,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+five_number,Required data available,numeric,,"1. Sort the data to see their order. ~ 2. Run quantile(x,probs=c(0,.25,.5,.75,1)). ~ 3. Calculate IQR() as Q3 minus Q1."
+five_number,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+percentile_cutoff,Required data available,numeric;probability,,"1. Enter numeric observations. ~ 2. Convert 75 percent to probability .75. ~ 3. Run quantile(x,probs=.75)."
+percentile_cutoff,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+relative_frequency,Required data available,categories,,1. Count each category with table(). ~ 2. Divide by the total using prop.table(). ~ 3. Multiply by 100 for percentages.
+relative_frequency,Required data missing,,categories,1. Stop before computing; categories was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+relative_frequency,Counts already supplied,counts,categories,1. Add the counts to get the total. ~ 2. Divide each count by the total. ~ 3. Do not fabricate individual responses.
+categorical_mode,Required data available,categories,,1. Count categories with table(). ~ 2. Find max(counts). ~ 3. Return every category whose count matches that maximum.
+categorical_mode,Required data missing,,categories,1. Stop before computing; categories was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+z_score,Required data available,numeric,,1. Calculate the sample mean and sd(). ~ 2. Subtract the mean from the chosen value. ~ 3. Divide by sd() if it is positive.
+z_score,Required data missing,,numeric,1. Stop before computing; numeric was not supplied. ~ 2. Get real observations or run the independent example only. ~ 3. Do not treat a demonstration as an answer about unknown data.
+mean_median,Groups change the summary,numeric;groups,,"1. Calculate the overall mean only if the question asks for it. ~ 2. To compare groups, use ru_plan('group_means') and report each sample size. ~ 3. A pooled mean may conceal distinct distributions."

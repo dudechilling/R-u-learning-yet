@@ -1,0 +1,37 @@
+---
+title: "How do I calculate a weighted expected value from discrete outcomes?"
+---
+
+## Question
+
+How do I calculate a weighted expected value from discrete outcomes?
+
+## Work through it
+
+Identify every possible numeric outcome and its probability; verify nonnegative probabilities summing to one; multiply each outcome by its probability and add.
+
+## Worked example: mtcars
+
+```{r}
+#| eval: false
+d <- ru_data("mtcars")
+counts <- table(d$cyl)
+outcomes <- as.numeric(names(counts))
+weights <- as.numeric(prop.table(counts))
+answer <- ru_apply("discrete_expectation", x=outcomes, y=weights)
+stopifnot(isTRUE(all.equal(unname(answer["expected"]),mean(d$cyl))))
+```
+
+The expected cylinder count under this *empirical distribution* equals the mean cylinder count in the recorded cars. An expected value need not be one of the possible individual outcomes.
+
+## Adapt to another question
+
+```r
+ru_apply("discrete_expectation", x=your_numeric_outcomes, y=your_probabilities)
+```
+
+If outcome probabilities are unknown, you cannot calculate a theoretical expectation without a defensible way to estimate them.
+
+Check the input conditions with `ru_plan("discrete_expectation")` before treating a calculation as an inference.
+
+[Run the standalone script](../examples/discrete_expectation.R)

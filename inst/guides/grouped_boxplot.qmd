@@ -1,0 +1,65 @@
+---
+title: "How do I compare the spread of one measurement across groups?"
+---
+
+## Quick answer
+
+Use a grouped boxplot to compare the centers and spreads of a numerical measurement across categories. Keep a common scale and show each group's usable sample size.
+
+## 1. The question
+
+How do recorded flower species differ in center and spread of sepal length?
+
+## 2. What information is available?
+
+The built-in **iris** data contain numerical sepal lengths in **centimetres** and a species label for every flower. Keep numeric values and group labels from the same rows.
+
+## 3. Which method fits?
+
+Use side-by-side **boxplots** for one numerical variable and one categorical grouping variable. Use a shared vertical axis so the sizes of differences are comparable. Label the sample sizes.
+
+## 4. Run it in RStudio
+
+This example shows **native base-R commands**, not a call to `ru_apply()`. Work through the numbered comments. Run lines with **Ctrl+Enter**, or make an editable copy with `ru_edit("grouped_boxplot")`.
+
+```{r setup-worked-grouped-boxplot, include=FALSE}
+knitr::read_chunk('../examples/grouped_boxplot.R')
+```
+
+```{r worked-grouped-boxplot}
+#| echo: true
+#| eval: true
+#| fig-alt: "Three side-by-side boxplots showing flower sepal length in centimeters for setosa, versicolor and virginica. Each group label includes a sample size of 50; the boxes show group medians and spread on a common vertical scale."
+```
+
+## 5. Read the result
+
+The vertical axis is sepal length in **centimetres**. Each box represents a species, its center line is the median, its box shows the middle 50%, and whiskers and flagged points show spread. A flagged point is not necessarily an error. This graph alone does not establish statistical significance.
+
+## 6. Adapt it
+
+Change `iris$Sepal.Length` and `iris$Species` to your own columns, and update the units and heading. `table()` counts each group, `tapply()` finds each median, `boxplot()` draws on a common scale, and `text()` adds median labels.
+
+## 7. If the information changes
+
+Without group labels, use one boxplot or histogram. If you need to test independent population means, first check the sampling design and consider a Welch t-test. With repeat measurements on the same subjects, use a paired method.
+
+Read the conditional advice with `ru_plan("grouped_boxplot")`. Working code alone does not verify a study assumption.
+
+## Common mistakes
+
+A plotted difference is not necessarily a statistically significant difference. Flagged points are not automatically errors. Do not break the alignment between a value and its group label when removing missing observations.
+
+## Related concepts
+
+Read `?boxplot`, `help("percentiles_quantiles", package="rulearn")`, and `ru_guide("two_sample_t")` for a different inferential question.
+
+## Remember it (optional)
+
+Use the built-in `ToothGrowth` dataset. Without copying the finished example, create two grouped boxplots of `len` by `supp`. Identify the number of usable values and each group's median. Explain why this plot alone cannot prove a treatment effect. Revisit with another dataset later if useful.
+
+## Sources
+
+[R `boxplot()` documentation](https://search.r-project.org/R/refmans/graphics/html/boxplot.html)
+
+[Open the standalone R script](../examples/grouped_boxplot.R)

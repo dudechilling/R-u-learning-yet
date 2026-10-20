@@ -1,0 +1,40 @@
+---
+title: "Can a correlation statistic miss a strong nonlinear relationship?"
+---
+
+## What the question asks
+
+Can a correlation statistic miss a strong nonlinear relationship?
+
+## Steps to decide and solve
+
+Calculate Pearson correlation but do not stop there; make a scatterplot; inspect curved and clustered patterns, leverage points, and the data range.
+
+## Worked example: anscombe
+
+```{r}
+#| eval: false
+d <- ru_data("anscombe")
+# Anscombe's real x2 values; the square is a NEW, constructed response.
+constructed <- data.frame(deviation=d$x2-mean(d$x2))
+constructed$squared <- constructed$deviation^2
+r <- ru_apply("zero_correlation", data=constructed,
+              x="deviation", y="squared")
+stopifnot(abs(r)<1e-10)
+# Compare with one of the original Anscombe pairs:
+ru_apply("zero_correlation", data=d, x="x2", y="y2")
+```
+
+The deliberately constructed quadratic relationship has zero Pearson correlation by symmetry, despite a perfect curved relationship. Anscombe's observed example also demonstrates why similarly sized correlations cannot replace inspection of a plot. Only the x2 values in the constructed example come from the dataset; the squared response is not a recorded measurement.
+
+## Apply it to another question
+
+```r
+ru_apply("zero_correlation", data=your_data, x="first_numeric_column", y="second_numeric_column")
+```
+
+If the question concerns monotonic ranks, explore Spearman correlation. Neither Pearson nor Spearman covers every possible dependence pattern.
+
+Use `ru_plan("zero_correlation")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../examples/zero_correlation.R)

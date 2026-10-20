@@ -1,0 +1,43 @@
+---
+title: "How do I test and interpret linear association between two measurements?"
+---
+
+## Question
+
+How do I test and interpret linear association between two measurements?
+
+## Decide which method fits
+
+Check paired measurements; draw a scatterplot for nonlinearity and influential points; calculate Pearson r with an interval and test under explicit assumptions.
+
+## Worked example: cars
+
+```{r}
+#| eval: false
+d <- ru_data("cars")
+fit <- ru_apply("correlation_test", d, x="speed", y="dist", confidence=.95)
+stopifnot(is.finite(fit$estimate))
+```
+
+The fitted coefficient measures linear association between speed and stopping distance in recorded cars. It is not a causal-effect estimate and can be distorted by unusual observations or a curved relationship.
+
+## Apply to another dataset
+
+```r
+ru_apply("correlation_test", your_data, x="first_numeric_column", y="second_numeric_column", confidence=.95)
+```
+
+If the question is about ranks or a monotonic relationship, inspect whether spearman_correlation better matches the task.
+
+## Optional Palmer penguins example
+
+```r
+if (requireNamespace("palmerpenguins", quietly=TRUE)) {
+  d <- ru_data("penguins")
+  ru_apply("correlation_test", d, x="bill_length_mm", y="body_mass_g", confidence=.95)
+}
+```
+
+Review assumptions and available input conditions with `ru_plan("correlation_test")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../examples/correlation_test.R)

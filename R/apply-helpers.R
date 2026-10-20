@@ -72,17 +72,61 @@
     stop("Supply confidence= explicitly, for example confidence=.95.",call.=FALSE)
   .ru_probability(a$confidence,"confidence",strict=TRUE)
 }
-.ru_time <- function(a,minimum=3L) {
+.ru_time <- function(a, minimum=3L) {
   v <- .ru_column(a,"x",numeric=TRUE)
-  t <- .ru_column(a,"time")
-  if (length(t)!=length(v)) stop("Time must match the observations.")
-  good <- is.finite(v) & !is.na(t)
-  if (sum(good)<minimum) stop("Not enough complete time observations.")
-  d <- data.frame(time=t[good],value=v[good])
-  d <- d[order(d$time),,drop=FALSE]
-  if (anyDuplicated(d$time))
-    stop("Duplicate timestamps: first aggregate or resolve duplicates.",call.=FALSE)
+  time <- .ru_column(a,"time")
+  if (length(time)!=length(v))
+    stop("Time must match the observations.",call.=FALSE)
+  if (!(is.numeric(time) || inherits(time,"Date") ||
+        inherits(time,"POSIXt")))
+    stop("Time must be numeric, Date, or POSIXct, not an unordered category.",
+         call.=FALSE)
+  valid_time <- !is.na(time) & is.finite(as.numeric(time))
+  if (anyDuplicated(time[valid_time]))
+    stop("Duplicate timestamps: resolve repeated time points before analysis.",
+         call.=FALSE)
+  good <- is.finite(v) & valid_time
+  if (sum(!good)) {
+    message("Omitted ",sum(!good)," observations from the time series (",
+            sum(!valid_time)," missing/invalid timestamps; ",
+            sum(valid_time & !is.finite(v))," missing/invalid measurements).")
+  }
+  if (sum(good)<minimum)
+    stop("Not enough complete time observations.",call.=FALSE)
+  ordering <- order(time[good])
+  if (!identical(ordering,seq_along(ordering)))
+    message("Sorted observations by timestamp.")
+  d <- data.frame(time=time[good][ordering],value=v[good][ordering])
+  attr(d,"time_spacing") <- .ru_spacing(d$time)
+  if (!attr(d,"time_spacing")$regular)
+    message("Irregular time intervals detected; observation lags do not ",
+            "represent equal elapsed-time lags.")
   d
+}
+
+.ru_spacing <- function(t) {
+  # Check chronological spacing in the original time units.
+  if (length(t)<2L) return(list(regular=TRUE,label="one observation"))
+  num <- as.numeric(t)
+  increments <- diff(num)
+  if (any(!is.finite(increments)) || any(increments<=0))
+    stop("Timestamps must be strictly increasing.",call.=FALSE)
+  if (inherits(t,"Date")) {
+    day <- format(t,"%d")
+    month_index <- as.integer(format(t,"%Y"))*12L+
+                   as.integer(format(t,"%m"))
+    month_steps <- diff(month_index)
+    if (length(unique(day))==1L &&
+        length(unique(month_steps))==1L && month_steps[1L]>0L)
+      return(list(regular=TRUE,label=paste(month_steps[1L],
+                                          "calendar month(s) per observation")))
+  }
+  delta <- stats::median(increments)
+  regular <- max(abs(increments-delta)) <=
+             (1e-8 * max(1,abs(delta)))
+  list(regular=regular,label=if (regular)
+       paste("constant interval",signif(delta,5),"in numeric time units")
+       else "variable intervals")
 }
 .ru_warn_inference <- function() {
   message("Check sampling, independence and model assumptions before ",
@@ -130,4 +174,28 @@
   },add=TRUE)
   set.seed(seed)
   force(expr)
+}
+
+.ru_alternative <- function(x) {
+  if (!is.character(x) || length(x)!=1L || is.na(x) ||
+      !(x %in% c("two.sided","less","greater")))
+    stop("alternative= must be 'two.sided', 'less', or 'greater'.",
+         call.=FALSE)
+  x
+}
+.ru_text <- function(value, otherwise) {
+  if (is.null(value)) return(otherwise)
+  if (!is.character(value) || length(value)!=1L || is.na(value) ||
+      !nzchar(trimws(value)))
+    stop("Plot labels and colors must be nonempty character strings.",
+         call.=FALSE)
+  value
+}
+.ru_axis <- function(a, key, default) {
+  explicit <- if (key=="x") a$xlab else a$ylab
+  named <- if (key=="x") a$x else a$y
+  if (!is.null(explicit)) return(.ru_text(explicit, default))
+  if (is.character(named) && length(named)==1L && !is.null(a$data))
+    return(named)
+  default
 }

@@ -1,0 +1,26 @@
+---
+title: "Statistical concepts"
+---
+
+The complete concept articles are native R help pages installed with `rulearn`. They work offline in RStudio's Help pane. Enter `library(rulearn)` first, then call `help("topic", package="rulearn")`.
+
+| Topic | Help command |
+|---|---|
+| Population and sample | `help("population_sample", package="rulearn")` |
+| Mean and median | `help("mean_median", package="rulearn")` |
+| Variance and standard deviation | `help("standard_deviation", package="rulearn")` |
+| Percentiles and quantiles | `help("percentiles_quantiles", package="rulearn")` |
+| Probability distributions | `help("probability_distributions", package="rulearn")` |
+| Sampling distributions | `help("sampling_distributions", package="rulearn")` |
+| Correlation | `help("correlation", package="rulearn")` |
+| Autocorrelation | `help("autocorrelation", package="rulearn")` |
+| Stationarity | `help("stationarity", package="rulearn")` |
+| Hypothesis tests and p-values | `help("p_value", package="rulearn")` |
+| Confidence intervals | `help("confidence_intervals", package="rulearn")` |
+| Independent and paired data | `help("independent_paired", package="rulearn")` |
+| Time series | `help("time_series", package="rulearn")` |
+| Trend | `help("trend", package="rulearn")` |
+| Recover from R errors | `help("r_errors", package="rulearn")` |
+| Seasonality | `help("seasonality", package="rulearn")` |
+
+You do not need to remember a title. Use `ru_find("What does a p-value mean?")` to locate it.

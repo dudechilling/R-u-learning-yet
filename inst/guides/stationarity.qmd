@@ -1,0 +1,34 @@
+---
+title: "How can I explore whether a time series is reasonably stable?"
+---
+
+## What the question asks
+
+How can I explore whether a time series is reasonably stable?
+
+## Steps to decide and solve
+
+Inspect a time plot; compare the mean and spread in similar early and late windows; look for trend, variance changes and dependence.
+
+## Worked example: Nile
+
+```{r}
+#| eval: false
+d <- ru_data("Nile")
+check <- ru_apply("stationarity", data=d, x="flow", time="year")
+stopifnot(nrow(check)==2L)
+```
+
+Window means and sample standard deviations describe the earlier and later sections of the records. They are diagnostic clues, not a definitive test that the generating process is stationary.
+
+## Apply it to another question
+
+```r
+ru_apply("stationarity", data=your_data, x="numeric_column", time="date_column")
+```
+
+Stable variance alone does not imply a constant mean; stable means alone do not establish unchanging autocorrelation.
+
+Use `ru_plan("stationarity")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../examples/stationarity.R)
