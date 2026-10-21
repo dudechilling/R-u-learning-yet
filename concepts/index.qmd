@@ -22,6 +22,7 @@ The complete concept articles are native R help pages installed with `rulearn`. 
 | Trend | `help("trend", package="rulearn")` |
 | Recover from R errors | `help("r_errors", package="rulearn")` |
 | Seasonality | `help("seasonality", package="rulearn")` |
+| Statistical variables vs R objects | `help("statistical_variable", package="rulearn")` |
 | Descriptive and inferential statistics | `help("descriptive_inferential", package="rulearn")` |
 | Measurement scales | `help("measurement_scales", package="rulearn")` |
 | Sample spaces and events | `help("probability_events", package="rulearn")` |

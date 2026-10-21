@@ -1,76 +1,9 @@
-# Read the one canonical Quarto guide bundled with the installed package.
+# Show one installed guide as a readable native Rd topic.
+# The existing Quarto and R files remain the one canonical source.
 ru_guide <- function(query) {
   item <- .ru_pick(query)
-  if (is.null(item)) return(invisible(NULL))
-  path <- system.file("guides",paste0(item$id,".qmd"),package="rulearn")
-  if (!nzchar(path))
-    stop("The installed guide is missing for ",item$id,call.=FALSE)
-  lines <- readLines(path,warn=FALSE,encoding="UTF-8")
-  if (length(lines)>=3L && lines[1L]=="---") {
-    second <- which(lines[-1L]=="---")
-    if (length(second)) lines <- lines[-seq_len(second[1L]+1L)]
-  }
-  # The Quarto page executes this exact script using read_chunk().
-  # Expand it in the Console as well, rather than maintaining two code copies.
-  begin <- grep("^```[{]r setup-worked-",lines)
-  if (length(begin)==1L) {
-    close <- which(lines=="```" & seq_along(lines)>begin)
-    start_code <- grep("^```[{]r worked-",lines)
-    start_code <- start_code[start_code>begin]
-    if (length(close)>=2L && length(start_code)==1L &&
-        close[1L]<start_code[1L] && close[2L]>start_code[1L]) {
-      script <- system.file("examples",paste0(item$id,".R"),
-                            package="rulearn")
-      if (!nzchar(script))
-        stop("The example script is missing for ",item$id,call.=FALSE)
-      native <- readLines(script,warn=FALSE,encoding="UTF-8")
-      # The script can contain a separate short quick example. Expand only
-      # the detailed section at this point; the short section is added below.
-      worked <- grep("^## ---- worked-",native)
-      if (length(worked)!=1L || worked>=length(native))
-        stop("Missing canonical worked R code for ",item$id,call.=FALSE)
-      native <- native[seq.int(worked+1L,length(native))]
-      before <- if(begin>1L) lines[seq_len(begin-1L)] else character()
-      after <- if(close[2L]<length(lines))
-        lines[seq.int(close[2L]+1L,length(lines))] else character()
-      lines <- c(before,"```r",native,"```",after)
-    } else {
-      stop("The guide contains an invalid external-code reference for ",
-           item$id,call.=FALSE)
-    }
-  }
-  # Expand the optional quick example from the SAME installed script.
-  # Quarto extracts both chunks using knitr::read_chunk(); the Console
-  # displays the exact R lines instead of showing empty Quarto fences.
-  quick_setup <- grep("^```[{]r setup-quick-",lines)
-  if(length(quick_setup)==1L) {
-    file <- system.file("examples",paste0(item$id,".R"),package="rulearn")
-    if (!nzchar(file))
-      stop("Quick-example source missing for ",item$id,call.=FALSE)
-    full <- readLines(file,warn=FALSE,encoding="UTF-8")
-    quick_at <- grep("^## ---- quick-",full)
-    worked_at <- grep("^## ---- worked-",full)
-    if(length(quick_at)!=1L || length(worked_at)!=1L ||
-       worked_at<=quick_at+1L)
-      stop("Invalid quick-example sections for ",item$id,call.=FALSE)
-    quick <- full[seq.int(quick_at+1L,worked_at-1L)]
-    close_setup <- which(lines=="```" & seq_along(lines)>quick_setup)[1L]
-    if (is.na(close_setup))
-      stop("Invalid Quarto setup for ",item$id,call.=FALSE)
-    lines <- lines[-seq.int(quick_setup,close_setup)]
-    q <- grep("^```[{]r quick-",lines)
-    if(length(q)!=1L)
-      stop("Missing quick-example display for ",item$id,call.=FALSE)
-    qend <- which(lines=="```" & seq_along(lines)>q)[1L]
-    if(is.na(qend))
-      stop("Unterminated quick-example display for ",item$id,call.=FALSE)
-    before <- if(q>1L) lines[seq_len(q-1L)] else character()
-    after <- if(qend<length(lines))
-      lines[seq.int(qend+1L,length(lines))] else character()
-    lines <- c(before,"```r",quick,"```",after)
-  }
-  cat(paste(lines,collapse="\n"),"\n",sep="")
-  invisible(path)
+  if(is.null(item)) return(invisible(NULL))
+  .ru_show_guide(item$id)
 }
 
 # Copy an editable ordinary R script. Revised guides keep an immediate
@@ -110,6 +43,16 @@ ru_edit <- function(query, dir=getwd(), open=interactive(),
       stop("Could not copy the example to ",dest,call.=FALSE)
   }
   message("Editable copy: ",normalizePath(dest))
-  if (isTRUE(open)) utils::file.edit(dest)
+  if(isTRUE(open)) {
+    if(.ru_rstudio_ready("navigateToFile")) {
+      tryCatch(rstudioapi::navigateToFile(dest),error=function(e) {
+        warning("RStudio Source editor did not open: ",conditionMessage(e),
+                call.=FALSE)
+        utils::file.edit(dest)
+      })
+    } else {
+      utils::file.edit(dest)
+    }
+  }
   invisible(normalizePath(dest))
 }

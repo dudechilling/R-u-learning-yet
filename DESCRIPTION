@@ -1,11 +1,11 @@
 Package: rulearn
 Title: Offline R and Statistics Reference Library
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: person("R-u-learning-yet", "Contributors", email="244890287+dudechilling@users.noreply.github.com", role=c("aut","cre"))
 Description: Search offline statistical concept references, beginner-oriented R function help, and editable worked RStudio walkthroughs. Native R help integrates with the Help pane and existing base-R documentation. Older example and method helpers remain available for compatibility.
 License: file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1)
 Imports: graphics, grDevices, stats, utils
-Suggests: palmerpenguins
+Suggests: palmerpenguins, rstudioapi
 NeedsCompilation: no

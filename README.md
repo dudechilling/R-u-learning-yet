@@ -29,7 +29,16 @@ ru_find("What is a sample space?")
 ru_find("Stem and leaf plot")
 ```
 
-Search results distinguish **Concept**, **Function**, and **Walkthrough**, and provide the direct command to open each entry. Search is deterministic and runs locally after installation. No chatbot or live service is involved.
+In RStudio, `ru_find()` opens its best relevant article or formatted walkthrough in the **Help** pane. Ordinary programming questions such as `ru_find("How do I create variables?")` lead to the R object/column reference, not an unrelated statistical method. In a terminal without RStudio, search prints only the best result and its opening command; `ru_open()` shows the reference as readable text.
+
+```r
+ru_find("How do I create variables?")
+ru_open("r_objects_columns")                 # native Help page
+ru_guide("histogram")                        # formatted Help walkthrough
+ru_edit("histogram", mode="quick")            # editable R code in Source
+```
+
+`ru_guide()` uses RStudio's existing `previewRd()` API when `rstudioapi` is installed and available, and falls back to readable Console text otherwise. Legacy guides that still use `ru_apply()` are labeled as compatibility examples rather than native-R instruction. Offline access remains supported. No chatbot or live service is involved.
 
 ## 1. Understand a concept
 
@@ -68,7 +77,7 @@ Two other fully annotated examples demonstrate grouped boxplots with `iris` and 
 
 ## Reference collection
 
-The package currently contains **20 concept references**, **10 beginner-oriented function references**, and **46 existing question-led walkthroughs**. Four fully revised examples set the standard for improving the remaining walkthroughs; the others remain available for use and future revision.
+The package currently contains **21 concept references**, **11 beginner-oriented function references**, and **46 existing question-led walkthroughs**. Four fully revised examples set the standard for improving the remaining walkthroughs; the others remain available for use and future revision.
 
 - **Concepts:** population and sample; center and spread; probability and sampling distributions; correlation and autocorrelation; stationarity, trend and seasonality; inference, intervals and study design.
 - **Functions:** `mean()`, `median()`, `sd()`, `hist()`, `quantile()`, `cor()`, `t.test()`, `acf()`, and `table()`.

@@ -14,6 +14,7 @@ The package offers short learner-oriented introductions to native R functions, a
 | Correlation: `cor()` | `help("r_cor", package="rulearn")` | `?cor` |
 | Mean testing: `t.test()` | `help("r_t_test", package="rulearn")` | `?t.test` |
 | Autocorrelation: `acf()` | `help("r_acf", package="rulearn")` | `?acf` |
+| Create R objects / select columns: `<-`, `$` | `help("r_objects_columns", package="rulearn")` | `?assignOps`, `?Extract` |
 | Stem-and-leaf display: `stem()` | `help("r_stem", package="rulearn")` | `?stem` |
 | Frequency counts: `table()` | `help("r_table", package="rulearn")` | `?table` |
 

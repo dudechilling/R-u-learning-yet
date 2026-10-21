@@ -49,7 +49,11 @@ ru_scatter(x, y, xlab = "X", ylab = "Y",
 \item{show_fit}{Whether to draw a straight-line regression fit.}
 \item{labels}{Optional text labels aligned with original observations.}
 }
-\details{Scripts use named datasets and explicitly labeled hypothetical models. Console searches do not use a network connection. Inspect assumptions before applying any example to a real dataset.}
+\details{In RStudio, search opens the best matching article or rendered guide
+in the built-in Help pane instead of filling the Console with long lists.
+Outside RStudio, search gives the best match and direct opening command.
+A question without relevant indexed information reports no match.
+The core search and reference material run offline. Scripts use named datasets and explicitly labeled hypothetical models. Console searches do not use a network connection. Inspect assumptions before applying any example to a real dataset.}
 \examples{
 ru_find("What is stationarity?")
 ru_find("How do I make a histogram?")

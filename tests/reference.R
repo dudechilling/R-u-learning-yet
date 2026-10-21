@@ -186,8 +186,8 @@ for (id in c("import_csv","mean_median","sample_sd")) {
             any(grepl("## ---- worked-",script,fixed=TRUE)),
             !any(grepl("ru_apply(",script,fixed=TRUE)))
   note <- capture.output(ru_guide(id))
-  stopifnot(which(grepl("## Immediate answer",note,fixed=TRUE))[1L] <
-            which(grepl("## Complete walkthrough",note,fixed=TRUE))[1L])
+  stopifnot(which(grepl("Immediate answer",note,fixed=TRUE))[1L] <
+            which(grepl("Complete walkthrough",note,fixed=TRUE))[1L])
   for (mode in c("quick","full")) {
     folder <- tempfile(paste0(id,"-"))
     dir.create(folder)
@@ -261,11 +261,12 @@ for (id in c("histogram","grouped_boxplot","two_sample_t")) {
   idx2 <- which(grepl("## ---- worked-",lines,fixed=TRUE))[1L]
   stopifnot(idx1 < idx2)
   guide_out <- capture.output(ru_guide(id))
-  quick_heading <- grep("## Immediate answer",guide_out,fixed=TRUE)[1L]
-  detailed_heading <- grep("## Complete walkthrough",guide_out,fixed=TRUE)[1L]
+  quick_heading <- grep("Immediate answer",guide_out,fixed=TRUE)[1L]
+  detailed_heading <- grep("Complete walkthrough",guide_out,fixed=TRUE)[1L]
   stopifnot(is.finite(quick_heading),is.finite(detailed_heading),
             quick_heading<detailed_heading,
-            any(grepl("```r",guide_out,fixed=TRUE)))
+            !any(grepl("```",guide_out,fixed=TRUE)),
+            !any(grepl("#| eval:",guide_out,fixed=TRUE)))
 }
 stopifnot(length(help("r_errors",package="rulearn"))==1L)
 

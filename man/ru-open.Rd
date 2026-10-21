@@ -9,7 +9,16 @@ ru_open(query, type = NULL)
 \item{query}{A full question, partial phrase, or exact reference ID.}
 \item{type}{Optional \code{"concept"}, \code{"function"} or \code{"walkthrough"} filter.}
 }
-\details{Use \code{ru_find()} to inspect all relevant results and copy the shown command. Concept and function articles are standard \code{.Rd} help pages displayed by \code{help()}; built-in R functions retain their own official documentation (for example \code{?sd}). Walkthroughs come from one canonical packaged Quarto file, also available as an editable standalone R script with \code{ru_edit()}. For established methods \code{ru_apply()} remains available but is not required for learning or running the native code.}
+\details{Inside RStudio, concept and function entries open using native
+R Help; the Help pane preserves RStudio's own navigation history.
+A selected walkthrough displays as a formatted temporary Rd topic using
+the existing \code{rstudioapi::previewRd()} integration when available.
+The text comes from the installed canonical Quarto guide, so no second
+copy of the lesson is maintained. Outside RStudio, the same references
+use readable Console text. When there is no suitable topic, a no-match
+message appears rather than an unrelated statistical method.
+Legacy \code{ru_apply()} examples remain compatible but are not
+substitutes for learning ordinary R functions.}
 \seealso{\code{\link{ru_find}}, \code{\link{ru_guide}}, \link{stationarity}, \link{variance_sd}, \link{r_sd}, \link{r_hist}, \link{hypothesis_tests_pvalues}}
 \examples{
 # Search from ordinary language:

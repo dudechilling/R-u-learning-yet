@@ -18,7 +18,9 @@
     "with","what","are","does","on","by","and","from","using","for",
     "define","definition","does","work","works","function","between",
     "make","create","calculate","find","show","draw","have",
-    "different","two","me","please","tell","about","as")))
+    "different","two","me","please","tell","about","as",
+    "this","that","something","anything","library","not","cover",
+    "whether","causes")))
 }
 
 # Deterministic, conservative spelling repair using the words already
@@ -31,7 +33,7 @@
   if (!length(vocabulary)) return(list(words=tokens,changes=changed))
   for(i in seq_along(tokens)) {
     term <- tokens[i]
-    if (nchar(term)<5L || term %in% vocabulary) next
+    if (nchar(term)<6L || term %in% vocabulary) next
     choices <- vocabulary[abs(nchar(vocabulary)-nchar(term))<=2L]
     if (!length(choices)) next
     distances <- as.integer(utils::adist(term,choices))
@@ -99,6 +101,31 @@
   q <- sub("^what does (a |the )?(.+) mean[?]?$","\\2",q)
   corrected <- .ru_correct_tokens(.ru_words(q),catalog)
   tokens <- corrected$words
+  # Programming requests need assignment/extraction, not statistical models.
+  # Inspect the original query before punctuation tokenization removes <- and $.
+  intent_objects <- grepl(paste0(
+    "\\b(create|make|assign|store|save|declare|copy|extract|select|pull)\\b.*\\b(variables?|varibles|objects?|columns?|fields?)\\b|",
+    "\\b(add|new)\\b.*\\bcolumns?\\b|",
+    "\\bassignment\\s+(operator|arrow)\\b|",
+    "df[$][[:alnum:]_.]+|",
+    "<-|",
+    "\\b(select|extract)\\b.*\\b(csv|data[ -]?frame)\\b"
+    ),tolower(trimws(query)),perl=TRUE)
+  # A named scatter display or plotting a pair of measurements is a
+  # visualization question, not a paired hypothesis-test question.
+  intent_scatter <- grepl(
+    "\\bscatter\\b|\\b(plot|draw|graph)\\b.*\\b(two|paired|relationship)\\b",
+    tolower(trimws(query)),perl=TRUE) &&
+    !grepl("\\b(over time|time series)\\b",tolower(query),perl=TRUE)
+  out_of_scope_explanation <- grepl(
+    "^what causes\\b",tolower(trimws(query)),perl=TRUE) &&
+    !grepl(
+      "\\b(data|statistics?|sampling|sample|population|probability|correlation|autocorrelation|stationarity|variance|hypothesis|pvalue|trend|model)\\b",
+      tolower(query),perl=TRUE)
+  intent_statistical_variable <- grepl(paste0(
+    "\\b(statistical|statistics|measured|observed)\\b.*\\bvariables?\\b|",
+    "\\bvariables?\\b.*\\b(statistical|statistics)\\b"
+    ),tolower(trimws(query)),perl=TRUE)
   intent_concept <- grepl(
     "^(what is|what are|define|definition|meaning of|when is|can i use|should i use)\\b",
     tolower(trimws(query)),perl=TRUE) ||
@@ -152,14 +179,32 @@
         !any(c("histogram","boxplot","plot","graph","chart") %in% tokens) &&
         item$id=="mean_median")
       hit <- hit + 30L
+    # Variables alone are not evidence of correlation or plotting.
+    # This is a topic-specific disambiguation, not a new calculation system.
+    if(intent_objects) {
+      hit <- if(item$id=="r_objects_columns") 350L else 0L
+    } else if(intent_statistical_variable) {
+      hit <- if(item$id=="statistical_variable") 350L else 0L
+    } else {
+      meaningful <- setdiff(tokens,c("variable","variables","varibles",
+                                     "numeric","numerical","data"))
+      if(!length(meaningful) || !any(meaningful %in% keys))
+        hit <- 0L
+    }
+    if(intent_scatter && item$id=="scatterplot") hit <- hit + 115L
     if(intent_concept && item$type=="concept") hit <- hit + 17L
     if(intent_function && item$type=="function") hit <- hit + 20L
     if(intent_walkthrough && item$type=="walkthrough") hit <- hit + 8L
     if(intent_error && item$id=="r_errors") hit <- hit + 21L
-    # Intent alone is not evidence of a topical match.
-    if (!length(tokens) || !any(vapply(tokens,function(k)
-      k %in% keys,logical(1))))
-      hit <- 0L
+    # Do not revive unrelated hits via an intent bonus alone.
+    valid <- if(intent_objects) item$id=="r_objects_columns"
+      else if(intent_statistical_variable) item$id=="statistical_variable"
+      else {
+        meaningful <- setdiff(tokens,c("variable","variables","varibles",
+                                       "numeric","numerical","data"))
+        length(meaningful)>0L && any(meaningful %in% keys)
+      }
+    if (!valid || out_of_scope_explanation) hit <- 0L
     hit
   },integer(1))
   ord <- order(-score,match(catalog$type,c("concept","function","walkthrough")),
@@ -183,31 +228,31 @@ ru_topics <- function() {
 ru_find <- function(query,n=10L,type=NULL) {
   if(missing(query) || !is.character(query) || length(query)!=1L ||
      is.na(query) || !nzchar(trimws(query))) {
-    cat("Try ru_find('stationarity'), ru_find('sd function'), ",
+    cat("Try ru_find('create variables'), ru_find('stationarity'), ",
         "or ru_topics().\n",sep="")
     return(invisible(.ru_catalog()[FALSE,,drop=FALSE]))
   }
   hits <- .ru_search_results(query,n=n,type=type)
   changes <- attr(hits,"corrected_terms")
-  if (length(changes))
+  if(length(changes))
     cat("Spelling suggestion: ",paste(changes,collapse=", "),".\n",sep="")
   if(!nrow(hits)) {
-    cat("No local reference found. Try fewer words or ru_topics().\n")
+    cat("No local reference found for that question. ",
+        "Try a more specific term or ru_topics().\n",sep="")
     return(invisible(hits))
   }
-  for(i in seq_len(nrow(hits))) {
-    prefix <- paste0(i,". [",
-                     toupper(substring(hits$type[i],1L,1L)),
-                     substring(hits$type[i],2L),"] ")
-    limit <- max(25L,as.integer(getOption("width",80L))-nchar(prefix)-1L)
-    wrapped <- strwrap(hits$title[i],width=limit)
-    cat(prefix,wrapped[1L],"\n",sep="")
-    if(length(wrapped)>1L)
-      for(line in wrapped[-1L]) cat("   ",line,"\n",sep="")
-    cat("   ID: ",hits$id[i],"\n",sep="")
-    cat("   Open: ",hits$path[i],"\n",sep="")
-    if(hits$type[i]=="walkthrough")
-      cat("   Check: ",hits$inputs[i],"\n",sep="")
+  top <- hits[1L,]
+  if(.ru_rstudio_ready()) {
+    # One relevant native article/walkthrough in the Help pane, not
+    # a verbose list or raw Quarto printed into the Console.
+    if(top$type=="walkthrough") ru_guide(top$id)
+    else .ru_help_page(top$topic,package=top$package)
+  } else {
+    cat("Best match: [",top$type,"] ",top$title,"\n",
+        "Open: ",top$path,"\n",sep="")
+    if(nrow(hits)>1L)
+      cat("Other relevant results: ",
+          paste(head(hits$id[-1L],2L),collapse=", "),".\n",sep="")
   }
   invisible(hits)
 }
@@ -216,13 +261,13 @@ ru_open <- function(query,type=NULL) {
     stop("Provide one search phrase or reference ID.",call.=FALSE)
   result <- .ru_search_results(query,n=1L,type=type)
   if(!nrow(result)) {
-    cat("No matching entry. Use ru_find('keywords') for choices.\n")
+    cat("No matching reference. Try ru_find('keywords').\n")
     return(invisible(NULL))
   }
   item <- result[1L,]
   if(item$type=="walkthrough")
     return(ru_guide(item$id))
-  utils::help(item$topic,package=item$package)
+  .ru_help_page(item$topic,package=item$package)
 }
 
 # Internal method lookup remains restricted to walkthroughs for compatibility.

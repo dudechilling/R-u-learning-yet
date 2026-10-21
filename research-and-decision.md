@@ -521,3 +521,42 @@ distribution decision requires the author's explicit action.
 Help-pane interaction, initial application time and accuracy, error-recovery
 difficulty, independent 24-hour transfer, seven-day retention, keyboard and
 assistive-technology accessibility. Software checks cannot satisfy these.
+
+## Manual Windows QA failure: basic R variables and Help-pane presentation (2026-10-20)
+
+**Observed by learner:** `ru_find("How do I create variables?")` returned correlation and scatterplot references, and `ru_guide("correlation_test")` printed raw ```{r}` fences, `#| eval: false`, wrapper-based code and irrelevant explanation. The learner described it as "kind of chunky and not helpful". An earlier Windows package reinstall printed "package 'rulearn' is in use and will not be installed", so the installed Windows revision was **never independently established**.
+
+**Independent reproduction:** Exported local SHA `4c94ae5ba6b4cf17843b176807db934e30adaec0` by `git archive`, installed into a clean R library on m710, and executed the two original calls exactly. Both failures were reproduced. This establishes a real source defect at that SHA, **not** that the source was running in the learner's Windows session.
+
+**Confirmed root causes:**
+
+1. Search accepted generic "variables" from statistical-method titles without evidence of the verb "create" or the R programming operation. No reference for R assignment and column extraction was indexed.
+2. The Console-facing guide function read installed `.qmd` lines directly; only specially labeled short/detailed code chunks were expanded. Legacy ```{r}` chunks retained raw Quarto directives and `ru_apply()`. This was a representation defect, not necessarily a numerical-statistics defect.
+3. The search correction proposed in the prior candidate did not include basic R object creation, so a statistics-only topic index could not answer the immediate task.
+
+**Targeted changes (no new computation engine):**
+
+- Add one installed Rd beginner reference `r_objects_columns`. The immediate example uses `mpg <- df$mpg` and `weight <- df$weight` for a data frame with those actual columns. Explain `<-`, `$`, name checking, object-versus-column distinctions, and adding a derived data-frame column. Do not embed the learner's vehicle CSV or infer its data values. The built-in `mtcars` dataset verifies executable syntax; its weight column is `wt`, not `weight`.
+- Add a distinct `statistical_variable` concept to explain variables, observations and measurement types without confusing those with R assignment.
+- Add deterministic classification for assignment/column requests, distinguish statistical-variable definitions from programming instructions, and prevent generic "variables" alone from ranking unrelated correlations or plots. Ensure an explicit scatter/paired-number plot still finds `scatterplot`. Tighten conservative spelling and no-match behavior for unrelated requests.
+- In RStudio, `ru_find()` opens the best matching native R help article or rendered walkthrough instead of printing lists. `ru_open()` uses native R Help. `ru_guide()` converts its existing installed canonical `.qmd` plus editable source-code chunks to **temporary Rd**, then uses `rstudioapi::previewRd()` in the Help pane if available. No persistent duplicate guide pages are generated. The non-RStudio fallback displays plain text with no Quarto fences or printer backspaces.
+- All legacy wrapper-based guides remain available, visibly labeled as compatibility examples. `ru_edit()` continues to refuse overwrites and now uses RStudio's existing `navigateToFile()` API to open a copied script in the Source editor when available. `rstudioapi` is suggested for IDE integration, not required for offline statistics reference. The package version is incremented to `0.3.1` to distinguish the installer from prior `0.3.0` QA packages.
+
+**Software observations before human retest:**
+
+- With a clean local package installation, all requested programming/search cases routed to the assignment reference, statistical-variable concept, scatterplot, or explicit no-match as intended; conservative misspelling `varibles` found the right reference.
+- Additional unseen paraphrases verified extraction/assignment, plotting, statistical definitions, and out-of-domain false-positive handling. The package's prior 22-query and historical question benchmarks remained at `22/22` and `18/19` respectively, with the final historical case correctly outside its scope. These are adapted, **in-sample** scripted retrieval checks, not human timing or comprehension measurements.
+- All 46 indexed worked guides converted to syntactically valid Rd and plain text without raw Quarto execution directives. The older correlation guide remained clearly marked as a wrapper example. Both quick and detailed canonical R examples remained available.
+- **RStudio Help pane and Source editor behavior are UNVERIFIED in a Windows GUI**. Headless output and inspection of the official `rstudioapi` interface cannot substitute for that manual check. Student speed, 24-hour recall and seven-day retention also remain UNVERIFIED.
+- A build-time source-commit marker and source archive SHA-256 will be included in the **private QA package** to verify the installed revision, rather than relying on `packageVersion()` alone. No GitHub push, default-branch merge, site deployment, license decision or academic-file upload is authorized.
+
+**Executed software checks before final Git freeze:**
+
+- Original failure reproduced in an isolated install of `4c94ae5`. Source version could not be inferred from the failed Windows reinstallation.
+- Proposed `rulearn` version `0.3.1` installed locally; original RLY-QA-001 through RLY-QA-010 and independent paraphrase/no-match questions passed. All 46 canonical walkthroughs rendered into parseable temporary Rd and ordinary text with no raw Quarto fences, execution metadata or printer-backspace controls. Legacy `correlation_test` is explicitly marked as wrapper-based.
+- The existing 22-query search benchmark still returned `22/22` correct top results; the historical task benchmark returned `18/19` appropriate top outcomes (last item intentionally outside this statistics reference). These are adapted scripted checks, not speed or retention evidence.
+- `R CMD build` created `rulearn_0.3.1.tar.gz` from the working tree. After addressing two ordinary namespace-check NOTEs, `R CMD check --no-manual` reported **Status: OK** (0 errors, 0 warnings, 0 notes) across **seven** test scripts: consistency, data adaptation, reference, review regressions, smoke, transfer, and windows variables QA.
+- Quarto 1.10.19 rendered 51 pages; static audit found 0 broken links/assets, 0 missing image descriptions, and all 51 pages had document language and primary heading. The source archive contained 165 files, including 46 runnable example scripts, with no original academic documents or named student identifiers.
+- Code behavior in an actual Windows RStudio graphical Help or Source pane is **NOT VERIFIED** by m710's headless tests; the next supervised manual session must verify Help-pane opening, back navigation, Source editor opening, and correct package replacement after restarting R.
+
+**Final checks and Windows QA kit:** Verify again after committing the source and stamping a private installer with its full Git SHA. The earlier `4c94ae5` package remains preserved. No GitHub publication or license change has been authorized.
