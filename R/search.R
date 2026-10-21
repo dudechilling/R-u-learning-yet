@@ -11,6 +11,11 @@
 }
 .ru_words <- function(x) {
   s <- tolower(gsub("p[- ]?values?", "pvalue", x, perl=TRUE))
+  # Apostrophe clitics are not independent search terms: "car's" must
+  # not supply an "s" that matches statistical notation such as "r_s".
+  # Strip a one-letter apostrophe suffix before punctuation splitting,
+  # including a typographic apostrophe. Standalone r, s, t, x and y stay.
+  s <- gsub("(?<=[[:alnum:]])['\u2019][[:alpha:]]\\b","",s,perl=TRUE)
   s <- gsub("[^[:alnum:]]+"," ",s)
   t <- strsplit(s,"[[:space:]]+")[[1]]
   unique(setdiff(t[nzchar(t)],c(
@@ -21,7 +26,8 @@
     "different","two","me","please","tell","about","as",
     "this","that","something","anything","library","not","cover",
     "if","whether","when","should","use","describe",
-    "whether","causes")))
+    # Generic question scaffolding cannot justify a statistical hit alone.
+    "whether","causes","why","change","compare")))
 }
 
 # Deterministic, conservative spelling repair using the words already

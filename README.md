@@ -98,7 +98,7 @@ candidate, with status retained in the catalogue.
 ## Tests and redistribution
 
 Run `R CMD build .` from a parent folder and then
-`R CMD check --no-manual rulearn_0.4.1.tar.gz` on the built archive.
+`R CMD check --no-manual rulearn_0.4.2.tar.gz` on the built archive.
 Quarto-specific rendering remains unverified in Phase 1 because its CLI
 was unavailable in the m710 environment; the offline R package itself does
 not require Quarto.

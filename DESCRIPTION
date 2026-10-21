@@ -1,6 +1,6 @@
 Package: rulearn
 Title: Offline R and Statistics Reference Library
-Version: 0.4.1
+Version: 0.4.2
 Authors@R: person("R-u-learning-yet", "Contributors", email="244890287+dudechilling@users.noreply.github.com", role=c("aut","cre"))
 Description: Provides searchable offline statistics and R references with short
     native-R examples, data-adaptation instructions, and optional visual
