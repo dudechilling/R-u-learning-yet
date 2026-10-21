@@ -3,57 +3,57 @@ load_builtin,load_builtin,R fundamentals,How do I load a built-in R dataset?,loa
 import_csv,import_csv,R fundamentals,How do I import a CSV into a data frame?,import csv,read.csv,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/utils/html/read.table.html
 r_objects_columns,r_objects_columns,R fundamentals,How do I create R objects and select CSV columns?,r objects columns,<-$,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/assignOps.html
 derived_column,derived_column,R fundamentals,How do I create a derived column in a data frame?,derived column,<-$,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/Extract.html
-vectors,vectors,R fundamentals,How do I create and inspect a vector?,vectors,c length,DISCOVERED,NOT_VERIFIED,
-data_frames,data_frames,R fundamentals,What is a data frame in R?,data frames,data.frame,DISCOVERED,NOT_VERIFIED,
-factors,factors,R fundamentals,How do I represent categories as factors?,factors,factor,DISCOVERED,NOT_VERIFIED,
+vectors,vectors,R fundamentals,How do I create and inspect a vector?,vectors,c length,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/base/html/vector.html
+data_frames,data_frames,R fundamentals,What is a data frame in R?,data frames,data.frame,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+factors,factors,R fundamentals,How do I represent categories as factors?,factors,factor,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 inspect_columns,inspect_columns,R fundamentals,"How do I check column names, types, and rows?",inspect columns,names str head nrow,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/utils/html/str.html
 sort_values,sort_values,R fundamentals,How do I sort numerical observations?,sort values,sort order,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/sort.html
 filter_rows,filter_rows,R fundamentals,How do I keep observations meeting a condition?,filter rows,subset,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-missing_values,missing_values,R fundamentals,How do I find and handle missing values?,missing values,is.na na.rm,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-r_packages,r_packages,R fundamentals,How do I install and load an R package?,r packages,install.packages library,DISCOVERED,NOT_VERIFIED,
+missing_values,missing_values,R fundamentals,How do I find and handle missing values?,missing values,is.na na.rm,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+r_packages,r_packages,R fundamentals,How do I install and load an R package?,r packages,install.packages library,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 run_code,run_code,R fundamentals,How do I run an R command in RStudio?,run code,RStudio,DISCOVERED,NOT_VERIFIED,
 read_output,read_output,R fundamentals,How do I interpret printed R output?,read output,print summary,DISCOVERED,NOT_VERIFIED,
-quarto_file,quarto_file,R fundamentals,What is a Quarto document?,quarto file,qmd,DISCOVERED,NOT_VERIFIED,
-quarto_render,quarto_render,R fundamentals,How do I render a Quarto document?,quarto render,quarto,DISCOVERED,NOT_VERIFIED,
-r_errors,r_errors,R fundamentals,How do I fix common R syntax and execution errors?,r errors,str names,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-relative_paths,relative_paths,R fundamentals,How do I find the CSV file R is opening?,relative paths,getwd file.choose,DISCOVERED,NOT_VERIFIED,
-select_rows_columns,select_rows_columns,R fundamentals,How do I subset rows and columns?,select rows columns,[,DISCOVERED,NOT_VERIFIED,
-numeric_type,numeric_type,R fundamentals,How do I tell whether a column is numeric?,numeric type,is.numeric,DISCOVERED,NOT_VERIFIED,
+quarto_file,quarto_file,R fundamentals,What is a Quarto document?,quarto file,qmd,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+quarto_render,quarto_render,R fundamentals,How do I render a Quarto document?,quarto render,quarto,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+r_errors,r_errors,R fundamentals,How do I fix common R syntax and execution errors?,r errors,str names,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+relative_paths,relative_paths,R fundamentals,How do I find the CSV file R is opening?,relative paths,getwd file.choose,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+select_rows_columns,select_rows_columns,R fundamentals,How do I subset rows and columns?,select rows columns,[,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+numeric_type,numeric_type,R fundamentals,How do I tell whether a column is numeric?,numeric type,is.numeric,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 statistical_variable,statistical_variable,Data and measurement,What is a statistical variable?,statistical variable,str,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
 observational_unit,observational_unit,Data and measurement,What is an observational unit?,observational unit,nrow,DISCOVERED,NOT_VERIFIED,
-population_sample,population_sample,Data and measurement,How is a sample different from a population?,population sample,nrow,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-sample_statistic,sample_statistic,Data and measurement,What is a sample statistic versus population parameter?,sample statistic,mean,DISCOVERED,NOT_VERIFIED,
-measurement_scales,measurement_scales,Data and measurement,"How do nominal, ordinal, interval and ratio scales differ?",measurement scales,factor,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-categorical_quantitative,categorical_quantitative,Data and measurement,How do I choose a method for categorical versus quantitative data?,categorical quantitative,str,DISCOVERED,NOT_VERIFIED,
+population_sample,population_sample,Data and measurement,How is a sample different from a population?,population sample,nrow,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+sample_statistic,sample_statistic,Data and measurement,What is a sample statistic versus population parameter?,sample statistic,mean,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+measurement_scales,measurement_scales,Data and measurement,"How do nominal, ordinal, interval and ratio scales differ?",measurement scales,factor,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+categorical_quantitative,categorical_quantitative,Data and measurement,How do I choose a method for categorical versus quantitative data?,categorical quantitative,str,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 discrete_continuous,discrete_continuous,Data and measurement,What is the difference between discrete and continuous data?,discrete continuous,table,DISCOVERED,NOT_VERIFIED,
-sample_size,sample_size,Data and measurement,What does sample size mean?,sample size,length nrow,DISCOVERED,NOT_VERIFIED,
+sample_size,sample_size,Data and measurement,What does sample size mean?,sample size,length nrow,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 units,units,Data and measurement,How do I interpret measurement units in an R plot?,units,xlab ylab,DISCOVERED,NOT_VERIFIED,
 derived_values,derived_values,Data and measurement,When is a derived variable different from a recorded observation?,derived values,transform,DISCOVERED,NOT_VERIFIED,
 minimum,minimum,Descriptive statistics,How do I find the minimum?,minimum,min,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/Extremes.html
 maximum,maximum,Descriptive statistics,How do I find the maximum?,maximum,max,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/Extremes.html
 range,range,Descriptive statistics,How do I calculate a range?,range,range diff,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/range.html
 mean,mean,Descriptive statistics,How do I calculate the arithmetic mean?,mean,mean,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/mean.html
-median,median,Descriptive statistics,How do I calculate a median?,median,median,DISCOVERED,NOT_VERIFIED,
+median,median,Descriptive statistics,How do I calculate a median?,median,median,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/median.html
 mode_statistical,mode_statistical,Descriptive statistics,What is the most frequent value (statistical mode)?,mode statistical,table,DISCOVERED,NOT_VERIFIED,
 trimmed_mean,trimmed_mean,Descriptive statistics,How do I calculate a trimmed mean?,trimmed mean,mean,DISCOVERED,NOT_VERIFIED,
 quartiles,quartiles,Descriptive statistics,"How do I calculate Q1, median, and Q3?",quartiles,quantile,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/quantile.html
 percentiles,percentiles,Descriptive statistics,How do I calculate percentile cutoffs?,percentiles,quantile,DISCOVERED,NOT_VERIFIED,
 quantiles,quantiles,Descriptive statistics,How do I find arbitrary quantiles?,quantiles,quantile,DISCOVERED,NOT_VERIFIED,
-interquartile_range,interquartile_range,Descriptive statistics,How do I calculate the IQR?,interquartile range,IQR,DISCOVERED,NOT_VERIFIED,
+interquartile_range,interquartile_range,Descriptive statistics,How do I calculate the IQR?,interquartile range,IQR,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 variance,variance,Descriptive statistics,How do I calculate sample variance?,variance,var,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/cor.html
 standard_deviation,variance_sd,Descriptive statistics,How do I calculate sample standard deviation?,standard deviation,sd,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/sd.html
-outliers,outliers,Descriptive statistics,How can I identify potential outliers?,outliers,boxplot.stats,DISCOVERED,NOT_VERIFIED,
+outliers,outliers,Descriptive statistics,How can I identify potential outliers?,outliers,boxplot.stats,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 distribution_shape,distribution_shape,Descriptive statistics,How do I describe distribution shape?,distribution shape,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
 skewness,skewness,Descriptive statistics,"What is positive or negative skew, and how can I tell?",skewness,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
 symmetry,symmetry,Descriptive statistics,What makes a distribution approximately symmetric?,symmetry,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
 unimodal,unimodal,Descriptive statistics,What does unimodal mean?,unimodal,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
 bimodal,bimodal,Descriptive statistics,What does bimodal mean?,bimodal,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
 multimodal,multimodal,Descriptive statistics,How do I describe more than two peaks?,multimodal,hist,DISCOVERED,NOT_VERIFIED,
-relative_frequency,relative_frequency,Descriptive statistics,How do I calculate proportions from counts?,relative frequency,prop.table,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
+relative_frequency,relative_frequency,Descriptive statistics,How do I calculate proportions from counts?,relative frequency,prop.table,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
 z_score,z_score,Descriptive statistics,How do I standardize a numerical value?,z score,scale,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-standard_error,standard_error,Descriptive statistics,How does standard error differ from standard deviation?,standard error,sd sqrt,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
+standard_error,standard_error,Descriptive statistics,How does standard error differ from standard deviation?,standard error,sd sqrt,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
 weighted_average,weighted_average,Descriptive statistics,How do I calculate a mean when counts represent many cases?,weighted average,weighted.mean,DISCOVERED,NOT_VERIFIED,
-frequency_table,frequency_table,Data visualization,How do I create a frequency table?,frequency table,table,DISCOVERED,NOT_VERIFIED,
+frequency_table,frequency_table,Data visualization,How do I create a frequency table?,frequency table,table,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
 stem_leaf,r_stem,Data visualization,How do I create a stem-and-leaf plot?,stem leaf,stem,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/stem.html
 histogram,histogram,Data visualization,How do I make a histogram?,histogram,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
 histogram_breaks,histogram_breaks,Data visualization,How do I change histogram intervals?,histogram breaks,hist,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/graphics/html/hist.html
@@ -86,36 +86,74 @@ probability_rules,probability_rules,Probability and random variables,How do unio
 conditional_probability,conditional_probability,Probability and random variables,What does P(A given B) mean?,conditional probability,table,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
 independence,independence,Probability and random variables,When are two events independent?,independence,table,DISCOVERED,NOT_VERIFIED,
 empirical_probability,empirical_probability,Probability and random variables,How do I estimate event probability from counts?,empirical probability,prop.table,DISCOVERED,NOT_VERIFIED,
-discrete_random_variable,discrete_random_variable,Probability and random variables,What is a discrete random variable?,discrete random variable,table,DISCOVERED,NOT_VERIFIED,
-continuous_random_variable,continuous_random_variable,Probability and random variables,What is a continuous random variable?,continuous random variable,density,DISCOVERED,NOT_VERIFIED,
-pmf,pmf,Probability and random variables,What is a probability mass function?,pmf,dbinom,DISCOVERED,NOT_VERIFIED,
-pdf,pdf,Probability and random variables,What is a probability density function?,pdf,dnorm,DISCOVERED,NOT_VERIFIED,
-cdf,cdf,Probability and random variables,How do I calculate cumulative probability?,cdf,pnorm,DISCOVERED,NOT_VERIFIED,
-binomial,binomial,Probability and random variables,When does a binomial model apply?,binomial,dbinom,DISCOVERED,NOT_VERIFIED,
-normal_distribution,normal_distribution,Probability and random variables,How do I interpret a normal distribution?,normal distribution,dnorm,DISCOVERED,NOT_VERIFIED,
-expected_value,expected_value,Probability and random variables,How do I calculate expected value?,expected value,sum,DISCOVERED,NOT_VERIFIED,
-sampling_distribution,sampling_distribution,Sampling and inference,What is a sampling distribution?,sampling distribution,mean,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
+discrete_random_variable,discrete_random_variable,Probability and random variables,What is a discrete random variable?,discrete random variable,table,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+continuous_random_variable,continuous_random_variable,Probability and random variables,What is a continuous random variable?,continuous random variable,density,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+pmf,pmf,Probability and random variables,What is a probability mass function?,pmf,dbinom,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+pdf,pdf,Probability and random variables,What is a probability density function?,pdf,dnorm,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/Normal.html
+cdf,cdf,Probability and random variables,How do I calculate cumulative probability?,cdf,pnorm,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/Normal.html
+binomial,binomial,Probability and random variables,When does a binomial model apply?,binomial,dbinom,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/Binomial.html
+normal_distribution,normal_distribution,Probability and random variables,How do I interpret a normal distribution?,normal distribution,dnorm,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/Normal.html
+expected_value,expected_value,Probability and random variables,How do I calculate expected value?,expected value,sum,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+sampling_distribution,sampling_distribution,Sampling and inference,What is a sampling distribution?,sampling distribution,mean,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
 sampling_error,sampling_error,Sampling and inference,What is sampling error?,sampling error,mean,DISCOVERED,NOT_VERIFIED,
 confidence_interval,confidence_interval,Sampling and inference,How do I interpret a confidence interval?,confidence interval,t.test,DISCOVERED,NOT_VERIFIED,
-hypotheses,hypotheses,Sampling and inference,What are null and alternative hypotheses?,hypotheses,t.test,DISCOVERED,NOT_VERIFIED,
+hypotheses,hypotheses,Sampling and inference,What are null and alternative hypotheses?,hypotheses,t.test,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
 test_statistic,test_statistic,Sampling and inference,What is a test statistic?,test statistic,t.test,DISCOVERED,NOT_VERIFIED,
-p_value,p_value,Sampling and inference,What does a p-value mean?,p value,t.test,DISCOVERED,NOT_VERIFIED,
-statistical_significance,statistical_significance,Sampling and inference,How is statistical significance different from practical importance?,statistical significance,t.test,DISCOVERED,NOT_VERIFIED,
-one_sample_t,one_sample_t,Sampling and inference,When is a one-sample t test appropriate?,one sample t,t.test,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
+p_value,p_value,Sampling and inference,What does a p-value mean?,p value,t.test,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+statistical_significance,statistical_significance,Sampling and inference,How is statistical significance different from practical importance?,statistical significance,t.test,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+one_sample_t,one_sample_t,Sampling and inference,When is a one-sample t test appropriate?,one sample t,t.test,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/t.test.html
 two_sample_t,two_sample_t,Sampling and inference,When do I compare two independent means?,two sample t,t.test,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
 paired_t,paired_t,Sampling and inference,When do I use a paired test?,paired t,t.test,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
 design,design,Sampling and inference,Why do sampling design and independence matter?,design,sample,DISCOVERED,NOT_VERIFIED,
-estimator,estimator,Sampling and inference,How do estimates differ from true parameters?,estimator,mean,DISCOVERED,NOT_VERIFIED,
-sample_proportion,sample_proportion,Sampling and inference,How do I calculate a sample proportion?,sample proportion,prop.table,DISCOVERED,NOT_VERIFIED,
-time_series,time_series,"Spatial, temporal, and modelling",What is a time series?,time series,ts,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-trend,trend,"Spatial, temporal, and modelling",How do I recognize a trend?,trend,plot,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-seasonality,seasonality,"Spatial, temporal, and modelling",What is seasonality?,seasonality,cycle,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-autocorrelation,autocorrelation,"Spatial, temporal, and modelling",What is autocorrelation?,autocorrelation,acf,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-stationarity,stationarity,"Spatial, temporal, and modelling",What does weak stationarity mean?,stationarity,acf,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
-spatial_statistics,spatial_statistics,"Spatial, temporal, and modelling",What is spatial dependence?,spatial statistics,NA,DISCOVERED,NOT_VERIFIED,
-interpolation,interpolation,"Spatial, temporal, and modelling",How do I estimate values between observations?,interpolation,approx,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
+estimator,estimator,Sampling and inference,How do estimates differ from true parameters?,estimator,mean,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+sample_proportion,sample_proportion,Sampling and inference,How do I calculate a sample proportion?,sample proportion,prop.table,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+time_series,time_series,"Spatial, temporal, and modelling",What is a time series?,time series,ts,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+trend,trend,"Spatial, temporal, and modelling",How do I recognize a trend?,trend,plot,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+seasonality,seasonality,"Spatial, temporal, and modelling",What is seasonality?,seasonality,cycle,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+autocorrelation,autocorrelation,"Spatial, temporal, and modelling",What is autocorrelation?,autocorrelation,acf,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/acf.html
+stationarity,stationarity,"Spatial, temporal, and modelling",What does weak stationarity mean?,stationarity,acf,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/acf.html
+spatial_statistics,spatial_statistics,"Spatial, temporal, and modelling",What is spatial dependence?,spatial statistics,NA,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+interpolation,interpolation,"Spatial, temporal, and modelling",How do I estimate values between observations?,interpolation,approx,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/approxfun.html
 extrapolation,extrapolation,"Spatial, temporal, and modelling",What risks arise from extrapolating?,extrapolation,predict,DISCOVERED,NOT_VERIFIED,
-linear_regression,linear_regression,"Spatial, temporal, and modelling",What does a linear regression represent?,linear regression,lm,NEEDS_REVIEW,EXISTING_GUIDE_NOT_COMPACT,
+linear_regression,linear_regression,"Spatial, temporal, and modelling",What does a linear regression represent?,linear regression,lm,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/lm.html
 model_diagnostics,model_diagnostics,"Spatial, temporal, and modelling",How do I inspect model residuals?,model diagnostics,plot,DISCOVERED,NOT_VERIFIED,
 covariates,covariates,"Spatial, temporal, and modelling",How do I recognize confounding or omitted variables?,covariates,lm,DISCOVERED,NOT_VERIFIED,
 sample_sd,sample_sd,Descriptive statistics,"How do I summarize range, variance and standard deviation together?",range and standard deviation;sample variability,range;var;sd,VERIFIED,R_EXECUTED_EDITORIAL_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/cor.html
+accuracy_precision,accuracy_precision,Data and measurement,"What is the difference between accuracy, precision, reliability and validity?",measurement validity;reliability;precision versus accuracy;random error;systematic error;measurement bias,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+bernoulli,bernoulli,Probability and random variables,What is a Bernoulli trial?,Bernoulli;one binary trial;binary random variable,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/Binomial.html
+central_limit_theorem,central_limit_theorem,Sampling and inference,What does the central limit theorem say?,central limit theorem;CLT;sample means approximately normal;large sample,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+choose_center,choose_center,Descriptive statistics,When should I use the mean rather than the median?,choose mean median;central tendency skew outlier;robust center;when use median,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/base/html/mean.html
+choose_spread,choose_spread,Descriptive statistics,When should I choose SD versus IQR?,choose dispersion;standard deviation versus iqr;which spread;outliers;robust spread,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+cluster_stratified,cluster_stratified,Sampling and inference,How do stratified and cluster sampling differ?,stratified sampling;cluster sampling;systematic sampling;sampling methods,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+conditional_independence,conditional_independence,Probability and random variables,How do conditional probability and independence differ?,conditional probability;P(A given B);independence;P(A|B);without replacement,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+confidence_intervals,confidence_intervals,Sampling and inference,How do I interpret a confidence interval?,95 percent confidence interval;CI;interval interpretation;coverage,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/t.test.html
+confounding,confounding,Sampling and inference,What is a confounder in a comparison?,confounding;third variable;spurious association;control variables,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+cumulative_frequency,cumulative_frequency,Data visualization,How do I calculate cumulative frequency?,cumulative frequency;ogive;running total;percent at or below;ecdf,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+descriptive_inferential,descriptive_inferential,Data and measurement,What is the difference between descriptive and inferential statistics?,descriptive inferential;describe sample versus infer population;statistical inference,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+dotplot,dotplot,Data visualization,How do I make a dot plot of numeric observations?,dot plot;stacked observations;stripchart;repeated values,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+experiment_design,experiment_design,Sampling and inference,How do observational studies differ from randomized experiments?,experimental observational;randomized trial;control group;causal design,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+exponential_distribution,exponential_distribution,Probability and random variables,When is an exponential waiting-time model suitable?,exponential distribution;waiting time;memoryless;pexp,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/Exponential.html
+five_number,five_number,Descriptive statistics,How do I obtain and interpret a five-number summary?,five number;five-number;minimum q1 median q3 maximum;boxplot statistics,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+inverse_cdf,inverse_cdf,Probability and random variables,How do I find a normal cutoff from a probability?,inverse CDF;quantile;qnorm;normal cutoff;critical z,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/Normal.html
+joint_marginal,joint_marginal,Probability and random variables,What is the difference between joint and marginal probabilities?,joint distribution;marginal distribution;two variable probability,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+mean_confidence_interval,mean_confidence_interval,Sampling and inference,How do I calculate a t interval for a mean?,t confidence interval;mean confidence;average CI;t.test CI,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/t.test.html
+moving_average,moving_average,"Spatial, temporal, and modelling",How does a moving average help describe time series?,moving average;running average;rolling mean;smoothing;centered time filter,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+mutually_exclusive,mutually_exclusive,Probability and random variables,Are mutually exclusive events independent?,mutually exclusive versus independent;disjoint;cannot both occur,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+nearest_neighbor,nearest_neighbor,"Spatial, temporal, and modelling",How does nearest-neighbor interpolation work?,nearest neighbour;closest value;nearest-neighbor interpolation,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+percentile_rank,percentile_rank,Descriptive statistics,How do I interpret a percentile rank?,percentile rank;38th percentile;how many scored above;position in sample;percentile versus quantile,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+poisson,poisson,Probability and random variables,When can a Poisson distribution model counts?,Poisson;lambda;dpois;count process;event rate,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/Poisson.html
+probability_complement,probability_complement,Probability and random variables,What is the complement of an event?,complement;not A;one minus;none;at least one,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+probability_events,probability_events,Probability and random variables,What is an event in probability?,event in probability;probability axioms;event outcome;sample space,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+probability_union,probability_union,Probability and random variables,How do I find the probability of A or B?,union;A or B;addition rule;at least one;inclusion exclusion,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+proportion_interval,proportion_interval,Sampling and inference,How do I calculate a confidence interval for a proportion?,proportion CI;binomial interval;confidence proportion;prop.test,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/prop.test.html
+random_assignment,random_assignment,Sampling and inference,Why is random assignment not the same as random sampling?,random sampling versus random assignment;randomization;causality versus generalization,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+random_variance,random_variance,Probability and random variables,What is variance of a random variable?,random variable variance;theoretical spread;weighted squared deviation,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+regression_residuals,regression_residuals,"Spatial, temporal, and modelling",How do I interpret regression residuals?,residual;model error;observed minus predicted;prediction error,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+sampling_design,sampling_design,Sampling and inference,How do I recognize probability and nonprobability sampling?,probability sampling;random sample;nonprobability convenience;sample selection,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+sampling_frame,sampling_frame,Sampling and inference,What is a sampling frame and why can it cause bias?,sampling frame;sampling bias;coverage error;who was eligible,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+selection_bias,selection_bias,Sampling and inference,What is selection bias?,selection bias;volunteer bias;sampling bias;nonresponse bias,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+semivariogram,semivariogram,"Spatial, temporal, and modelling",What does a semivariogram show?,semivariogram;variogram;semivariance;spatial lag;nugget sill range,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,
+significant_figures,significant_figures,Data and measurement,How do I count significant figures?,significant digits;sig figs;0.0030;trailing zeros;precision of measurement;scientific notation,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://openstax.org/books/introductory-statistics/pages/1-2-data-sampling-and-variation-in-data-and-sampling
+student_t,student_t,Probability and random variables,When should I use the Student t distribution?,student t;degrees of freedom;qt;pt;t distribution,,AUTHORED,R_EXAMPLE_EXECUTED_EDITORIAL_SOURCE_REVIEW_PENDING,https://search.r-project.org/R/refmans/stats/html/TDist.html
+type_errors_power,type_errors_power,Sampling and inference,"What are Type I error, Type II error and power?",Type I Type II error;alpha beta;false positive;false negative;power,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,
+zero_correlation,zero_correlation,Association,Does Pearson correlation of zero prove no relationship?,r zero;correlation zero;no linear correlation;nonlinear relationship;pearson zero,,VERIFIED,R_EXECUTED_AGENT_EDITORIAL_SOURCE_REVIEWED_WINDOWS_GUI_PENDING,https://search.r-project.org/R/refmans/stats/html/cor.html

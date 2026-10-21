@@ -47,9 +47,9 @@ replay_topics <- list(
   "What is a statistical experiment?"="probability_events",
   "What is a sample space?"="sample_space",
   "Difference between independent and mutually exclusive events"=
-     "conditional_independence",
+     "mutually_exclusive",
   "What does conditional probability mean?"="conditional_independence",
-  "What is the complement of an event?"="probability_events",
+  "What is the complement of an event?"="probability_complement",
   "Stem and leaf plot for a numeric column"="r_stem",
   "How to import a csv file"="import_csv"
 )
@@ -75,11 +75,12 @@ stopifnot(nrow(se)==1L,identical(se$id[1L],"sampling_distributions"))
 invisible(capture.output(bg <- ru_find(
   "Compare measurements separated by category with a boxplot",n=1L)))
 stopifnot(nrow(bg)==1L,identical(bg$id[1L],"grouped_boxplot"))
-# Outside statistical-reference scope, return no match rather than a
-# plausible but unrelated concept. Native IDE help covers document rendering.
-invisible(capture.output(outside <- ru_find(
+# Quarto-specific pages are explicitly DEFERRED from the independently
+# verified Phase 1 candidate. Do not send a learner to a PDF probability
+# density function when they ask about generating a Quarto report.
+invisible(capture.output(doc <- ru_find(
   "Create a Quarto document rendered as PDF",n=3L)))
-stopifnot(nrow(outside)==0L)
+stopifnot(nrow(doc)==0L)
 
 invisible(capture.output(no_match <- ru_find("xyzzymn",n=2L)))
 stopifnot(nrow(no_match)==0L)

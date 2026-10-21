@@ -1,0 +1,12 @@
+/* Field Atlas is the sole canonical source of palette hex tokens. */
+:root {
+  --atlas-ocean: #28627A;
+  --atlas-clay: #C66A49;
+  --atlas-jade: #3F806E;
+  --atlas-ochre: #B18A3B;
+  --atlas-iris: #7B668C;
+  --atlas-slate: #73818B;
+  --atlas-warm-paper: #FAF8F4;
+  --atlas-deep-ink: #273640;
+  --atlas-grid: #E1E4E0;
+}

@@ -57,12 +57,12 @@ results; it does not write long articles to the Console.
 
 ## Search versus coverage
 
-The local coverage index currently lists **120 scoped topics**. The initial
-candidate supplies **31 reviewed compact lessons** (with executable examples)
-and maintains the earlier 46 longer walkthroughs, 21 native concept articles,
-and 11 R-function articles. The remaining ledger entries are clearly marked
-`NEEDS_REVIEW` or `DISCOVERED`. An indexed topic is not automatically a
-finished instruction page.
+The local coverage index contains **158 scoped topics**. This candidate
+provides **61 source-reviewed compact lessons**, of which 47 include
+executable ordinary R examples and 14 provide conceptual study guidance
+without unnecessary code. The remaining 97 indexed topics consist of
+53 `AUTHORED` but unverified drafts, 8 `NEEDS_REVIEW`, and 36 `DISCOVERED`
+topics without finished lessons. An indexed topic is not a published lesson.
 
 Older walkthroughs that have not been rewritten show a **clear compatibility
 notice** rather than claiming to teach ordinary R code. Their original
@@ -80,29 +80,28 @@ sampling, measurement units, independence assumptions or interpretations.
 
 ## Content and reproducibility
 
-Compact lesson sources are in `inst/lessons/*.md`. Each contains a single
-structured question, immediate answer, native R code, edit instructions,
-checks, interpretation, optional explanation and source URL. The Viewer
-renders these installed files into temporary HTML; no duplicated page text
-is committed.
+Compact lesson sources are in `inst/lessons/*.md`. Each contains an
+original question, immediate answer, validity checks, bounded interpretation
+and optional explanation. Computational lessons include native R and an edit
+table. Concept-only study cards contain no fake calculation.
+Public sources are cited only where verified; source-slide anchors remain
+in the private QA evidence.
 
-The small `R/` directory implements reference lookup and rendering. The
-`inst/www/` directory contains local CSS, minimal copy-button JavaScript and
-four purposeful SVG figures. Figures can be regenerated with
-`Rscript scripts/generate-figures.R`. Existing long-form material remains
-in `inst/guides/` and `inst/examples/`; the legacy Quarto site remains
-optional. The public `inst/extdata/coverage.csv` ledger contains topic
-status but **not** private coursework or filenames.
-
-Detailed architectural decisions and evidence limits live in
-[research-and-decision.md](research-and-decision.md). See
-[methodology.md](methodology.md) for editorial and statistical safeguards.
+The `R/` directory implements reference lookup and local rendering.
+The `inst/www/` directory supplies a local shared palette, copy control
+and five purpose-built SVG diagrams. Regenerate figures with
+`Rscript scripts/generate-figures.R`. The 46 older long-form
+walkthroughs remain as compatibility material. Unfinished broader
+curriculum and Quarto-specific output remain outside the verified
+candidate, with status retained in the catalogue.
 
 ## Tests and redistribution
 
 Run `R CMD build .` from a parent folder and then
-`R CMD check --no-manual rulearn_0.4.0.tar.gz` on the built archive.
-Also run the Quarto site and local-rendering test suites when updating pages.
+`R CMD check --no-manual rulearn_0.4.1.tar.gz` on the built archive.
+Quarto-specific rendering remains unverified in Phase 1 because its CLI
+was unavailable in the m710 environment; the offline R package itself does
+not require Quarto.
 Windows Viewer navigation and clipboard behaviour require a supervised
 Windows RStudio test; automated HTML checks are not a substitute.
 

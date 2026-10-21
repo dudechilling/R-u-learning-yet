@@ -86,7 +86,7 @@ grDevices::dev.off()
 # Search from general questions; do not train on or retain coursework.
 lookup <- c(
  "What is the sample space?"="sample_space",
- "Are independent events the same as mutually exclusive?"="conditional_independence",
+ "Are independent events the same as mutually exclusive?"="mutually_exclusive",
  "How do I make a stem and leaf plot?"="r_stem",
  "Define descriptive and inferential statistics"="descriptive_inferential",
  "How do I make a histogram?"="histogram",

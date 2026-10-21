@@ -174,6 +174,79 @@
   if(grepl("\\b(describe|inspect|summarize)\\b.*\\bdataset\\b",qstat,perl=TRUE) &&
      !grepl("\\b(statistic|mean|variance|quartile|graph|plot)\\b",qstat,perl=TRUE))
     subject <- "inspect_columns"
+  # Preserve statistical-population and foundational exam wordings
+  # when newer, narrower lesson titles introduce competing terms.
+  if(grepl("\\bstatistical population\\b",qstat,perl=TRUE))
+    subject <- "population_sample"
+  if(grepl("\\bstatistical experiment\\b",qstat,perl=TRUE))
+    subject <- "probability_events"
+  if(grepl("\\bindependen\\w*\\b",qstat,perl=TRUE) &&
+     grepl("\\bmutually exclusive\\b",qstat,perl=TRUE))
+    subject <- "mutually_exclusive"
+  if(grepl("\\bcomplement\\b",qstat,perl=TRUE) &&
+     !grepl("\\bcomplementary probabilities\\b",qstat,perl=TRUE))
+    subject <- "probability_complement"
+  if(grepl("^what does a p-value mean",qstat,perl=TRUE))
+    subject <- "hypothesis_tests_pvalues"
+  # Prefer the precise *question intent*, not a generic term shared with
+  # several older reference pages. Only disambiguate when the full set of
+  # qualifying concept words is present; preserve unrelated searches.
+  if(grepl("\\bpercentile\\b",qstat,perl=TRUE) &&
+     grepl("\\brank\\b|\\branked\\b",qstat,perl=TRUE))
+    subject <- "percentile_rank"
+  if(grepl("\\b(mean|median)\\b.*\\b(mean|median)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(when|choose|select|report|better|instead)\\b",qstat,perl=TRUE))
+    subject <- "choose_center"
+  if(grepl("\\b(event|events)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(probability|random)\\b",qstat,perl=TRUE) &&
+     !grepl("\\b(conditional|independent|union|or|mutually|complement)\\b",qstat,perl=TRUE))
+    subject <- "probability_events"
+  if(grepl("\\bexpected value\\b|\\bexpectation of\\b",qstat,perl=TRUE))
+    subject <- "expected_value"
+  if(grepl("\\brandom variables?\\b",qstat,perl=TRUE) &&
+     grepl("\\bvariance\\b",qstat,perl=TRUE))
+    subject <- "random_variance"
+  if(grepl("\\bsampling distribution\\b",qstat,perl=TRUE) &&
+     !grepl("\\bstandard error\\b",qstat,perl=TRUE))
+    subject <- "sampling_distribution"
+  if(grepl("\\bstandard error\\b",qstat,perl=TRUE) &&
+     !grepl("\\bstandard deviation\\b",qstat,perl=TRUE))
+    subject <- "standard_error"
+  if(grepl("\\bconfidence interval\\b",qstat,perl=TRUE) &&
+     !grepl("\\b(for|of) (the )?mean\\b|\\bt interval\\b",qstat,perl=TRUE))
+    subject <- "confidence_intervals"
+  # Recognize method intent from several independent study terms, rather
+  # than merely finding an incidental noun in a legacy reference title.
+  # These are conservative domain disambiguations, not assignment solvers.
+  if(grepl("\\b(rank(ed)?|ordered|ordinal)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(opinion|rating|response|measurement|difference|scale)\\b",qstat,perl=TRUE))
+    subject <- "measurement_scales"
+  if(grepl("\\b(fraction|share|proportion|percentage|percent)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(categories|category|counts?|recorded|frequency)\\b",qstat,perl=TRUE))
+    subject <- "relative_frequency"
+  if(grepl("\\b(treatment|experiment|intervention)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(random|assigned|allocation)\\b",qstat,perl=TRUE))
+    subject <- "experiment_design"
+  if(grepl("\\bunion\\b|\\b(at least one)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(events?|overlap|probability|rule)\\b",qstat,perl=TRUE))
+    subject <- "probability_union"
+  if(grepl("\\b(conditioned|conditioning|given)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(probability|events?|occurred)\\b",qstat,perl=TRUE))
+    subject <- "conditional_independence"
+  if(grepl("\\b(success|failure)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(count|number|independent|multiple|trials?|distribution)\\b",qstat,perl=TRUE) &&
+     !grepl("\\bone (trial|single trial)\\b",qstat,perl=TRUE))
+    subject <- "binomial"
+  if(grepl("\\b(expectation|expected value|weighted expectation)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(probability|weighted|random)\\b",qstat,perl=TRUE))
+    subject <- "expected_value"
+  if(grepl("\\b(sample means?|sampling means?)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(variation|variability|across|repeated|sampling|distribution)\\b",qstat,perl=TRUE))
+    subject <- "sampling_distribution"
+  if(grepl("\\b(false|falsely|incorrect|wrong)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(reject|rejecting|rejection)\\b",qstat,perl=TRUE) &&
+     grepl("\\b(null|h0|hypothesis)\\b",qstat,perl=TRUE))
+    subject <- "type_errors_power"
   # Programming requests need assignment/extraction, not statistical models.
   # Inspect the original query before punctuation tokenization removes <- and $.
   intent_objects <- grepl(paste0(
@@ -277,7 +350,10 @@
     } else {
       meaningful <- setdiff(tokens,c("variable","variables","varibles",
                                      "numeric","numerical","data"))
-      if(!length(meaningful) || !any(meaningful %in% keys))
+      # Two independent intent cues can justify a precise local reference
+      # even if the novice wording shares no title/alias tokens.
+      if((!length(meaningful) || !any(meaningful %in% keys)) &&
+         !(nzchar(subject) && item$id==subject))
         hit <- 0L
     }
     if(intent_scatter && item$id=="scatterplot") hit <- hit + 115L
@@ -291,7 +367,8 @@
       else {
         meaningful <- setdiff(tokens,c("variable","variables","varibles",
                                        "numeric","numerical","data"))
-        length(meaningful)>0L && any(meaningful %in% keys)
+        (length(meaningful)>0L && any(meaningful %in% keys)) ||
+          (nzchar(subject) && item$id==subject)
       }
     if (!valid || out_of_scope_explanation || out_of_scope_repair) hit <- 0L
     hit

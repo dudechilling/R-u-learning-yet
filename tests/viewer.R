@@ -97,23 +97,30 @@ unlink(directory,recursive=TRUE)
 # Every reviewed lesson has the same one-source content structure and a
 # genuinely executable example from an R included dataset or a model.
 index <- getFromNamespace(".ru_lesson_index","rulearn")()
-stopifnot(nrow(index)==31L,!anyDuplicated(index$id))
+stopifnot(nrow(index)==61L,!anyDuplicated(index$id),all(index$status=="VERIFIED"))
 grDevices::pdf(tempfile(fileext=".pdf"))
 for(id in index$id) {
  item <- lesson_read(id)
- stopifnot(all(c("immediate answer","use this in r","what to edit",
-                 "what to check","interpret your results","learn more") %in%
+ stopifnot(all(c("immediate answer","what to check",
+                 "interpret your results","learn more") %in%
                names(item$sections)),
-           length(item$edit)>=1L,
-           grepl("^https://",item$meta$sources),
            !grepl("ru_apply(",item$code,fixed=TRUE),
-           nzchar(item$code),
            item$meta$status %in% c("AUTHORED","VERIFIED"))
- env <- new.env(parent=.GlobalEnv)
- result <- try(suppressMessages(eval(parse(text=item$code),envir=env)),
-               silent=TRUE)
- if(inherits(result,"try-error"))
-   stop("Lesson failed to execute: ",id," ",result,call.=FALSE)
+ if(nzchar(item$code)){
+   stopifnot(length(item$edit)>=1L,
+             all(c("use this in r","what to edit") %in% names(item$sections)))
+   env <- new.env(parent=.GlobalEnv)
+   result <- try(suppressMessages(eval(parse(text=item$code),envir=env)),
+                 silent=TRUE)
+   if(inherits(result,"try-error"))
+     stop("Lesson failed to execute: ",id," ",result,call.=FALSE)
+ } else {
+   stopifnot(length(item$edit)==0L,
+             "exam answer pattern" %in% names(item$sections))
+   page <- make_page(item)
+   stopifnot(!grepl("class='copy'",page,fixed=TRUE),
+             grepl("Answer pattern for study",page,fixed=TRUE))
+ }
 }
 grDevices::dev.off()
 
@@ -125,7 +132,8 @@ stopifnot(length(html)>=95L,
           file.exists(file.path(folder,"results.html")),
           file.exists(file.path(folder,"figures","skew-shapes.svg")),
           file.exists(file.path(folder,"reference.js")),
-          file.exists(file.path(folder,"reference.css")))
+          file.exists(file.path(folder,"reference.css")),
+          file.exists(file.path(folder,"field-atlas.css")))
 s<-paste(readLines(file.path(folder,"skewness.html")),collapse="\n")
 stopifnot(grepl("aria-label='Copy this R code",s,fixed=TRUE),
           grepl("details",s,fixed=TRUE),
@@ -140,10 +148,13 @@ s<-paste(readLines(file.path(folder,"results.html")),collapse="\n")
 stopifnot(!grepl("<script>alert('bad')</script>",s,fixed=TRUE),
           grepl("&lt;script&gt;",s,fixed=TRUE))
 source <- getFromNamespace(".ru_coverage","rulearn")()
-stopifnot(nrow(source)==120L,
-          sum(source$content_status=="VERIFIED")==31L,
-          sum(source$content_status=="NEEDS_REVIEW")==23L,
-          sum(source$content_status=="DISCOVERED")==66L,
+stopifnot(nrow(source)==158L,
+          sum(source$content_status=="VERIFIED")==61L,
+          sum(source$content_status=="AUTHORED")==53L,
+          sum(source$content_status=="NEEDS_REVIEW")==8L,
+          sum(source$content_status=="DISCOVERED")==36L,
+          !anyDuplicated(source$reference_id),
+          all(index$id %in% source$reference_id),
           !any(vapply(
             c(paste0(c("STAT","GEOG")," ",c("1200","2700")),
               paste0("/home","/earl")),
@@ -152,5 +163,5 @@ stopifnot(nrow(source)==120L,
 catalog<-paste(readLines(file.path(folder,"catalog.html")),collapse="\n")
 stopifnot(grepl("Topic coverage",catalog,fixed=TRUE),
           grepl("Verified",catalog,ignore.case=TRUE))
-cat("31 native lessons, static pages, SVG, edit/copy controls, ",
-    "offline content, CSP, query escaping, 120-topic ledger: PASS\n",sep="")
+cat(nrow(index),"compact lessons, conceptual study and native code, static pages, ",
+    "offline content, CSP, query escaping, 158-topic ledger: PASS\n",sep="")

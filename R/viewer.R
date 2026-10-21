@@ -32,26 +32,38 @@
         if(!section %in% names(sections)) sections[[section]] <- character()
       } else if(nzchar(section)) sections[[section]] <- c(sections[[section]],line)
     }
-  mandatory <- c("immediate answer","use this in r","what to edit",
-                 "what to check","interpret your results","learn more")
+  mandatory <- c("immediate answer","what to check",
+                 "interpret your results","learn more")
   if(!all(mandatory %in% names(sections)) || !nzchar(title))
     stop("Required lesson sections missing: ",id,call.=FALSE)
-  chunk <- sections[["use this in r"]]
-  start <- grep("^```r[[:space:]]*$",chunk)
-  stop <- which(chunk=="```")
-  if(length(start)!=1L || length(stop)!=1L || stop<=start+1L)
-    stop("Expected one R code block: ",id,call.=FALSE)
-  code <- paste(chunk[seq.int(start+1L,stop-1L)],collapse="\n")
-  table <- sections[["what to edit"]]
-  table <- table[grepl("^\\|",table)]
-  if(length(table)<3L) stop("Edit table missing: ",id,call.=FALSE)
-  table <- table[-c(1L,2L)]
-  rows <- lapply(table,function(line) {
-    line <- sub("^\\|","",sub("\\|$","",line))
-    v <- trimws(strsplit(line,"|",fixed=TRUE)[[1L]])
-    if(length(v)!=3L) stop("Invalid edit row: ",id,call.=FALSE)
-    v
-  })
+  # Conceptual exam study need not invent code.
+  code <- ""
+  rows <- list()
+  if("use this in r" %in% names(sections)) {
+    chunk <- sections[["use this in r"]]
+    start <- grep("^```r[[:space:]]*$",chunk)
+    stop <- which(chunk=="```")
+    if(length(start)!=1L || length(stop)!=1L || stop<=start+1L)
+      stop("Expected exactly one native R block: ",id,call.=FALSE)
+    code <- paste(chunk[seq.int(start+1L,stop-1L)],collapse="\n")
+    if(!nzchar(trimws(code)))stop("Empty code block: ",id,call.=FALSE)
+    if(!"what to edit" %in% names(sections))
+      stop("R example must explain editable elements: ",id,call.=FALSE)
+    table <- sections[["what to edit"]]
+    table <- table[grepl("^\\|",table)]
+    if(length(table)<3L) stop("Edit table missing: ",id,call.=FALSE)
+    table <- table[-c(1L,2L)]
+    rows <- lapply(table,function(line) {
+      line <- sub("^\\|","",sub("\\|$","",line))
+      v <- trimws(strsplit(line,"|",fixed=TRUE)[[1L]])
+      if(length(v)!=3L) stop("Invalid edit row: ",id,call.=FALSE)
+      v
+    })
+  } else if("what to edit" %in% names(sections)) {
+    stop("Concept-only lesson must omit code-edit table: ",id,call.=FALSE)
+  }
+  if(!nzchar(code) && !"exam answer pattern" %in% names(sections))
+    stop("Concept-only lesson needs exam answer pattern: ",id,call.=FALSE)
   list(id=id,title=title,meta=meta,sections=sections,
        code=code,edit=rows,source=file)
 }
@@ -128,7 +140,11 @@
     stop("Invalid visual filename: ",item$id,call.=FALSE)
   paste0("<figure><img src='figures/",visual,"' width='480' alt='",
          .ru_html_escape(item$meta$alt),"'/>",
-         "<figcaption>",.ru_inline(item$meta$caption),"</figcaption></figure>")
+         "<figcaption>",.ru_inline(item$meta$caption),"</figcaption>",
+         "<p class='visual-open'><a href='figures/",visual,
+         "' target='_blank' rel='noopener noreferrer' aria-label='Open full-size illustration: ",
+         .ru_html_escape(item$meta$alt),"'>",
+         "Open full-size illustration (local)</a></p></figure>")
 }
 .ru_source_links <- function(item) {
   links <- trimws(strsplit(item$meta$sources,";",fixed=TRUE)[[1L]])
@@ -144,16 +160,25 @@
   paste0("<article class='lesson' data-lesson='",item$id,"'>",
     "<p class='eyebrow'>",.ru_html_escape(item$meta$domain),"</p>",
     "<h1>",.ru_html_escape(item$title),"</h1>",
+    if(!identical(item$meta$status,"VERIFIED"))
+      "<p class='review-status'>Authored draft: source and editorial verification pending.</p>"
+    else "",
     "<section class='immediate' aria-label='Immediate answer'><h2>Quick answer</h2>",
     .ru_rich_paragraphs(item$sections[["immediate answer"]]),"</section>",
-    "<section aria-label='Native R example'><h2>Use this in R</h2>",
-    "<div class='code-toolbar'><span>Ordinary R &middot; editable</span>",
-    "<button class='copy' data-target='code-",item$id,"' type='button' ",
-    "aria-label='Copy this R code to the clipboard'>Copy</button></div>",
-    "<pre class='r-code'><code id='code-",item$id,"'>",
-    .ru_html_escape(item$code),"</code></pre>",
-    "<p class='copy-status' aria-live='polite'></p></section>",
-    "<section><h2>What to edit</h2>",.ru_table(item),"</section>",
+    if("exam answer pattern" %in% names(item$sections))
+      paste0("<section><h2>Answer pattern for study</h2>",
+        .ru_rich_paragraphs(item$sections[["exam answer pattern"]]),"</section>")
+    else "",
+    if(nzchar(item$code))
+      paste0("<section aria-label='Native R example'><h2>Use this in R</h2>",
+        "<div class='code-toolbar'><span>Ordinary R &middot; editable</span>",
+        "<button class='copy' data-target='code-",item$id,"' type='button' ",
+        "aria-label='Copy this R code to the clipboard'>Copy</button></div>",
+        "<pre class='r-code' tabindex='0' aria-label='Scrollable R code'><code id='code-",item$id,"'>",
+        .ru_html_escape(item$code),"</code></pre>",
+        "<p class='copy-status' aria-live='polite'></p></section>",
+        "<section><h2>What to edit</h2>",.ru_table(item),"</section>")
+    else "",
     "<section><h2>What to check</h2>",
     .ru_rich_paragraphs(item$sections[["what to check"]]),"</section>",
     "<section><h2>Interpret your results</h2>",
@@ -186,6 +211,7 @@
          "content=\"default-src 'none'; img-src 'self' data:; style-src 'self'; ",
          "script-src 'self'; connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'\">",
          "<title>",.ru_html_escape(title)," &mdash; R-u-learning-yet</title>",
+         "<link href='field-atlas.css' rel='stylesheet'>",
          "<link href='reference.css' rel='stylesheet'></head>",
          "<body><main class='page'><header class='site-head'><a href='results.html'>",
          "<strong>R-u-learning-yet</strong></a><span>Offline RStudio reference</span></header>",

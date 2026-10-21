@@ -23,20 +23,25 @@
       if(available) paste0("<li><a href='",reference,".html'>",
                             title,"</a><small> &middot; ",label,"</small></li>")
       else paste0("<li>",title,"<small> &middot; ",label,
-                  " (compact page pending)</small></li>")
+                  if(identical(row$content_status,"AUTHORED"))
+                    " (draft; source and editorial review pending)"
+                  else " (compact page pending)",
+                  "</small></li>")
     },character(1L))
     paste0("<details class='catalog-group'><summary>",.ru_html_escape(domain),
            " &middot; ",nrow(data)," topics</summary><ul>",
            paste(items,collapse=""),"</ul></details>")
   },character(1L))
   counts <- table(factor(topics$content_status,
-              levels=c("VERIFIED","NEEDS_REVIEW","DISCOVERED")))
+              levels=c("VERIFIED","AUTHORED","NEEDS_REVIEW","DISCOVERED")))
   intro <- paste0("<h1>Topic coverage</h1>",
     "<p>",nrow(topics)," scoped topics. ",
-    as.integer(counts["VERIFIED"])," compact lessons verified in automated R tests; ",
-    as.integer(counts["NEEDS_REVIEW"])," need revision and ",
-    as.integer(counts["DISCOVERED"])," await fuller source review.</p>",
-    "<p>Incomplete topics are indexed for planning, not represented as finished teaching material.</p>")
+    as.integer(counts["VERIFIED"])," verified earlier by software/editorial tests; ",
+    as.integer(counts["AUTHORED"])," authored drafts awaiting source/editorial review; ",
+    as.integer(counts["NEEDS_REVIEW"])," existing references needing revision; ",
+    as.integer(counts["DISCOVERED"])," topics without compact lessons.</p>",
+    "<p>Authoring and executing example code do not prove complete lesson, source,",
+    " figure or human usability verification.</p>")
   writeLines(.ru_shell("Topic coverage",paste0(intro,paste(sections,collapse=""))),
              file.path(folder,"catalog.html"),useBytes=TRUE)
 }
@@ -46,7 +51,7 @@
   dir.create(file.path(folder,"figures"),recursive=TRUE,showWarnings=FALSE)
   assets <- system.file("www",package="rulearn")
   if(!nzchar(assets)) stop("Installed offline Viewer assets missing.",call.=FALSE)
-  for(file in c("reference.css","reference.js")) {
+  for(file in c("field-atlas.css","reference.css","reference.js")) {
     if(!file.copy(file.path(assets,file),file.path(folder,file),overwrite=TRUE))
       stop("Could not stage Viewer asset: ",file,call.=FALSE)
   }

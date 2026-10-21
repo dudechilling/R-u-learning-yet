@@ -10,3 +10,4 @@
 ^rulearn_.*[.]tar[.]gz$
 ^rulearn[.]Rcheck$
 ^\.git$
+^research-and-decision[.]md$

@@ -27,7 +27,7 @@ ru_edit <- function(query, dir=getwd(), open=interactive(),
   source <- system.file("examples",paste0(id,".R"),package="rulearn")
   if(!dir.exists(dir))stop("The requested directory does not exist.",call.=FALSE)
   if(!nzchar(source)) {
-    if(is.null(lesson)) return(invisible(NULL))
+    if(is.null(lesson) || !nzchar(lesson$code)) return(invisible(NULL))
     dest <- file.path(dir,paste0("ru-",lesson$id,".R"))
     if(file.exists(dest))stop("Refusing to overwrite ",dest,call.=FALSE)
     writeLines(lesson$code,dest,useBytes=TRUE)
