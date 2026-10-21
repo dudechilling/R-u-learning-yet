@@ -38,7 +38,9 @@ for (id in c("histogram","grouped_boxplot","two_sample_t")) {
 }
 
 guide <- capture.output(ru_guide("histogram"))
-stopifnot(any(grepl("hist(values",guide,fixed=TRUE)))
+stopifnot(length(guide)==0L)
+lesson <- getFromNamespace(".ru_lesson_read","rulearn")("histogram")
+stopifnot(!is.null(lesson),grepl("hist(",lesson$code,fixed=TRUE))
 scratch <- tempfile(pattern="rulearn-edit-")
 dir.create(scratch)
 created <- ru_edit("histogram",dir=scratch,open=FALSE)

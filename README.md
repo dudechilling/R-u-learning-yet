@@ -1,110 +1,111 @@
 # R-u-learning-yet
 
-**An offline reference library for learning statistics and R in RStudio.**
+**An offline, assignment-first reference library inside RStudio.**
 
-Start with a question, not a function name. Find a definition, consult R's native help, read a practical walkthrough, then write and modify ordinary R code. You do **not** need to use a custom calculation wrapper to work through a problem.
+Start with the question in your assignment. The package finds a method, shows
+an immediate explanation and ordinary R code, identifies what you must change,
+and gives optional background and practice. The package does **not** solve
+your dataset or validate your study assumptions for you.
 
 ## Release status
 
-These reference-library changes are currently **local development work**. The public
-GitHub `main` branch does not yet contain them. Until an authorized review and
-merge, the GitHub installation command below installs the older release.
+This version is a **local development candidate**, not the public GitHub
+`main` branch. Install the exact reviewed QA source archive provided
+separately after approval. Do not expect the current GitHub installation
+command to provide the new Viewer pages.
 
-To test an approved local checkout, run `R CMD INSTALL .` in a terminal from
-the repository root, then load `library(rulearn)` in RStudio.
+The package requires R 4.1 or newer and recommends the existing
+`rstudioapi` package to open the Viewer and Source editor. Core references
+continue to work offline without Quarto, Shiny, a chatbot or a server.
 
-## Install from GitHub after release
+## Search from RStudio
 
 ```r
-install.packages("remotes") # only needed once for installation
-remotes::install_github("dudechilling/R-u-learning-yet")
 library(rulearn)
 
-ru_find("What is stationarity?")
-ru_find("Define standard deviation")
-ru_find("What does a p-value mean?")
-ru_find("How do I make a histogram?")
-ru_find("How does the sd function work?")
-ru_find("What is a sample space?")
-ru_find("Stem and leaf plot")
-```
-
-In RStudio, `ru_find()` opens its best relevant article or formatted walkthrough in the **Help** pane. Ordinary programming questions such as `ru_find("How do I create variables?")` lead to the R object/column reference, not an unrelated statistical method. In a terminal without RStudio, search prints only the best result and its opening command; `ru_open()` shows the reference as readable text.
-
-```r
+ru_find("How can I tell if my data are skewed?")
+ru_find("What does unimodal mean?")
+ru_find("How do I create a stem and leaf plot?")
 ru_find("How do I create variables?")
-ru_open("r_objects_columns")                 # native Help page
-ru_guide("histogram")                        # formatted Help walkthrough
-ru_edit("histogram", mode="quick")            # editable R code in Source
+ru_find("How do I calculate standard deviation?")
 ```
 
-`ru_guide()` uses RStudio's existing `previewRd()` API when `rstudioapi` is installed and available, and falls back to readable Console text otherwise. Legacy guides that still use `ru_apply()` are labeled as compatibility examples rather than native-R instruction. Offline access remains supported. No chatbot or live service is involved.
+In RStudio, these calls open **local HTML** in the existing **Viewer** pane,
+rather than printing an article into the Console. The page includes:
 
-## 1. Understand a concept
+- **Quick answer**: the immediate response in plain language.
+- **Use this in R**: copyable ordinary R code using a built-in dataset.
+- **What to edit**: table of columns and arguments to replace.
+- **What to check** and **Interpret your results**: validity and limits.
+- **Learn more**: extended instruction, collapsed until needed.
+
+The code-copy control does **not** execute R commands. If clipboard access
+fails, it selects the code and asks you to press Ctrl+C. Test clipboard
+behaviour in Windows RStudio before assuming it works.
 
 ```r
-help("stationarity", package="rulearn")
-ru_open("stationarity")
-help("standard_deviation", package="rulearn")
+ru_open("skewness")         # the relevant local reference in Viewer
+ru_guide("histogram")      # one formatted walkthrough
+ru_edit("histogram", mode="quick")  # editable script in Source editor
+ru_topics()                # catalogue with content status
 ```
 
-The reference articles open in R's usual Help system, including RStudio's Help pane. They explain a definition, its meaning, a practical example, important distinctions, limitations, relevant R code and related concepts. Use `??stationarity` to search installed R help more broadly.
+References return R objects **invisibly**. For an ordinary terminal outside
+RStudio, call `ru_text("How do I calculate a mean?")` to request short text
+explicitly. In a normal terminal `ru_find()` still returns structured search
+results; it does not write long articles to the Console.
 
-## 2. Learn the R function
+## Search versus coverage
+
+The local coverage index currently lists **120 scoped topics**. The initial
+candidate supplies **31 reviewed compact lessons** (with executable examples)
+and maintains the earlier 46 longer walkthroughs, 21 native concept articles,
+and 11 R-function articles. The remaining ledger entries are clearly marked
+`NEEDS_REVIEW` or `DISCOVERED`. An indexed topic is not automatically a
+finished instruction page.
+
+Older walkthroughs that have not been rewritten show a **clear compatibility
+notice** rather than claiming to teach ordinary R code. Their original
+`ru_apply()` methods and standalone example scripts remain available for
+existing users. The package does not expand the calculation interface.
 
 ```r
-ru_find("How does the sd function work?", type="function")
-ru_open("sd")                      # beginner-friendly function reference
-help("sd", package="stats")       # official R function documentation
-?sd                                  # R's ordinary help shortcut
+help("stationarity", package="rulearn")   # original native R Help
+?hist                                  # official R hist() help
+ru_edit("skewness", open=FALSE)         # new compact native R script
 ```
 
-R's own help remains the authoritative reference for syntax and supported arguments.
+A reference gives a defensible method to consider; it cannot verify your
+sampling, measurement units, independence assumptions or interpretations.
 
-## 3. Follow a worked problem and edit the code
+## Content and reproducibility
 
-```r
-ru_find("How do I customize a histogram?", type="walkthrough")
-ru_guide("histogram")   # read the complete guide offline
-ru_code("histogram")    # print ordinary R commands
-ru_edit("histogram", mode="quick")   # only the immediate, editable answer
-ru_edit("histogram")                 # detailed, editable walkthrough
-```
+Compact lesson sources are in `inst/lessons/*.md`. Each contains a single
+structured question, immediate answer, native R code, edit instructions,
+checks, interpretation, optional explanation and source URL. The Viewer
+renders these installed files into temporary HTML; no duplicated page text
+is committed.
 
-The histogram example uses `faithful` and teaches `hist()`, `breaks`, `col`, `main`, `xlab`, `ylab`, `text()`, `abline()`, and `legend()` without requiring `ru_apply()`. Change `faithful$eruptions` to a suitable numerical column in your own data, then run one line at a time using **Ctrl+Enter**.
+The small `R/` directory implements reference lookup and rendering. The
+`inst/www/` directory contains local CSS, minimal copy-button JavaScript and
+four purposeful SVG figures. Figures can be regenerated with
+`Rscript scripts/generate-figures.R`. Existing long-form material remains
+in `inst/guides/` and `inst/examples/`; the legacy Quarto site remains
+optional. The public `inst/extdata/coverage.csv` ledger contains topic
+status but **not** private coursework or filenames.
 
-Two other fully annotated examples demonstrate grouped boxplots with `iris` and a Welch two-sample t-test with `PlantGrowth`.
+Detailed architectural decisions and evidence limits live in
+[research-and-decision.md](research-and-decision.md). See
+[methodology.md](methodology.md) for editorial and statistical safeguards.
 
-## Reference collection
+## Tests and redistribution
 
-The package currently contains **21 concept references**, **11 beginner-oriented function references**, and **46 existing question-led walkthroughs**. Four fully revised examples set the standard for improving the remaining walkthroughs; the others remain available for use and future revision.
+Run `R CMD build .` from a parent folder and then
+`R CMD check --no-manual rulearn_0.4.0.tar.gz` on the built archive.
+Also run the Quarto site and local-rendering test suites when updating pages.
+Windows Viewer navigation and clipboard behaviour require a supervised
+Windows RStudio test; automated HTML checks are not a substitute.
 
-- **Concepts:** population and sample; center and spread; probability and sampling distributions; correlation and autocorrelation; stationarity, trend and seasonality; inference, intervals and study design.
-- **Functions:** `mean()`, `median()`, `sd()`, `hist()`, `quantile()`, `cor()`, `t.test()`, `acf()`, and `table()`.
-- **Walkthroughs:** browse [the question-led index](inst/guides/index.qmd), or search from the RStudio console.
-
-The source of a concept or function reference is its native [R help file](man/). The longer tutorials remain in [`inst/guides/`](inst/guides/); their scripts are in [`inst/examples/`](inst/examples/). These are different types of content, not independent copies of an article.
-
-## Using authentic datasets
-
-R already includes `iris`, `faithful`, `airquality`, `mtcars`, `PlantGrowth`, `sleep`, `Nile`, `Titanic` and other relevant datasets.
-
-```r
-data(iris)
-names(iris)
-mean(iris$Sepal.Length)
-hist(iris$Sepal.Length,
-     xlab="Sepal length (cm)", main="Recorded flowers")
-```
-
-Optional Palmer penguins data require a separately installed `palmerpenguins` package. Hypothetical model inputs and constructed variables are labeled as such. The data remain in their respective source packages; they are not copied into this repository.
-
-## Compatibility and limitations
-
-The older `ru_apply()`, `ru_plan()`, `ru_run()` and plotting helpers remain available for existing users. They are not the primary learning path. Method-specific options that were previously ignored now produce clear errors when unsupported; frequency-weighted probabilities and statistical test alternatives have been corrected. Conventional autocorrelation rejects irregular timestamps.
-
-The existing Quarto site is for longer walkthroughs. Concepts and function references are also available offline through native R help and do not require Quarto. The website is not required to use the installed reference library.
-
-See the [competitive research and decision record](research-and-decision.md) for verified capabilities, alternative products, evidence limits, and the learner-testing protocol.
-
-See [editorial and verification rules](methodology.md). Source redistribution rights have not been changed.
+The repository has **no selected redistribution licence**. No licence
+permissions are inferred from public access. Do not redistribute course
+materials, graded work, instructor slides or student identifiers.

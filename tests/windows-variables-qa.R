@@ -47,7 +47,7 @@ no_match <- c(
   "What causes temperatures to change?")
 for(q in no_match){
   txt <- capture.output(h<-ru_find(q,n=4L))
-  stopifnot(nrow(h)==0L,any(grepl("No local reference",txt,fixed=TRUE)))
+  stopifnot(nrow(h)==0L,length(txt)==0L)
 }
 
 # Genuine offline help, including R's native help topics for <- and $.
@@ -55,7 +55,7 @@ stopifnot(length(help("r_objects_columns",package="rulearn"))==1L,
           length(help("statistical_variable",package="rulearn"))==1L,
           length(help("assignOps",package="base"))==1L,
           length(help("Extract",package="base"))==1L)
-stopifnot(length(ru_open("r_objects_columns"))==1L)
+stopifnot(nrow(ru_open("r_objects_columns"))==1L)
 installed_rd <- utils:::.getHelpFile(
   help("r_objects_columns",package="rulearn"))
 article <- getFromNamespace(".ru_console_rd","rulearn")(installed_rd)
@@ -84,23 +84,20 @@ ids <- unique(catalog$id)
 stopifnot(length(ids)==46L)
 for(id in ids){
   console <- capture.output(ru_guide(id))
-  stopifnot(length(console)>3L,
-            !any(grepl("```",console,fixed=TRUE)),
-            !any(grepl("#| eval:",console,fixed=TRUE)),
-            !any(grepl("knitr::read_chunk",console,fixed=TRUE)),
-            !any(grepl("## ",console,fixed=TRUE)),
-            !any(grepl(intToUtf8(8L),console,fixed=TRUE)))
+  stopifnot(length(console)==0L)
   tmp <- getFromNamespace(".ru_quarto_guide_to_rd","rulearn")(id)
   stopifnot(file.exists(tmp),inherits(tools::parse_Rd(tmp),"Rd"))
 }
-legacy <- capture.output(ru_guide("correlation_test"))
-stopifnot(any(grepl("Older compatibility guide",legacy,fixed=TRUE)),
-          any(grepl("ru_apply(",legacy,fixed=TRUE)),
-          !any(grepl("#| eval:",legacy,fixed=TRUE)))
-native <- capture.output(ru_guide("histogram"))
-stopifnot(any(grepl("Immediate answer",native,fixed=TRUE)),
-          any(grepl("Complete walkthrough",native,fixed=TRUE)),
-          any(grepl("hist(",native,fixed=TRUE)))
+legacy <- getFromNamespace(".ru_short_fallback","rulearn")(
+  getFromNamespace(".ru_catalog","rulearn")()[
+    getFromNamespace(".ru_catalog","rulearn")()$id=="correlation_test",][1L,])
+stopifnot(grepl("compatibility wrapper",legacy,fixed=TRUE))
+native <- getFromNamespace(".ru_page_html","rulearn")(
+  getFromNamespace(".ru_lesson_read","rulearn")("histogram"))
+stopifnot(grepl("Quick answer",native,fixed=TRUE),
+          grepl("Use this in R",native,fixed=TRUE),
+          grepl("hist(",native,fixed=TRUE),
+          !grepl("#| eval:",native,fixed=TRUE))
 
 # The quick R script must remain editable and contain no package solver call.
 folder <- tempfile("ruly-qa-");dir.create(folder)

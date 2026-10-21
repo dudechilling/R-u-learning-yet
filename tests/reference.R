@@ -45,7 +45,7 @@ replay_topics <- list(
   "Which scale of measurement is better for ordered categories?"=
      "measurement_scales",
   "What is a statistical experiment?"="probability_events",
-  "What is a sample space?"="probability_events",
+  "What is a sample space?"="sample_space",
   "Difference between independent and mutually exclusive events"=
      "conditional_independence",
   "What does conditional probability mean?"="conditional_independence",
@@ -110,8 +110,8 @@ for (word in c("Weak stationarity","variance","autocovariance","lag",
   if (!grepl(word,body,fixed=TRUE))
     stop("Stationarity help is missing: ",word)
 }
-stopifnot(length(ru_open("stationarity",type="concept"))==1L,
-          length(ru_open("sd",type="function"))==1L)
+stopifnot(nrow(ru_open("stationarity",type="concept"))==1L,
+          nrow(ru_open("sd",type="function"))==1L)
 
 # REF-005/006/012: edit and run ordinary native code, without a wrapper.
 scratch <- tempfile(pattern="rulearn-reference-")
@@ -186,8 +186,18 @@ for (id in c("import_csv","mean_median","sample_sd")) {
             any(grepl("## ---- worked-",script,fixed=TRUE)),
             !any(grepl("ru_apply(",script,fixed=TRUE)))
   note <- capture.output(ru_guide(id))
-  stopifnot(which(grepl("Immediate answer",note,fixed=TRUE))[1L] <
-            which(grepl("Complete walkthrough",note,fixed=TRUE))[1L])
+  stopifnot(length(note)==0L)
+  lesson <- getFromNamespace(".ru_lesson_read","rulearn")(id)
+  if(!is.null(lesson)) {
+    stopifnot(nzchar(lesson$code),
+      all(c("immediate answer","learn more") %in%
+          names(lesson$sections)))
+  } else {
+    # Existing legacy walkthroughs remain readable and editable but
+    # are not marked as completed compact lessons.
+    catalog <- getFromNamespace(".ru_catalog","rulearn")()
+    stopifnot(id %in% catalog$id)
+  }
   for (mode in c("quick","full")) {
     folder <- tempfile(paste0(id,"-"))
     dir.create(folder)
@@ -261,12 +271,22 @@ for (id in c("histogram","grouped_boxplot","two_sample_t")) {
   idx2 <- which(grepl("## ---- worked-",lines,fixed=TRUE))[1L]
   stopifnot(idx1 < idx2)
   guide_out <- capture.output(ru_guide(id))
-  quick_heading <- grep("Immediate answer",guide_out,fixed=TRUE)[1L]
-  detailed_heading <- grep("Complete walkthrough",guide_out,fixed=TRUE)[1L]
-  stopifnot(is.finite(quick_heading),is.finite(detailed_heading),
-            quick_heading<detailed_heading,
-            !any(grepl("```",guide_out,fixed=TRUE)),
-            !any(grepl("#| eval:",guide_out,fixed=TRUE)))
+  lesson <- getFromNamespace(".ru_lesson_read","rulearn")(id)
+  if(!is.null(lesson)) {
+    page <- getFromNamespace(".ru_page_html","rulearn")(lesson)
+    stopifnot(length(guide_out)==0L,
+              grepl("Quick answer",page,fixed=TRUE),
+              grepl("Use this in R",page,fixed=TRUE),
+              grepl("<details>",page,fixed=TRUE),
+              !grepl("#| eval:",page,fixed=TRUE))
+  } else {
+    # Unrevised topics render an honest short legacy notice until audited.
+    catalog <- getFromNamespace(".ru_catalog","rulearn")()
+    fallback <- getFromNamespace(".ru_short_fallback","rulearn")(
+      catalog[catalog$id==id,,drop=FALSE][1L,])
+    stopifnot(length(guide_out)==0L,
+              grepl("not passed the compact",fallback,fixed=TRUE))
+  }
 }
 stopifnot(length(help("r_errors",package="rulearn"))==1L)
 

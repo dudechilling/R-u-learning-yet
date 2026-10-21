@@ -20,6 +20,7 @@
     "make","create","calculate","find","show","draw","have",
     "different","two","me","please","tell","about","as",
     "this","that","something","anything","library","not","cover",
+    "if","whether","when","should","use","describe",
     "whether","causes")))
 }
 
@@ -77,6 +78,25 @@
     question=guide$question,inputs=guide$inputs,
     stringsAsFactors=FALSE)
   data <- rbind(refs[,names(guide)],guide)
+  # Enrich the existing reference index with the aliases from the one
+  # canonical Markdown source for each compact learner lesson.
+  lessons <- .ru_lesson_index()
+  if(nrow(lessons)) {
+    overlap <- match(data$id,lessons$id)
+    found <- which(!is.na(overlap))
+    if(length(found))
+      data$keywords[found] <- paste(data$keywords[found],
+                                    lessons$keywords[overlap[found]])
+    missing <- lessons[!lessons$id %in% data$id,,drop=FALSE]
+    if(nrow(missing)) {
+      add <- data.frame(id=missing$id,type=missing$type,
+                        title=missing$title,keywords=missing$keywords,
+                        topic=missing$id,package="rulearn",
+                        question=missing$title,inputs="",
+                        stringsAsFactors=FALSE)
+      data <- rbind(data,add)
+    }
+  }
   data$path <- vapply(seq_len(nrow(data)), function(i) {
     item <- data[i,]
     if(item$type=="walkthrough")
@@ -101,6 +121,59 @@
   q <- sub("^what does (a |the )?(.+) mean[?]?$","\\2",q)
   corrected <- .ru_correct_tokens(.ru_words(q),catalog)
   tokens <- corrected$words
+  # The subject named by the question takes priority over incidental
+  # mentions in other descriptions (e.g. bimodal "mean" or density histogram).
+  # These map a method to its existing/native reference, never to a solver.
+  subject <- ""
+  qstat <- tolower(trimws(query))
+  if(grepl("\\bsort\\b.*\\b(observations?|measurements?|values?|numbers?)\\b",qstat,perl=TRUE))
+    subject <- "sort_values"
+  else if(grepl("\\b(lowest|smallest|minimum)\\b",qstat,perl=TRUE) &&
+          !grepl("\\b(maximum|highest|range)\\b",qstat,perl=TRUE))
+    subject <- "minimum"
+  if(!nzchar(subject) &&
+     grepl("\\b(stem.and.leaf|stem and leaf)\\b",q,perl=TRUE))
+    subject <- "r_stem"
+  else if(grepl("\\b(skew|skewed|skewness)\\b",q,perl=TRUE))
+    subject <- "skewness"
+  else if(grepl("\\bunimodal\\b",q,perl=TRUE)) subject <- "unimodal"
+  else if(grepl("\\bbimodal\\b",q,perl=TRUE)) subject <- "bimodal"
+  else if(grepl("\\b(histograms?|histgram)\\b",q,perl=TRUE)) {
+    if(grepl("\\b(bins?|breaks?|intervals?|binwidth)\\b",q,perl=TRUE))
+      subject <- "histogram_breaks"
+    else if(!grepl("\\bdensity\\b",q,perl=TRUE)) subject <- "histogram"
+  }
+  else if(grepl("\\bbar (chart|graph)\\b|\\bbarplot\\b",q,perl=TRUE))
+    subject <- "bar_chart"
+  else if(grepl("\\b(sample mean|mean median)\\b",q,perl=TRUE) &&
+          grepl("\\bmedian\\b",q,perl=TRUE))
+    subject <- "mean_median"
+  else if(grepl("\\brange\\b",q,perl=TRUE) &&
+          grepl("\\bvariance\\b",q,perl=TRUE) &&
+          grepl("\\bstandard deviation\\b",q,perl=TRUE))
+    subject <- "sample_sd"
+  else if(grepl("\\bstandard deviation\\b",q,perl=TRUE) &&
+          grepl("\\bstandard error\\b",q,perl=TRUE))
+    subject <- "sampling_distributions"
+  else if(grepl("\\bquartiles?\\b|\\bq1\\b|\\bq3\\b",q,perl=TRUE))
+    subject <- "quartiles"
+  else if(grepl("\\bsample space\\b",q,perl=TRUE)) subject <- "sample_space"
+  else if(grepl("\\bstandard deviation\\b",q,perl=TRUE))
+    subject <- "variance_sd"
+  else if(grepl("\\bvariance\\b",q,perl=TRUE)) subject <- "variance"
+  else if(grepl("\\brange\\b",q,perl=TRUE) &&
+          !grepl("\\b(interquartile|iqr)\\b",q,perl=TRUE)) subject <- "range"
+  else if(grepl("\\b(mean|average)\\b",q,perl=TRUE) &&
+          !grepl("^what does it mean|\\bmean for\\b",qstat,perl=TRUE)) {
+    if(grepl("\\bmedian\\b",q,perl=TRUE)) subject <- "mean_median"
+    else if(grepl("\\b(group|groups|grouped)\\b",q,perl=TRUE))
+      subject <- "group_means"
+    else if(!grepl("\\b(trimmed|weighted|moving)\\b",q,perl=TRUE))
+      subject <- "mean"
+  }
+  if(grepl("\\b(describe|inspect|summarize)\\b.*\\bdataset\\b",qstat,perl=TRUE) &&
+     !grepl("\\b(statistic|mean|variance|quartile|graph|plot)\\b",qstat,perl=TRUE))
+    subject <- "inspect_columns"
   # Programming requests need assignment/extraction, not statistical models.
   # Inspect the original query before punctuation tokenization removes <- and $.
   intent_objects <- grepl(paste0(
@@ -117,6 +190,15 @@
     "\\bscatter\\b|\\b(plot|draw|graph)\\b.*\\b(two|paired|relationship)\\b",
     tolower(trimws(query)),perl=TRUE) &&
     !grepl("\\b(over time|time series)\\b",tolower(query),perl=TRUE)
+  # A mechanical repair request is not a statistical inference
+  # question merely because a reference example mentions vehicles.
+  out_of_scope_repair <- grepl(
+    "\\b(engine|mechanic|transmission|vehicle repair|car repair)\\b",
+    tolower(query),perl=TRUE) &&
+    grepl("\\b(broken|repair|fix|diagnose|malfunction)\\b",
+          tolower(query),perl=TRUE) &&
+    !grepl("\\b(data|statistics?|correlation|regression|sampling)\\b",
+           tolower(query),perl=TRUE)
   out_of_scope_explanation <- grepl(
     "^what causes\\b",tolower(trimws(query)),perl=TRUE) &&
     !grepl(
@@ -149,6 +231,12 @@
     heading <- tolower(paste(item$id,item$title))
     title_words <- .ru_words(heading)
     keys <- .ru_words(paste(item$keywords,item$question,item$id))
+    # "What does unimodal mean?" is NOT about arithmetic mean.
+    if(grepl("^what does .* mean[?]?$",tolower(item$title),perl=TRUE) &&
+       !item$id %in% c("mean","mean_median","r_mean")) {
+      title_words <- setdiff(title_words,"mean")
+      keys <- setdiff(keys,"mean")
+    }
     # Exact token matches, rather than accidental matches inside words such
     # as "not" in "cannot". Corrected search tokens are shown to the learner.
     hit <- sum(vapply(tokens,function(t) {
@@ -160,6 +248,7 @@
        (item$type=="function" &&
           q==sub("^r_","",tolower(item$id))))
       hit <- hit + 100L
+    if(nzchar(subject) && item$id==subject) hit <- hit + 125L
     if(nzchar(q) && grepl(q,tolower(item$title),fixed=TRUE))
       hit <- hit + 22L
     if(nzchar(q) && grepl(q,tolower(item$keywords),fixed=TRUE))
@@ -204,7 +293,7 @@
                                        "numeric","numerical","data"))
         length(meaningful)>0L && any(meaningful %in% keys)
       }
-    if (!valid || out_of_scope_explanation) hit <- 0L
+    if (!valid || out_of_scope_explanation || out_of_scope_repair) hit <- 0L
     hit
   },integer(1))
   ord <- order(-score,match(catalog$type,c("concept","function","walkthrough")),
@@ -218,56 +307,28 @@
   out
 }
 ru_topics <- function() {
-  cat("Reference collection:\n")
-  print(table(.ru_catalog()$type))
-  cat("\nWalkthrough categories:\n")
-  categories <- sort(table(.ru_db("problems.csv")$category),decreasing=TRUE)
-  print(categories)
-  invisible(categories)
+  topics <- .ru_coverage()
+  if(.ru_rstudio_ready("viewer"))
+    .ru_viewer_show(hits=NULL,query="",force_page="catalog")
+  invisible(topics)
 }
+
 ru_find <- function(query,n=10L,type=NULL) {
   if(missing(query) || !is.character(query) || length(query)!=1L ||
-     is.na(query) || !nzchar(trimws(query))) {
-    cat("Try ru_find('create variables'), ru_find('stationarity'), ",
-        "or ru_topics().\n",sep="")
+     is.na(query) || !nzchar(trimws(query)))
     return(invisible(.ru_catalog()[FALSE,,drop=FALSE]))
-  }
   hits <- .ru_search_results(query,n=n,type=type)
-  changes <- attr(hits,"corrected_terms")
-  if(length(changes))
-    cat("Spelling suggestion: ",paste(changes,collapse=", "),".\n",sep="")
-  if(!nrow(hits)) {
-    cat("No local reference found for that question. ",
-        "Try a more specific term or ru_topics().\n",sep="")
-    return(invisible(hits))
-  }
-  top <- hits[1L,]
-  if(.ru_rstudio_ready()) {
-    # One relevant native article/walkthrough in the Help pane, not
-    # a verbose list or raw Quarto printed into the Console.
-    if(top$type=="walkthrough") ru_guide(top$id)
-    else .ru_help_page(top$topic,package=top$package)
-  } else {
-    cat("Best match: [",top$type,"] ",top$title,"\n",
-        "Open: ",top$path,"\n",sep="")
-    if(nrow(hits)>1L)
-      cat("Other relevant results: ",
-          paste(head(hits$id[-1L],2L),collapse=", "),".\n",sep="")
-  }
+  if(.ru_rstudio_ready("viewer")) .ru_viewer_show(hits,query)
   invisible(hits)
 }
+
 ru_open <- function(query,type=NULL) {
   if(!is.character(query) || length(query)!=1L || is.na(query))
     stop("Provide one search phrase or reference ID.",call.=FALSE)
-  result <- .ru_search_results(query,n=1L,type=type)
-  if(!nrow(result)) {
-    cat("No matching reference. Try ru_find('keywords').\n")
-    return(invisible(NULL))
-  }
-  item <- result[1L,]
-  if(item$type=="walkthrough")
-    return(ru_guide(item$id))
-  .ru_help_page(item$topic,package=item$package)
+  result <- .ru_search_results(query,n=3L,type=type)
+  if(.ru_rstudio_ready("viewer"))
+    .ru_viewer_show(result,query,force_page=if(nrow(result))result$id[1L] else NULL)
+  invisible(if(nrow(result))result[1L,,drop=FALSE] else NULL)
 }
 
 # Internal method lookup remains restricted to walkthroughs for compatibility.

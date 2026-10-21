@@ -33,7 +33,8 @@ ru_scatter(x, y, xlab = "X", ylab = "Y",
 \item{query}{Plain-language question, search keyword, or exact reference or walkthrough ID.}
 \item{have}{Known available input labels.}
 \item{missing}{Input labels confirmed absent. Unmentioned inputs stay unknown.}
-\item{n}{Maximum number of matching local reference entries to display.}
+\item{n}{Maximum matching entries returned invisibly; the Viewer normally
+shows the single clear top result or an ambiguous-results page.}
 \item{type}{Optional content filter: \code{"concept"}, \code{"function"}, or \code{"walkthrough"}.}
 \item{x}{Numeric observations or categories appropriate to the plot type.}
 \item{y}{A second numeric vector, aligned one-to-one with x.}
@@ -49,11 +50,25 @@ ru_scatter(x, y, xlab = "X", ylab = "Y",
 \item{show_fit}{Whether to draw a straight-line regression fit.}
 \item{labels}{Optional text labels aligned with original observations.}
 }
-\details{In RStudio, search opens the best matching article or rendered guide
-in the built-in Help pane instead of filling the Console with long lists.
-Outside RStudio, search gives the best match and direct opening command.
-A question without relevant indexed information reports no match.
-The core search and reference material run offline. Scripts use named datasets and explicitly labeled hypothetical models. Console searches do not use a network connection. Inspect assumptions before applying any example to a real dataset.}
+\details{
+In RStudio, \code{ru_find()} opens a compact local HTML lesson in the
+existing Viewer when a reviewed reference is available. If several topics
+may apply, it shows a short list with meaningful distinctions; if none
+match, it shows an explicit no-match page. No network access or Quarto
+runtime is required to read the installed short reference.
+
+Successful lookup calls return structured results invisibly without
+printing long lists to the Console. \code{ru_topics()} opens the scoped
+coverage catalogue with honest content status labels. The installed
+catalogue currently has 120 candidate topics, not all finished.
+
+Native R \code{help()} remains available. \code{ru_text()} explicitly
+prints a short reference summary for an ordinary terminal without the
+RStudio Viewer. Existing calculation and plotting helpers remain
+available for compatibility, but are not required for learning.
+Examples use named recorded R datasets or explicitly constructed models.
+Executing a command does not validate measurement or study assumptions.
+}
 \examples{
 ru_find("What is stationarity?")
 ru_find("How do I make a histogram?")
