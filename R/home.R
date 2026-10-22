@@ -74,7 +74,7 @@ ru_home <- function(open=TRUE) {
 
 .ru_write_home <- function(folder) {
   docs <- system.file("help-pages",package="rulearn")
-  pages <- c(start="Start here",using="Use the local library",notices="License and notices",
+  pages <- c(start="Start here",using="Use the local library",tutorials="Guided tutorials",notices="License and notices",
              accessibility="Accessibility and help")
   for(id in names(pages)) {
     source <- file.path(docs,paste0(id,".html"))
@@ -102,10 +102,13 @@ ru_home <- function(open=TRUE) {
     "<p class='home-lead'>Ask a question. Find a suitable method. Inspect and edit ordinary R code.</p>",
     "<p>For new learners and analysts. Applied and research coverage is listed honestly in the learning paths. ",
     "A reference does not choose your sampling assumptions or prove a causal claim.</p>",
+    "<section class='first-step' aria-labelledby='first-step-title'><h2 id='first-step-title'>New to RU? Try an example first.</h2>",
+    "<p><a href='tutorials.html'>Open the guided tutorials</a> to make a histogram or estimate a mean,",
+    " with runnable code and explanations. No setup beyond <code>library(rulearn)</code>.</p></section>",
     "<nav class='home-nav' aria-label='Start and browse'>",
     "<a href='start.html'>Start here</a><a href='#ask'>Ask a statistics question</a>",
     "<a href='paths.html'>Learning paths</a><a href='methods.html'>Browse verified methods</a>",
-    "<a href='using.html#tutorials'>Tutorials</a><a href='start.html#examples'>R examples</a>",
+    "<a href='tutorials.html'>Tutorials</a><a href='start.html#examples'>R examples</a>",
     "<a href='catalog.html'>Reference and coverage</a><a href='notices.html'>License and notices</a>",
     "<a href='accessibility.html'>Help</a></nav>",
     "<section id='ask'><h2>Ask a statistics question</h2>",
@@ -119,7 +122,7 @@ ru_home <- function(open=TRUE) {
     "Use <a href='catalog.html'>Reference and coverage</a> for per-method status, ",
     "including unfinished topics. A catalogue entry is not a claim that a method is available.</p></section>",
     "<section><h2>Offline by default</h2><p>Local navigation, examples and code copying need no account or remote service. ",
-    "Source citations are optional online links. <a href='notices.html'>Redistribution clearance is pending.</a></p></section>",
+    "Source citations are optional online links. <a href='notices.html'>Read source licences and notices.</a></p></section>",
     "<section><h2>Control automatic opening</h2><p>Set the following option before attaching the package. ",
     "You can still call <code>ru_home()</code> to reopen this page.</p></section>",
     .ru_home_code("home-optout","options(rulearn.auto_home = FALSE)\nlibrary(rulearn)"))

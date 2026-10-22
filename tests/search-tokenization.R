@@ -1,7 +1,7 @@
 # Regression for one-letter apostrophe suffixes and irrelevant search hits.
 # These examples test retrieval, not an assignment-solving calculation.
 library(rulearn)
-stopifnot(as.character(packageVersion("rulearn"))=="0.4.2.9000")
+stopifnot(as.character(packageVersion("rulearn"))=="0.4.2.9001")
 
 tokens <- getFromNamespace(".ru_words","rulearn")
 for(term in c("car's","car’s","bike's","bike’s","driver's","driver’s")) {

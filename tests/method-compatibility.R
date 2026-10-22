@@ -1,7 +1,7 @@
 # P0-A: original synthetic question-first method-compatibility tests.
 # Missing verified methods must abstain rather than show a wrong calculation.
 library(rulearn)
-stopifnot(as.character(packageVersion("rulearn"))=="0.4.2.9000")
+stopifnot(as.character(packageVersion("rulearn"))=="0.4.2.9001")
 check_route <- function(label, question, expected) {
   printed <- capture.output(hits <- ru_find(question,n=3L))
   stopifnot(length(printed)==0L, is.data.frame(hits))

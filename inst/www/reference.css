@@ -67,3 +67,17 @@ figure img{max-width:100%}
 .skip-link{position:absolute;left:8px;top:-100px;background:var(--paper);padding:10px;z-index:10}
 .skip-link:focus{top:8px;outline:3px solid var(--atlas-ocean)}
 @media(max-width:360px){.home-nav{grid-template-columns:1fr}.site-head{flex-wrap:wrap}.site-head span{text-align:left}}
+
+/* Guided, offline student exercises use the existing paper/ink palette. */
+.first-step{padding:13px 14px;border-left:3px solid var(--atlas-jade);background:var(--paper);border-radius:5px}
+.first-step h2{margin:0 0 7px}.first-step p{margin:0}
+.tutorial-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:18px 0}
+.tutorial-pick a{display:block;border:1px solid var(--line);border-radius:5px;padding:12px;background:var(--paper);min-height:66px}
+.tutorial-pick a strong,.tutorial-pick a span{display:block}
+.tutorial-pick a span{font-size:12px;color:var(--muted);margin-top:3px}
+.tutorial-card{padding:13px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.tutorial-card .eyebrow{margin:0 0 7px}.tutorial-card ol{padding-left:21px}
+.tutorial-card li{margin-bottom:11px}
+.tutorial-card .code-toolbar{margin-top:12px}
+.tutorial-next{border-top:1px solid var(--line);padding-top:14px}
+@media(max-width:360px){.tutorial-pick{grid-template-columns:1fr}.tutorial-card{padding:10px}}

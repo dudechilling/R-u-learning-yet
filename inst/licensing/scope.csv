@@ -131,6 +131,7 @@ inst/guides/zero_correlation.qmd,CC-BY-4.0; code examples MIT,"Original educatio
 inst/help-pages/accessibility.html,CC-BY-4.0; code examples MIT,"Original educational text, figure or illustrative metadata; citations are external links"
 inst/help-pages/notices.html,CC-BY-4.0; code examples MIT,"Original educational text, figure or illustrative metadata; citations are external links"
 inst/help-pages/start.html,CC-BY-4.0; code examples MIT,"Original educational text, figure or illustrative metadata; citations are external links"
+inst/help-pages/tutorials.html,CC-BY-4.0; code examples MIT,Original guided student tutorials and R code examples
 inst/help-pages/using.html,CC-BY-4.0; code examples MIT,"Original educational text, figure or illustrative metadata; citations are external links"
 inst/lessons/anova_oneway.md,CC-BY-4.0; code examples MIT,"Original educational text, figure or illustrative metadata; citations are external links"
 inst/lessons/bar_chart.md,CC-BY-4.0; code examples MIT,"Original educational text, figure or illustrative metadata; citations are external links"
@@ -288,6 +289,7 @@ tests/release-controls.R,MIT,"Original project software, scripts, fixtures, test
 tests/review-regressions.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
 tests/search-tokenization.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
 tests/smoke.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
+tests/student-tutorials.R,MIT,Original offline tutorial code and navigation contract tests
 tests/transfer.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
 tests/viewer.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
 tests/windows-variables-qa.R,MIT,"Original project software, scripts, fixtures, tests or metadata"

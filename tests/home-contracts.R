@@ -46,7 +46,7 @@ stopifnot(!view$visible,file.exists(view$value),identical(view$value,home_file),
 again <- withVisible(ru_home(open=FALSE))
 stopifnot(identical(again$value,view$value),!again$visible)
 folder <- dirname(view$value)
-expected <- c("home.html","start.html","using.html","paths.html","methods.html",
+expected <- c("home.html","start.html","using.html","tutorials.html","paths.html","methods.html",
               "notices.html","accessibility.html","catalog.html","results.html")
 stopifnot(all(file.exists(file.path(folder,expected))))
 read <- function(p) paste(readLines(p,warn=FALSE,encoding="UTF-8"),collapse="\n")
@@ -55,7 +55,8 @@ for(label in c("Start here","Ask a statistics question","Learning paths",
   "Browse verified methods","Tutorials","R examples","Reference and coverage",
   "License and notices","Help")) stopifnot(grepl(label,home,fixed=TRUE))
 stopifnot(grepl("rulearn.auto_home",home,fixed=TRUE),
-          grepl("Redistribution clearance is pending",home,fixed=TRUE))
+          grepl("Read source licences and notices",home,fixed=TRUE),
+          grepl("href='tutorials.html'",home,fixed=TRUE))
 # All relative href/src targets and in-file anchors on generated documentation exist.
 for(name in expected) {
   html <- read(file.path(folder,name))

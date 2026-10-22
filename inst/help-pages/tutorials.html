@@ -1,0 +1,56 @@
+<h1>Try a statistics lesson</h1>
+<p class='home-lead'>Two short activities. Choose one, copy the R code, and run it in RStudio's Console or Source editor.</p>
+<p>The examples use R's built-in data or clearly invented numbers. RU does not run the code when you click Copy. No internet connection is needed after installation.</p>
+
+<nav class='tutorial-pick' aria-label='Choose a guided activity'>
+  <a href='#histogram-tutorial'><strong>1. Explore a histogram</strong><span>Describe the shape of recorded durations</span></a>
+  <a href='#confidence-tutorial'><strong>2. Estimate a mean</strong><span>Calculate and interpret a 90% confidence interval</span></a>
+</nav>
+
+<section id='histogram-tutorial' class='tutorial-card' aria-labelledby='histogram-title'>
+  <p class='eyebrow'>Beginner &middot; Descriptive statistics</p>
+  <h2 id='histogram-title'>1. Explore a histogram</h2>
+  <ol>
+    <li><strong>Ask:</strong> What does the distribution of eruption durations look like?</li>
+    <li><strong>Check:</strong> <code>faithful$eruptions</code> contains numerical durations, measured in minutes. The observations come from a built-in example dataset.</li>
+    <li><strong>Copy and run:</strong> Use the code below. RStudio should display a histogram in the Plots pane.</li>
+  </ol>
+  <div class='code-toolbar'><span>R code: built-in <code>faithful</code> data</span><button class='copy' type='button' data-target='tutorial-histogram-code' aria-label='Copy the histogram tutorial R code'>Copy</button></div>
+  <pre class='r-code' tabindex='0' aria-label='Scrollable histogram tutorial R code'><code id='tutorial-histogram-code'>data(faithful)
+durations &lt;- faithful$eruptions
+histogram &lt;- hist(durations, breaks = "Sturges",
+  main = "Eruption durations", xlab = "Duration (minutes)")</code></pre>
+  <p class='copy-status' aria-live='polite'></p>
+  <ol start='4'>
+    <li><strong>Observe:</strong> The bars count observations in duration intervals. There are 272 recorded durations. Describe peaks, gaps and spread before making a claim.</li>
+    <li><strong>Experiment:</strong> Change <code>breaks = "Sturges"</code> to <code>breaks = 12</code>. Re-run the code. Bin widths change the appearance but not the underlying measurements.</li>
+  </ol>
+  <p><a href='histogram.html'>Read the verified histogram reference</a> or <a href='histogram_breaks.html'>learn about bin boundaries</a>.</p>
+</section>
+
+<section id='confidence-tutorial' class='tutorial-card' aria-labelledby='confidence-title'>
+  <p class='eyebrow'>Core &middot; Statistical inference</p>
+  <h2 id='confidence-title'>2. Estimate an average with an interval</h2>
+  <ol>
+    <li><strong>Ask:</strong> How can I estimate a population mean when its standard deviation is unknown?</li>
+    <li><strong>Check:</strong> A one-sample Student t interval requires a suitable sampling design and independence assumptions. With only five observations, distributional assumptions need careful attention.</li>
+    <li><strong>Copy and run:</strong> The numbers are invented for practice, not evidence about a real population.</li>
+  </ol>
+  <div class='code-toolbar'><span>R code: five synthetic measurements</span><button class='copy' type='button' data-target='tutorial-confidence-code' aria-label='Copy the mean confidence interval tutorial R code'>Copy</button></div>
+  <pre class='r-code' tabindex='0' aria-label='Scrollable confidence interval tutorial R code'><code id='tutorial-confidence-code'>values &lt;- c(4, 6, 8, 9, 13)
+interval &lt;- t.test(values, conf.level = 0.90)$conf.int
+round(interval, 2)</code></pre>
+  <p class='copy-status' aria-live='polite'></p>
+  <ol start='4'>
+    <li><strong>Observe:</strong> R should print approximately <code>4.77</code> and <code>11.23</code>, the interval endpoints in the same units as the measurements.</li>
+    <li><strong>Interpret:</strong> In repeated valid sampling, this construction covers the population mean in 90% of intervals. It does not mean a fixed population mean has a 90% probability of being inside this realized interval.</li>
+    <li><strong>Experiment:</strong> Change <code>conf.level = 0.90</code> to <code>0.95</code>. The interval should widen. Changing a confidence level cannot correct biased sampling.</li>
+  </ol>
+  <p><a href='mean_confidence_interval.html'>Read the verified confidence-interval reference</a>.</p>
+</section>
+
+<section class='tutorial-next' aria-label='Continue learning'>
+  <h2>Where to go next</h2>
+  <p>Choose a <a href='paths.html'>learning path</a> to build prerequisites, or <a href='methods.html'>browse verified methods</a>. Topics marked IN_REVIEW or PLANNED are not complete lessons.</p>
+  <p><a href='home.html'>Return to the RU home page</a></p>
+</section>

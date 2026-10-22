@@ -4,7 +4,7 @@
 
 Start with a question. Find a compatible method. Check its assumptions. Inspect an original worked example, edit ordinary R code, and interpret its uncertainty and limits. The package is named `rulearn`.
 
-**Version 0.4.2.9000.** The original RU code and educational content have source-specific licences. Automated package checks have passed on Linux. Manual Windows RStudio Viewer and clipboard checks remain separate. No illustration is presented as an authentic interface screenshot.
+**Version 0.4.2.9001.** The original RU code and educational content have source-specific licences. Automated package checks have passed on Linux. Manual Windows RStudio Viewer and clipboard checks remain separate. No illustration is presented as an authentic interface screenshot.
 
 ## Install directly from GitHub main
 
@@ -67,7 +67,7 @@ hits
 
 ## Read and edit native R
 
-The home links to Start, usage guidance, local tutorials, method coverage, learning paths, accessibility help and licence notices. A computational page presents the question, method choice, assumptions, numbered procedure, original worked case, native code, editable inputs, interpretation and common mistakes.
+The home links to Start, a guided offline **Tutorials** page, local references, method coverage, learning paths, accessibility help and licence notices. Two Viewer walkthroughs demonstrate a histogram using built-in data and a synthetic 90% mean confidence interval, with copyable R code, expected results and interpretation. A computational page presents the question, method choice, assumptions, numbered procedure, original worked case, native code, editable inputs, interpretation and common mistakes.
 
 ```r
 ru_open("mean_confidence_interval")
@@ -142,7 +142,7 @@ Build from the source directory or name it explicitly from its parent:
 
 ```sh
 R CMD build path/to/source
-R CMD check --no-manual rulearn_0.4.2.9000.tar.gz
+R CMD check --no-manual rulearn_0.4.2.9001.tar.gz
 ```
 
 Use an isolated R library for installation and rerun every committed test against the installed archive. The original test cases remain; exact catalogue/version assertions change only when independently verified additions justify them. New tests cover method selection, numerical oracles, rejected inputs, RNG preservation and the home/attach contract.

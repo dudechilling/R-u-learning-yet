@@ -243,6 +243,6 @@
          "<link href='reference.css' rel='stylesheet'></head>",
          "<body><a class='skip-link' href='#content'>Skip to content</a><main class='page'><header class='site-head'><a href='home.html'>",
          "<strong>R-u-learning-yet</strong></a><span>Offline RStudio reference</span></header>",
-         "<nav class='site-nav' aria-label='Local library'><a href='home.html'>Home</a> <a href='results.html'>References</a> <a href='catalog.html'>Coverage</a></nav><div id='content'>",body,"</div><footer>Running R code does not verify sampling or model assumptions.</footer></main>",
+         "<nav class='site-nav' aria-label='Local library'><a href='home.html'>Home</a> <a href='tutorials.html'>Tutorials</a> <a href='results.html'>References</a> <a href='catalog.html'>Coverage</a></nav><div id='content'>",body,"</div><footer>Running R code does not verify sampling or model assumptions.</footer></main>",
          "<script defer src='reference.js'></script></body></html>")
 }
