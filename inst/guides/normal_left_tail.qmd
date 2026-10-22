@@ -1,0 +1,37 @@
+---
+title: "Under a normal model, what proportion falls below a cutoff?"
+---
+
+## Question
+
+Under a normal model, what proportion falls below a cutoff?
+
+## Work through it
+
+Check whether a normal approximation is appropriate; specify mean, standard deviation and cutoff; compute the lower cumulative probability.
+
+## Worked example: airquality
+
+```{r}
+#| eval: false
+d <- ru_data("airquality")
+mu <- mean(d$Temp)
+sigma <- sd(d$Temp)
+result <- ru_apply("normal_left_tail", mu=mu, sigma=sigma,
+                   threshold=75, assume_normal=TRUE)
+stopifnot(result>0,result<1)
+```
+
+The calculation fits illustrative normal parameters to recorded daily temperatures. It predicts a model area below 75°F, which need not equal the actual proportion below 75°F.
+
+## Adapt to another question
+
+```r
+ru_apply("normal_left_tail", mu=your_mean, sigma=your_sd, threshold=your_cutoff, assume_normal=TRUE)
+```
+
+If you want the observed share instead of model probability, use mean(d$Temp<75,na.rm=TRUE).
+
+Check the input conditions with `ru_plan("normal_left_tail")` before treating a calculation as an inference.
+
+[Run the standalone script](../examples/normal_left_tail.R)

@@ -1,0 +1,41 @@
+---
+title: "What is the most frequent category, including ties?"
+---
+
+## The question
+
+What is the most frequent category, including ties?
+
+## What to check and do
+
+1. Count each distinct category. 2. Identify the largest count. 3. Report all categories tied for that count.
+
+## Worked example: mtcars
+
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
+
+```{r}
+#| eval: false
+d <- ru_data("mtcars")
+answer <- ru_apply("categorical_mode", data=d, x="cyl")
+stopifnot(length(answer)>=1L)
+```
+
+The returned cylinder category is the mode of the recorded cars. This is the statistical mode, not R's mode() function for storage types.
+
+## Apply the method to another question
+
+Replace the data frame and column names with those in your own file:
+
+```r
+ru_apply("categorical_mode", data=your_data, x="category_column")
+```
+
+A dataset can be multimodal; the code returns all tied modes rather than choosing one arbitrarily.
+
+
+## Inspect conditions
+
+Use `ru_plan("categorical_mode")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../examples/categorical_mode.R)

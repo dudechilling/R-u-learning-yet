@@ -1,10 +1,14 @@
 # R-u-learning-yet
 
-A searchable, question-first collection of RStudio solutions. Each worked problem uses a **real, named dataset** where that makes sense, shows how the method works, and gives an equivalent call for **your own data and columns**.
+**An offline statistics and R learning library, from first steps to selected research workflows.**
 
-Search from the RStudio **Console**. No browser or internet access is needed after installing the package.
+Start with a question. Find a compatible method. Check its assumptions. Inspect an original worked example, edit ordinary R code, and interpret its uncertainty and limits. The package is named `rulearn`.
 
-## Install once
+**Version 0.4.2.9000.** The original RU code and educational content have source-specific licences. Automated package checks have passed on Linux. Manual Windows RStudio Viewer and clipboard checks remain separate. No illustration is presented as an authentic interface screenshot.
+
+## Install directly from GitHub main
+
+Run these commands in RStudio with internet access for installation:
 
 ```r
 install.packages("remotes")
@@ -12,88 +16,137 @@ remotes::install_github("dudechilling/R-u-learning-yet")
 library(rulearn)
 ```
 
-## Find the right method
+The package shall open its local landing page automatically in a supported
+interactive RStudio session. Run ru_home() to reopen it.
+Set options(rulearn.auto_home = FALSE) before library(rulearn) to disable
+automatic opening. Installed statistical content runs offline; installation
+from GitHub requires an internet connection.
+
+## What the candidate contains
+
+This release contains **84 compact lessons: 68 with executable native R examples and 16 conceptual references**. Its coverage register contains **174 topic rows**. Of these, 84 carry the recorded `VERIFIED` content label, 48 are `AUTHORED`, 6 `NEEDS_REVIEW`, and 36 `DISCOVERED`. These legacy status fields are retained for compatibility. Learning paths map unfinished work to `IN_REVIEW` or `PLANNED`.
+
+The latest release adds ten verified workflows. Their numerical examples have separate mathematical checks and frozen routing cases. Existing labels are not a claim that every lesson has received a new independent human or legal review. Software verification, source rights and actual IDE acceptance are distinct.
+
+The four learning paths cover:
+
+| Path | Current scope |
+| --- | --- |
+| Beginner | R objects, inspecting and importing data, variable types, summaries, frequencies and plots |
+| Core | Probability, distributions, sampling, CLT, mean and proportion intervals, t-test designs, hypothesis interpretation and uncertainty |
+| Applied | Simple least-squares regression, residual and influence diagnostics, and Welch one-way ANOVA |
+| Research | Grouped binomial logistic regression, iid mean bootstrap with percentile intervals, and Holm familywise multiple-testing adjustment |
+
+These are bounded workflows, not a claim that all advanced statistics is available. Mixed models, complex survey inference, advanced spatial/time-series methods and unimplemented estimators remain unsupported. Named incompatible methods must not receive a superficially similar substitute.
+
+Inspect the installed record rather than relying on a copied count:
 
 ```r
-ru_find("How can I show the distribution and mark the mean?")
-ru_find("Do two groups have different means?")
-ru_find("Does a zero correlation mean no relationship?")
-ru_topics()
-ru_plan("histogram")
+topics <- ru_topics()
+nrow(topics)
+table(topics$content_status)
 ```
 
-A problem plan separates **available**, **explicitly missing**, and **unknown** information:
+## Start with a question
 
 ```r
-ru_plan("histogram", have=c("numeric", "units"), missing="groups")
-ru_code("histogram")
-ru_run("histogram")
+ru_find("How do I create a histogram?")
+ru_find("How do I run a Welch t test for two independent groups?")
+ru_find("Fit binomial logistic regression to independent grouped successes and failures.")
+ru_find("Adjust a prespecified family of p-values with the Holm method.")
 ```
 
-`ru_code()` prints the example script; `ru_run()` executes it in a separate environment. These commands do **not** operate on your open dataset or insert invented values into it.
+Search is deterministic and local. Compatibility checks run before ranking. Search may return no match when the model, operation, design or interpretation is unsupported or contradictory. A reference is not a solver for an unseen dataset and does not supply missing study assumptions.
 
-## Practice on named datasets
+Results return invisibly as data frames. Assign the result to inspect it:
 
 ```r
-ru_datasets()
-flowers <- ru_data("iris")
-ru_columns(flowers)
-
-ru_apply("mean_median", data=flowers, x="Sepal.Length")
-ru_apply("group_means", data=flowers, x="Sepal.Length", group="Species")
-ru_apply("histogram", data=flowers, x="Petal.Length")
-ru_apply("grouped_boxplot", data=flowers, x="Sepal.Length", group="Species")
+hits <- ru_find("bootstrap_mean", n = 3L)
+hits
 ```
 
-Other included-R datasets cover missing values (`airquality`), speed and stopping distance (`cars`), fuel economy (`mtcars`), time series (`Nile` and `AirPassengers`), historical frequency tables (`Titanic`), and paired observations (`sleep`). **The underlying tables remain in R; the repository does not duplicate their raw data.**
+## Read and edit native R
 
-Palmer penguins is optional, not an automatic download:
+The home links to Start, usage guidance, local tutorials, method coverage, learning paths, accessibility help and licence notices. A computational page presents the question, method choice, assumptions, numbered procedure, original worked case, native code, editable inputs, interpretation and common mistakes.
 
 ```r
-install.packages("palmerpenguins")  # only if you want penguin examples
-penguins <- ru_data("penguins")
-ru_columns(penguins)
-ru_apply("grouped_boxplot", data=penguins,
-         x="body_mass_g", group="species")
-ru_apply("scatterplot", data=penguins,
-         x="bill_length_mm", y="bill_depth_mm")
+ru_open("mean_confidence_interval")
+ru_open("glm_binomial")
+ru_edit("bootstrap_mean", open = FALSE)
 ```
 
-Palmer penguins' source data are distributed under CC0. Some fields have missing observations; the functions disclose omitted measurements.
+`ru_edit()` writes an editable script. The Viewer Copy control copies text; it never executes R. When clipboard permission is unavailable, the page selects the code and explains manual copying. Inspect inputs and output before using an example with real observations.
 
-## Use the same methods with your own file
+For a first numeric exercise, use explicitly constructed values:
 
 ```r
-mine <- read.csv("measurements.csv")
-ru_columns(mine)
-ru_find("quartiles")
-ru_apply("five_number", data=mine, x="your_numeric_column")
-ru_apply("scatterplot", data=mine,
-         x="your_predictor_column", y="your_outcome_column")
+x <- c(4, 6, 8, 9, 13)
+mean(x)                  # 8
+median(x)                # 8
 ```
 
-The column names above are placeholders that you replace after checking `ru_columns(mine)`. The library does **not** infer your variables, their units, or the sampling design.
+Both summaries are 8 for this constructed vector. That calculation does not show that a real sample is representative or that its population mean is 8.
 
-Frequency tables require special care. A row with `Freq=100` represents 100 observations, not one:
+For a research-level first task:
 
 ```r
-ship <- ru_data("Titanic")
-ru_apply("relative_frequency", ship, x="Survived", weight="Freq")
-ru_apply("bar_chart", ship, x="Survived", weight="Freq")
+ru_open("multiple_testing_holm")
+raw_p <- c(.002, .014, .031, .20, .42, .06)
+stats::p.adjust(raw_p, method = "holm")
+# 0.012 0.070 0.124 0.400 0.420 0.180
 ```
 
-## Choosing a method is not validating its assumptions
+The values are synthetic. Holm adjusts an entire prespecified family of valid raw p-values. It does not create valid raw tests, estimate an effect size, or repair selective reporting.
 
-- A histogram, boxplot or mean describes the recorded values. It does not establish population representativeness.
-- Two-sample and paired tests require a defensible study design. Mark independence or pairing explicitly when applying them.
-- A normal curve is a **model assumption**, not a property automatically established by an observed sample.
-- The empirical bootstrap describes resampling from available observations. It does not correct a biased sample.
-- Missing measurements, unknown units, model fit and time spacing can change the meaning of a result.
+## Control automatic opening
 
-The repository includes **46 question-led guides** in [`problems/`](problems/index.qmd), with runnable scripts in [`inst/examples/`](inst/examples/). Those guides explain method choice, RStudio steps, interpretation and important exceptions. The search system is an inspectable keyword index and conditional decision rules—not a language model.
+Set the option **before** attachment:
 
-## Development and verification
+```r
+options(rulearn.auto_home = FALSE)
+library(rulearn)
+ru_home()                # Explicit request still works in supported RStudio
+```
 
-This is an R package built around base R, with optional penguin data. To test a local copy, use `R CMD build` and `R CMD check --no-manual`, or install it and run the included smoke and dataset-adaptation tests.
+The package does not edit `.Rprofile` or permanent IDE preferences. Attachment stays quiet and does not open a browser in noninteractive R, Rscript, package checks, unsupported IDEs or RStudio child jobs. A home-opening failure must not prevent package attachment.
 
-Source and editorial rules are in [methodology.md](methodology.md). A searchable Quarto website is configured, but its deployment is separate from the working RStudio console interface.
+Outside RStudio, use explicit text or native Help:
+
+```r
+ru_text("one_sample_t")
+help("research-workflows", package = "rulearn")
+path <- ru_home(open = FALSE)
+```
+
+The last command prepares the same local home and returns its path invisibly. It does not launch an external browser.
+
+## Offline operation and accessibility
+
+Installed lessons, navigation, code copying and included base-R computations need no account, telemetry, remote model, CDN, web server or network connection. Optional source links are labelled as online references. Installing R, optional packages or a new package archive is a separate activity that can require network access.
+
+The Viewer includes keyboard focus indicators, a skip link, named controls, image alternatives, code-scroll regions and a manual copy fallback. Headless browser checks cover narrow widths. Actual Windows RStudio keyboard, clipboard, scaling and screen-reader acceptance is not implied by those automated checks.
+
+The package declares R 4.1 or newer. Current local execution uses R 4.5.2 on Linux. `rstudioapi` is optional and supplies IDE integration. `palmerpenguins` is optional for older dataset examples; missing optional data must produce an explicit error rather than a fabricated substitute. Other platforms and the oldest supported R version require their own recorded test results.
+
+## Source, contribution and support boundaries
+
+Compact lessons live once in `inst/lessons/`. `R/` contains local search, rendering and compatibility helpers. `inst/help-pages/` contains the canonical short help fragments. The 46 older example scripts and walkthroughs remain available for compatibility; their existence is not a claim of newly reviewed compact coverage.
+
+Contributions must use original or demonstrably permitted material, synthetic examples or properly sourced data, explicit assumptions and frozen positive/negative cases. A new method needs independent numerical checks. Keep private data, raw assessment material, personal paths and confidential QA evidence out of the public tree. Do not hide mandatory third-party attribution.
+
+This library offers educational references, not live personal support, certification of an analysis, or a guarantee against scientific or legal error. Report a defect with the package version, method ID, a synthetic reproducible example, expected output and actual output. Do not include private observations or credentials.
+
+## Verification and release status
+
+Build from the source directory or name it explicitly from its parent:
+
+```sh
+R CMD build path/to/source
+R CMD check --no-manual rulearn_0.4.2.9000.tar.gz
+```
+
+Use an isolated R library for installation and rerun every committed test against the installed archive. The original test cases remain; exact catalogue/version assertions change only when independently verified additions justify them. New tests cover method selection, numerical oracles, rejected inputs, RNG preservation and the home/attach contract.
+
+The candidate is not a published installer. Do not install an older public tag and expect these new features. The current `LICENSE` grants MIT terms for expressly listed newly authored code and CC BY 4.0 terms for expressly listed original explanatory text, with code examples under MIT. The canonical scope is `inst/licensing/scope.csv`. Other files retain their preceding rights status. These grants do not clear redistribution of the whole archive or relicense dependencies. Do not describe the unapproved aggregate package as an open-source release.
+
+CI is prepared for pinned Windows, macOS and Linux runners, including a minimum-series R check. Actions are pinned to reviewed commits and optional test dependencies to versions and SHA-256 values. A prepared workflow is not evidence that its remote matrix has run. `scripts/ci-check.R` builds, requires a zero-note check, installs the exact archive through R and reruns all committed regressions.

@@ -1,0 +1,69 @@
+---
+title: "How do I count and compare categorical observations in R?"
+---
+
+## Immediate answer
+
+```{r setup-quick-bar-chart, include=FALSE}
+knitr::read_chunk('../examples/bar_chart.R')
+```
+
+```{r quick-bar-chart}
+#| echo: true
+#| eval: true
+#| fig-alt: "Three bars show counts of 50 recorded flowers for each species. The categories are separate groups, not numerical intervals."
+```
+
+## What to change
+
+Replace `iris$Species` with the category column in your own dataset. Update the title and the vertical-axis description. For example, a numerical code that represents categories should become `factor(mydata$code)` before counting.
+
+## What to check
+
+Use a **bar chart for categories**, not a histogram. Check missing category labels and what one data row represents. If your file is already a summary table with a frequency column, `table()` would count summary rows rather than original observations; use the recorded frequencies directly.
+
+## Complete walkthrough (optional)
+
+### The question
+
+How many recorded observations belong to each category, what share does each category represent, and how do I explain a labeled bar chart?
+
+### Available information and method
+
+The built-in `iris` data contain one flower per row and a categorical `Species` column. `table()` counts the categories, `prop.table()` converts counts into proportions, and `barplot()` draws the counts. `text()` adds count and percentage labels above the bars.
+
+### Run it in RStudio
+
+The full example below is the **same canonical script** copied with `ru_edit("bar_chart")`; the shorter example is copied with `ru_edit("bar_chart", mode="quick")`. Both use ordinary R functions.
+
+```{r setup-worked-bar-chart, include=FALSE}
+knitr::read_chunk('../examples/bar_chart.R')
+```
+
+```{r worked-bar-chart}
+#| echo: true
+#| eval: true
+#| fig-alt: "Three categories each contain 50 recorded iris flowers. Labels above equal-height bars show 50 observations and 33.3 percent for each species."
+```
+
+## Interpretation
+
+The horizontal axis names categories; it does **not** measure a continuous number. The bar height and labels give the count of recorded observations, while percentages describe shares of this sample. A larger bar does not demonstrate causation or representativeness.
+
+## If the information changes
+
+If your variable measures a **number** such as length or time, use a histogram to group measurements into intervals. If only pre-aggregated counts are available, plot those counts without re-counting their rows. With two categorical variables, inspect a contingency table rather than pretending either is a numeric axis.
+
+Use `ru_plan("bar_chart")` for conditional decision routes. The older `ru_apply()` interface remains available for compatibility, but is not required to learn this method.
+
+## Retention practice (optional)
+
+Without viewing the complete code, use the built-in `mtcars` dataset to count the categories of cylinder numbers using `factor(mtcars$cyl)`. Create a bar chart and state what its percentages represent. Explain why a histogram would answer a different question. Revisit the task later with another categorical variable.
+
+## Related topics and sources
+
+Read `help("measurement_scales", package="rulearn")`, `help("r_table", package="rulearn")`, `?barplot`, `?table`, and `ru_guide("histogram")`.
+
+Source: [R barplot reference](https://search.r-project.org/R/refmans/graphics/html/barplot.html)
+
+[Open the standalone R script](../examples/bar_chart.R)

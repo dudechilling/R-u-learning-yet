@@ -1,0 +1,35 @@
+---
+title: "What is the chance of exactly k successes in n independent trials?"
+---
+
+## Question
+
+What is the chance of exactly k successes in n independent trials?
+
+## Work through it
+
+Specify n, k, and success probability p; verify two outcomes, independent trials, and constant p; compute dbinom(k,n,p).
+
+## Worked example: mtcars
+
+```{r}
+#| eval: false
+d <- ru_data("mtcars")
+p <- mean(d$am==1)
+result <- ru_apply("binomial_exact", n=10, k=4, prob=p)
+stopifnot(result>0,result<1)
+```
+
+The observed share of cars with manual transmissions supplies a **hypothetical** success probability for ten independent draws. That illustrative binomial model does not establish a population transmission rate.
+
+## Adapt to another question
+
+```r
+ru_apply("binomial_exact", n=your_n, k=your_k, prob=your_p)
+```
+
+If a question asks 'at least k', use binomial_at_least; 'exactly k' is one count, not a cumulative tail.
+
+Check the input conditions with `ru_plan("binomial_exact")` before treating a calculation as an inference.
+
+[Run the standalone script](../examples/binomial_exact.R)

@@ -1,0 +1,34 @@
+---
+title: "How do I check whether consecutive observations are related?"
+---
+
+## What the question asks
+
+How do I check whether consecutive observations are related?
+
+## Steps to decide and solve
+
+Put measurements in time order; inspect trends and repeated cycles; use the autocorrelation function and interpret each lag carefully.
+
+## Worked example: Nile
+
+```{r}
+#| eval: false
+d <- ru_data("Nile")
+lags <- ru_apply("autocorrelation", data=d, x="flow", time="year")
+stopifnot(inherits(lags,"acf"))
+```
+
+Autocorrelation compares a series with lagged versions of itself. A positive lag-one value can signal persistence, but trend, seasonality and irregular time spacing also affect its interpretation.
+
+## Apply it to another question
+
+```r
+ru_apply("autocorrelation", data=your_data, x="numeric_column", time="date_column")
+```
+
+A raw ACF cannot establish stationarity; adjust the series or assess trend and changing variance where necessary.
+
+Use `ru_plan("autocorrelation")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../examples/autocorrelation.R)

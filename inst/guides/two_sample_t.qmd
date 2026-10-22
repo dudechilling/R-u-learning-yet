@@ -1,0 +1,82 @@
+---
+title: "How do I compare the means of two independent groups?"
+---
+
+## Immediate answer
+
+```{r setup-quick-two-sample-t, include=FALSE}
+knitr::read_chunk('../examples/two_sample_t.R')
+```
+
+```{r quick-two-sample-t}
+#| echo: true
+#| eval: true
+```
+
+## What to change
+
+Replace `PlantGrowth`, `weight`, the `group` column, and the two selected group labels. Confirm the grouping levels and the order of the estimated mean difference before choosing a directional alternative.
+
+## What to check
+
+Use **two independently sampled groups** and a numeric outcome; enough valid observations and defensible assumptions are required. Identical group sizes do not prove independence. If measurements are paired, use a paired analysis instead; if pairing is unknown, stop before inference. A t-test does not establish causation.
+
+## Complete walkthrough (optional)
+
+### 1. The question
+
+Is there evidence that recorded mean plant weights differ between a control and one treatment?
+
+### 2. What information is available?
+
+The built-in **PlantGrowth** dataset includes numeric `weight` and categorical `group`. This example selects `ctrl` and `trt1`, each with ten recorded plants. Confirm from the design that the experimental units are independent.
+
+### 3. Which method fits?
+
+Use **Welch's two-sample t-test** when the response is numerical, there are exactly two independent groups, and the assumptions justify comparing population means. Welch's method does not assume equal population variances.
+
+### 4. Run it in RStudio
+
+This example shows **native base-R commands**, not a call to `ru_apply()`. Work through the numbered comments. Run lines with **Ctrl+Enter**, or make an editable copy with `ru_edit("two_sample_t")` for the detailed code, or `ru_edit("two_sample_t", mode="quick")` for the short example.
+
+```{r setup-worked-two-sample-t, include=FALSE}
+knitr::read_chunk('../examples/two_sample_t.R')
+```
+
+```{r worked-two-sample-t}
+#| echo: true
+#| eval: true
+#| fig-alt: "Side-by-side boxplots of the control and treatment-one plant weights in the PlantGrowth data. Both groups contain ten measurements; boxes show their medians and spread, but not statistical significance."
+```
+
+## Interpretation
+
+`t.test()` shows the sample means, an estimated interval for the difference, and a p-value. The difference uses the ordering of factor levels, here **control minus treatment 1**. The p-value is not the probability that the null hypothesis is true. The interval and study design are essential to interpreting importance.
+
+## Adapting the full example
+
+Replace the dataset, numeric response, grouping column, and two labels. Confirm independent units rather than assuming them. Changing `alternative` to `greater` or `less` changes the direction **relative to factor level order**; inspect `levels(d$group)`.
+
+## If the information changes
+
+If each subject has two linked measurements, use a **paired** test instead. If pairing or independence is unknown, establish the design and report group summaries until it is known. If only a descriptive comparison is needed, do not add a hypothesis test.
+
+Read the conditional advice with `ru_plan("two_sample_t")`. Working code alone does not verify a study assumption.
+
+## Common mistakes
+
+Checking that both groups contain ten observations does not establish independence. Reversing the group order reverses the sign of a reported difference and changes the interpretation of one-sided tests. A small p-value does not establish causation or practical importance.
+
+## Related concepts
+
+Read native help `?t.test`, `help("hypothesis_tests_pvalues",package="rulearn")`, `help("confidence_intervals",package="rulearn")`, and `help("independent_paired",package="rulearn")`.
+
+## Retention practice (optional)
+
+Consider `ToothGrowth` at one selected dose: how would you compare mean `len` for the two supplements? Write the native `t.test()` formula and identify the group order. Before treating its p-value as inference, explain which study-design condition must be established. For paired observations, consult `help("independent_paired",package="rulearn")`. Retry later using new variables.
+
+## Sources
+
+[R `t.test()` documentation](https://search.r-project.org/R/refmans/stats/html/t.test.html)
+
+[Open the standalone R script](../examples/two_sample_t.R)

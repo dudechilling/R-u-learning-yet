@@ -1,0 +1,83 @@
+---
+title: "How do I display the distribution of numerical observations?"
+---
+
+## Immediate answer
+
+```{r setup-quick-histogram, include=FALSE}
+knitr::read_chunk('../examples/histogram.R')
+```
+
+```{r quick-histogram}
+#| echo: true
+#| eval: true
+#| fig-alt: "Histogram of recorded eruption times, with duration in minutes on the horizontal axis and count on the vertical axis."
+```
+
+## What to change
+
+Replace `faithful$eruptions` with **your numerical column**, choose an informative unit label, then adjust `breaks` and the title. `breaks=10` suggests a bin count; it does not guarantee exactly ten bars.
+
+## What to check
+
+Use **numeric** measurements, not category names. Count missing/nonfinite values before plotting, confirm the unit, and identify what each bar counts. The histogram displays intervals; its horizontal axis limits need not equal the sample minimum and maximum. For category names use `table()` and `barplot()`.
+
+## Complete walkthrough (optional)
+
+### 1. The question
+
+How long do geyser eruptions last, and do the observed durations form one cluster or several?
+
+### 2. What information is available?
+
+The built-in **faithful** dataset records eruption durations in **minutes**. Its numerical column is `eruptions`. Each usable row is one recorded eruption.
+
+### 3. Which method fits?
+
+Use a **histogram** because duration is numeric and the question concerns how many observations fall into intervals. Bin edges change the picture, not the measurements.
+
+### 4. Run it in RStudio
+
+This example shows **native base-R commands**, not a call to `ru_apply()`. Work through the numbered comments. Run lines with **Ctrl+Enter**, or make an editable copy with `ru_edit("histogram")` for the detailed code, or `ru_edit("histogram", mode="quick")` for the short example.
+
+```{r setup-worked-histogram, include=FALSE}
+knitr::read_chunk('../examples/histogram.R')
+```
+
+```{r worked-histogram}
+#| echo: true
+#| eval: true
+#| fig-alt: "Histogram showing recorded geyser eruption durations in minutes. Two clusters of durations appear, with count labels over bars. Solid blue and dashed brown vertical lines show the sample mean and median."
+```
+
+## Interpretation
+
+The horizontal axis shows **duration in minutes**; the vertical axis shows **the count of eruptions per interval**. The numbers above the bars are frequencies, not percentages. The blue line shows the sample mean; the dashed brown line shows the median. Look for separate clusters, but do not infer what caused them.
+
+## Adapting the full example
+
+Replace `faithful$eruptions` with your own numeric column. Change the units, plot title and `by=0.5` (interval width). `hist()` makes the bars, `text()` labels their counts, `abline()` adds reference values, and `legend()` explains the lines.
+
+## If the information changes
+
+With a category column, use `table()` and `barplot()` instead. With grouped numeric measurements, compare distributions using the same interval rules or grouped boxplots. If the numeric observations are missing, do not manufacture them.
+
+Read the conditional advice with `ru_plan("histogram")`. Working code alone does not verify a study assumption.
+
+## Common mistakes
+
+A histogram is not a bar chart of named categories. A bar shows the number of eruptions in a range of minutes, not the chance of one exact duration. Confirm units and how NAs are handled.
+
+## Related concepts
+
+Try native help `?hist`, the concept `help("mean_median", package="rulearn")`, and the related walkthrough `ru_guide("bar_chart")`.
+
+## Retention practice (optional)
+
+Without looking at the code first, make a histogram of `airquality$Wind`, label the horizontal axis in miles per hour and mark the mean using `abline()`. Explain what one bar counts. If stuck, reopen the worked code. Optional: retry on a different dataset after about 24 hours and seven days.
+
+## Sources
+
+[R `hist()` documentation](https://search.r-project.org/R/refmans/graphics/html/hist.html)
+
+[Open the standalone R script](../examples/histogram.R)

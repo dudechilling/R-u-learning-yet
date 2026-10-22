@@ -1,0 +1,35 @@
+---
+title: "How do I predict a new observation from a fitted regression?"
+---
+
+## Question
+
+How do I predict a new observation from a fitted regression?
+
+## Decide which method fits
+
+Fit the model to paired predictor and response values; specify a new predictor within the observed range; request a prediction interval rather than silently treating the predicted mean as certain.
+
+## Worked example: cars
+
+```{r}
+#| eval: false
+d <- ru_data("cars")
+prediction <- ru_apply("predict_regression", d, x="speed", y="dist",
+                       new_x=15.5, confidence=.95)
+stopifnot(nrow(prediction)==1L,all(is.finite(prediction)))
+```
+
+The interval describes uncertainty about a new stopping-distance observation at the chosen speed under the model, not merely the uncertainty in the fitted mean. It does not justify predictions beyond observed speeds.
+
+## Apply to another dataset
+
+```r
+ru_apply("predict_regression", your_data, x="predictor", y="outcome", new_x=15.5, confidence=.95)
+```
+
+A confidence interval for the mean fitted response is narrower than an interval for a future individual observation.
+
+Review assumptions and available input conditions with `ru_plan("predict_regression")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../examples/predict_regression.R)

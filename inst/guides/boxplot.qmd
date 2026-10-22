@@ -1,0 +1,34 @@
+---
+title: "How do I show the median, quartiles, and potential outliers?"
+---
+
+## What the question asks
+
+How do I show the median, quartiles, and potential outliers?
+
+## Steps to decide and solve
+
+Select a numeric field; examine its missing values; draw the boxplot and review the 1.5×IQR convention for flagged points.
+
+## Worked example: airquality
+
+```{r}
+#| eval: false
+d <- ru_data("airquality")
+s <- ru_apply("boxplot", data=d, x="Ozone")
+stopifnot(length(s$stats)==5L)
+```
+
+The ozone distribution includes substantial variation and missing observations. A point beyond the whisker may deserve investigation, but does not automatically mean the sensor was wrong.
+
+## Apply it to another question
+
+```r
+ru_apply("boxplot", data=your_data, x="numeric_column")
+```
+
+If the question is about differences across groups, use grouped_boxplot. If you need exact quartile values use five_number.
+
+Use `ru_plan("boxplot")` to inspect alternative routes when required information is absent or uncertain.
+
+[Open the standalone R script](../examples/boxplot.R)

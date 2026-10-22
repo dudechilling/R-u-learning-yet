@@ -1,0 +1,34 @@
+---
+title: "How do I select a reproducible random sample of records?"
+---
+
+## Question
+
+How do I select a reproducible random sample of records?
+
+## Work through it
+
+Identify the full set of eligible rows; set a sample size no larger than the available rows; sample without replacement and report the selection method.
+
+## Worked example: iris
+
+```{r}
+#| eval: false
+d <- ru_data("iris")
+chosen <- ru_apply("sample_random", data=d, n=12, seed=42)
+stopifnot(nrow(chosen)==12, identical(names(chosen),names(d)))
+```
+
+The selected rows are a reproducible simple random subsample of the 150 Iris records. This random selection does not make the original collection representative of all flowers.
+
+## Adapt to another question
+
+```r
+ru_apply("sample_random", data=your_data, n=12, seed=42)
+```
+
+With-replacement sampling uses a different rule and can select a record more than once; do not confuse it with sampling without replacement.
+
+Check the input conditions with `ru_plan("sample_random")` before treating a calculation as an inference.
+
+[Run the standalone script](../examples/sample_random.R)

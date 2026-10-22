@@ -1,0 +1,36 @@
+---
+title: "How do I estimate a confidence interval for a population mean?"
+---
+
+## Question
+
+How do I estimate a confidence interval for a population mean?
+
+## Decide which method fits
+
+Select the relevant sample, choose and disclose the confidence level; calculate a t interval and explain its repeated-sampling interpretation.
+
+## Worked example: PlantGrowth
+
+```{r}
+#| eval: false
+d <- ru_data("PlantGrowth")
+control <- subset(d, group=="ctrl")
+fit <- ru_apply("mean_confidence_interval", control,
+                x="weight", confidence=.95)
+stopifnot(length(fit$conf.int)==2L)
+```
+
+The interval concerns the mean weight of observations in the selected control group, under sampling and model assumptions. 95% is the long-run coverage of the procedure, not a probability that a fixed mean moves between endpoints.
+
+## Apply to another dataset
+
+```r
+ru_apply("mean_confidence_interval", your_data, x="numeric_column", confidence=.95)
+```
+
+If the question concerns a proportion rather than a numeric mean, use proportion_interval. If two groups are contrasted, check the design before selecting an appropriate two-sample method.
+
+Review assumptions and available input conditions with `ru_plan("mean_confidence_interval")`. A valid computation does not itself verify the underlying study design.
+
+[Standalone R script](../examples/mean_confidence_interval.R)

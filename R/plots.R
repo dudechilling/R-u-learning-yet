@@ -37,6 +37,7 @@ ru_bar <- function(x,title="Category counts",xlab="Category",
     if (any(!is.finite(x)) || any(x<0)) stop("Counts must be finite and nonnegative.")
     counts <- x
   } else {
+    if (sum(is.na(x))) message("Omitted ",sum(is.na(x))," missing categories.")
     counts <- table(x,useNA="no")
   }
   if (!length(counts)) stop("No categories to plot.")
@@ -49,11 +50,13 @@ ru_bar <- function(x,title="Category counts",xlab="Category",
   mtext(xlab,side=1,line=par("mar")[1]-1)
   invisible(counts)
 }
-ru_box <- function(x,groups=NULL,units="Value",title="Spread and outliers") {
+ru_box <- function(x,groups=NULL,units="Value",title="Spread and outliers",
+                   col=NULL) {
   if (is.null(groups)) {
     z <- .ru_numeric(x)
     s <- boxplot.stats(z)
-    boxplot(z,col="#CEE2F0",border="#254967",ylab=units,main=title)
+    boxplot(z,col=if (is.null(col)) "#CEE2F0" else col,
+            border="#254967",ylab=units,main=title)
     abline(h=median(z),col="#A35E20",lty=2)
     legend("topright",legend=paste0("Median: ",signif(median(z),4)),
            col="#A35E20",lty=2,bty="n",cex=.8)
@@ -63,12 +66,19 @@ ru_box <- function(x,groups=NULL,units="Value",title="Spread and outliers") {
     stop("Numeric values and matching group labels are required.")
   good <- is.finite(x) & !is.na(groups)
   if (!any(good)) stop("No complete grouped observations.")
-  f <- factor(groups[good])
+  if (sum(!good)) message("Omitted ",sum(!good)," incomplete grouped observations.")
+  f <- droplevels(factor(groups[good]))
   if (nlevels(f)<2) stop("At least two groups are required.")
-  palette <- rep(c("#CEE2F0","#EAC89E","#B8D5C0","#D6CAE8"),length.out=nlevels(f))
-  boxplot(x[good] ~ f,col=palette,border="#254967",
+  sizes <- table(f)
+  palette <- if (is.null(col)) {
+    rep(c("#CEE2F0","#EAC89E","#B8D5C0","#D6CAE8"),length.out=nlevels(f))
+  } else {
+    if (!is.character(col) || !length(col)) stop("col= must contain plot colors.")
+    rep(col,length.out=nlevels(f))
+  }
+  labels <- paste0(levels(f), " (n=",as.integer(sizes),")")
+  boxplot(x[good] ~ f,col=palette,border="#254967",names=labels,
           main=title,ylab=units,xlab="Group")
-  legend("topright",legend=levels(f),fill=palette,bty="n",cex=.78)
   invisible(tapply(x[good],f,median))
 }
 ru_scatter <- function(x,y,xlab="X",ylab="Y",title="Paired measurements",
@@ -79,6 +89,7 @@ ru_scatter <- function(x,y,xlab="X",ylab="Y",title="Paired measurements",
   if (sum(good)<3L) stop("At least three complete numeric pairs are required.")
   if (!is.null(labels) && length(labels)!=length(x))
     stop("Labels must align with the original paired measurements.")
+  if (sum(!good)) message("Omitted ",sum(!good)," incomplete observation pairs.")
   if (!is.null(labels)) labels <- as.character(labels[good])
   x <- x[good]; y <- y[good]
   plot(x,y,type="n",xlab=xlab,ylab=ylab,main=title)

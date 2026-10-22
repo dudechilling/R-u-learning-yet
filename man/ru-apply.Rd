@@ -1,7 +1,7 @@
 \name{ru_apply}
 \alias{ru_apply}
-\title{Apply a question-led method to your own data}
-\description{Choose an indexed problem and supply explicit columns or vectors. Operations validate required inputs and avoid guessing missing information. The method is reusable; assumptions are not automatically valid for every dataset.}
+\title{Legacy Convenience Interface for Applying Indexed Methods}
+\description{The optional indexed calculation interface is retained for compatibility with earlier usage. To learn R, prefer the native R commands in \code{ru_guide()}, \code{ru_edit()}, and the concept/function references. Existing operations validate explicit inputs and cannot confirm study-design assumptions.}
 \usage{
 ru_apply(problem, data = NULL, x = NULL, y = NULL, group = NULL,
          time = NULL, threshold = NULL, prob = NULL, n = NULL, k = NULL,
@@ -10,7 +10,8 @@ ru_apply(problem, data = NULL, x = NULL, y = NULL, group = NULL,
          reps = 500L, independent = FALSE, paired = FALSE,
          assume_normal = FALSE, alternative = "two.sided",
          new_x = NULL, allow_extrapolate = FALSE, weight = NULL,
-         operator = ">=", file = NULL, successes = NULL, show_plot = TRUE)
+         operator = ">=", file = NULL, successes = NULL, show_plot = TRUE,
+         units = NULL, xlab = NULL, ylab = NULL, title = NULL, col = NULL)
 }
 \arguments{
 \item{problem}{Exact problem ID, or an unambiguous question found by \code{ru_find()}.}
@@ -36,9 +37,13 @@ ru_apply(problem, data = NULL, x = NULL, y = NULL, group = NULL,
 \item{operator}{One of \code{>=}, \code{>}, \code{<=}, \code{<}, \code{==}, or \code{!=} for row filtering.}
 \item{file}{Existing CSV path for the import problem.}
 \item{successes}{Success count for a proportion confidence interval.}
-\item{show_plot}{Whether graph-producing methods should render plots when supported.}
+\item{show_plot}{Whether graph-producing methods should render plots. FALSE returns computed values without creating a graph.}
+\item{units}{Measurement units or label for a histogram or boxplot.}
+\item{xlab, ylab}{Explicit axis labels for supported plots; include units.}
+\item{title}{Meaningful plot title for supported graph methods.}
+\item{col}{Base R color for relevant plotted measurements.}
 }
-\details{Different problem IDs require different inputs; inspect \code{ru_plan(id)} and the worked example before calling. These functions do not prove sampling assumptions, causal effects, or normality. A model-based calculation may be possible even when its interpretation is not justified.}
+\details{Different problem IDs require different inputs; inspect \code{ru_plan(id)} and the worked example before calling. The function refuses arguments that the selected method does not use. These functions do not prove sampling assumptions, causal effects, or normality. A model-based calculation may be possible even when its interpretation is not justified.}
 \examples{
 d <- ru_data("iris")
 ru_apply("mean_median", d, x="Sepal.Length")

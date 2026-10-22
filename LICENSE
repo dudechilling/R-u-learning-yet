@@ -1,1 +1,21 @@
-Copyright remains with the authors of original contributions. No redistribution license has been selected. Public access does not itself grant rights to redistribute the material.
+R-U-LEARNING-YET -- ORIGINAL SOURCE AND EDUCATIONAL CONTENT
+
+Copyright (c) 2026 R-u-learning-yet contributors.
+
+Original software source, scripts, tests and code examples classified as MIT
+in inst/licensing/scope.csv are made available under the MIT terms in
+inst/licensing/MIT.txt.
+
+Original educational text, documentation, examples and figures classified
+as CC-BY-4.0 in inst/licensing/scope.csv are made available under Creative
+Commons Attribution 4.0 International, with their original embedded R code
+examples also licensed under MIT. The CC BY 4.0 notice is included locally.
+
+The references to official R and public statistical documentation are links,
+not republications of the referenced works. Third-party packages, datasets
+and trademarks retain their own rights and notices. These grants apply only
+to material for which RU contributors hold the necessary rights, and do not
+relicense any third-party protected material.
+
+No institutional affiliation or endorsement is claimed. There is no
+guarantee against future third-party claims.

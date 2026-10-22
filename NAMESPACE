@@ -31,3 +31,10 @@ export(ru_apply)
 
 importFrom(stats,aggregate)
 importFrom(utils,tail)
+export(ru_guide)
+export(ru_edit)
+export(ru_open)
+export(ru_text)
+export(ru_palette)
+
+export(ru_home)

@@ -1,0 +1,35 @@
+---
+title: "How do sample means vary across repeated resampling?"
+---
+
+## Question
+
+How do sample means vary across repeated resampling?
+
+## Work through it
+
+Choose a numeric sample and a resample size; bootstrap from observed values with replacement; compare the distribution of resampled means with the original mean.
+
+## Worked example: iris
+
+```{r}
+#| eval: false
+d <- ru_data("iris")
+means <- ru_apply("sampling_distribution", data=d,
+                  x="Sepal.Length", n=30, reps=500, seed=42)
+stopifnot(length(means)==500,all(is.finite(means)))
+```
+
+The histogram displays an empirical bootstrap distribution for 30-draw means from the recorded sepal lengths. It describes resampling from this dataset, not a guaranteed sampling distribution for all plants.
+
+## Adapt to another question
+
+```r
+ru_apply("sampling_distribution", data=your_data, x="numeric_column", n=30, reps=500, seed=42)
+```
+
+If a question specifies a known probabilistic population model, simulate from that model instead of bootstrapping observed values.
+
+Check the input conditions with `ru_plan("sampling_distribution")` before treating a calculation as an inference.
+
+[Run the standalone script](../examples/sampling_distribution.R)

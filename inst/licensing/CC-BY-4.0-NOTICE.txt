@@ -1,0 +1,8 @@
+Original educational material expressly listed in scope.csv is licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0).
+
+Copyright 2026 R-u-learning-yet contributors, to the extent applicable rights exist.
+Canonical licence: https://creativecommons.org/licenses/by/4.0/
+Legal code: https://creativecommons.org/licenses/by/4.0/legalcode.en
+
+Attribution: identify R-u-learning-yet contributors, identify this library and the source version, retain the licence notice and source link where practicable, and identify modifications. The legal code governs; this notice is not a substitute licence.
+Code blocks in the expressly listed teaching files use the bundled MIT licence instead. No grant is made for unrelated code, datasets or material outside the recorded scope. The original material is provided without warranties under the licence terms. No affiliation or endorsement is implied.

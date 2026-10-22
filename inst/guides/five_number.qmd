@@ -1,0 +1,41 @@
+---
+title: "How do I get quartiles, an IQR, and a five-number summary?"
+---
+
+## The question
+
+How do I get quartiles, an IQR, and a five-number summary?
+
+## What to check and do
+
+1. Use numeric data. 2. Calculate quantiles and interquartile range. 3. State the quartile convention when precision or small samples matter.
+
+## Worked example: mtcars
+
+This example uses a public dataset distributed with R. It does not make claims about observations outside that dataset.
+
+```{r}
+#| eval: false
+d <- ru_data("mtcars")
+answer <- ru_apply("five_number", data=d, x="mpg")
+stopifnot(answer$IQR>0, length(answer$quantile)==5)
+```
+
+The IQR describes the middle half of the fuel-economy measurements. R's quantile() and fivenum() can use different conventions for the quartiles.
+
+## Apply the method to another question
+
+Replace the data frame and column names with those in your own file:
+
+```r
+ru_apply("five_number", data=your_data, x="numeric_column")
+```
+
+For outliers, check the boxplot convention (1.5 × IQR) rather than calling every extreme number an error.
+
+
+## Inspect conditions
+
+Use `ru_plan("five_number")` for available-versus-missing input routes. A calculation can run even when its assumptions do not justify an inference.
+
+[Standalone R script](../examples/five_number.R)

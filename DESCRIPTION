@@ -1,11 +1,17 @@
 Package: rulearn
-Title: Searchable RStudio Problem Bank
-Version: 0.2.0
+Title: Offline R and Statistics Reference Library
+Version: 0.4.2.9000
 Authors@R: person("R-u-learning-yet", "Contributors", email="244890287+dudechilling@users.noreply.github.com", role=c("aut","cre"))
-Description: Find question-based R examples, inspect conditional solution steps, and apply methods to new datasets by supplying column names. Use included R datasets or optional Palmer penguins.
+Description: Provides searchable offline statistics and R references with short
+    native-R examples, data-adaptation instructions, and optional visual
+    guidance rendered in the RStudio Viewer. Built-in R Help and existing
+    calculation helpers remain available for compatibility.
 License: file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1)
 Imports: graphics, grDevices, stats, utils
-Suggests: palmerpenguins
+Suggests: palmerpenguins, rstudioapi
 NeedsCompilation: no
+Packaged: 2026-10-22 06:39:25 UTC; earl
+Author: R-u-learning-yet Contributors [aut, cre]
+Maintainer: R-u-learning-yet Contributors <244890287+dudechilling@users.noreply.github.com>

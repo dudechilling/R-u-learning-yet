@@ -1,0 +1,49 @@
+---
+title: "How variable are measurements, and what units does standard deviation use?"
+---
+
+## Immediate answer
+
+```{r setup-quick-sample-sd, include=FALSE}
+knitr::read_chunk('../examples/sample_sd.R')
+```
+
+```{r quick-sample-sd}
+#| echo: true
+#| eval: true
+```
+
+## What to change
+
+Replace `iris$Petal.Length` with any compatible **numeric** measurement. Change the explanation of the unit; the example's flower lengths are in centimetres. `range(x)` gives the recorded minimum and maximum; `diff(range(x))` measures the gap between them.
+
+## What to check
+
+A sample variance uses squared differences from the sample mean and R's denominator `n - 1`. Standard deviation takes its square root, returning the original units. Report missing measurements and verify at least two usable observations before calling `sd()`. Do not confuse **standard deviation** (spread among measurements) with **standard error** (uncertainty in a sample estimate).
+
+## Complete walkthrough (optional)
+
+The longer editable native R script checks types and missingness, computes each statistic and labels the units. Open it with `ru_edit("sample_sd")`.
+
+```{r setup-worked-sample-sd, include=FALSE}
+knitr::read_chunk('../examples/sample_sd.R')
+```
+
+```{r worked-sample-sd}
+#| echo: true
+#| eval: true
+```
+
+## Interpretation
+
+The minimum and maximum describe the measured endpoints; they are not necessarily the axes displayed on a graph. Variance is in squared measurement units and standard deviation is in original units. Neither proves that a sample represents a larger population.
+
+## Retention practice (optional)
+
+Without copying the full answer, use `airquality$Wind`: calculate the observed endpoints, the distance between them, sample variance and standard deviation. Describe what the units mean. Later try a different measurement column, checking missing values first.
+
+## Related concepts and sources
+
+Read `help("variance_sd",package="rulearn")`, `help("sampling_distributions",package="rulearn")`, `?range`, `?var`, `?sd` and `ru_plan("sample_sd")`. [Official R standard deviation documentation](https://search.r-project.org/R/refmans/stats/html/sd.html).
+
+[Open the standalone R script](../examples/sample_sd.R)

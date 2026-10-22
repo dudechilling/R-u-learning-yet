@@ -1,0 +1,141 @@
+case_id,family,kind,query,expected,rationale
+one_sample_t-p01,one_sample_t,positive,How do I run a two-sided one-sample t test against a target mean?,one_sample_t,Named supported scope and assumptions
+one_sample_t-p02,one_sample_t,positive,Test one population mean with unknown sigma using Student t.,one_sample_t,Named supported scope and assumptions
+one_sample_t-p03,one_sample_t,positive,Use t.test on one numeric sample with a specified null mean.,one_sample_t,Named supported scope and assumptions
+one_sample_t-p04,one_sample_t,positive,Is a single sample mean different from 12 under a one-sample t test?,one_sample_t,Named supported scope and assumptions
+one_sample_t-p05,one_sample_t,positive,Calculate the two-sided one sample t statistic with sample standard deviation.,one_sample_t,Named supported scope and assumptions
+one_sample_t-p06,one_sample_t,positive,One-sample t testing for an independent normal sample and unknown population SD.,one_sample_t,Named supported scope and assumptions
+one_sample_t-p07,one_sample_t,positive,Compare one mean to a benchmark using a two tailed t-test.,one_sample_t,Named supported scope and assumptions
+one_sample_t-n01,one_sample_t,negative,Run a one-sample t test with known population sigma.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+one_sample_t-n02,one_sample_t,negative,Use a one-sample t test for a population variance.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+one_sample_t-n03,one_sample_t,negative,Perform a one-sided one-sample t test.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+one_sample_t-n04,one_sample_t,negative,Use a single-sample t test for binary success probability.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+one_sample_t-n05,one_sample_t,negative,Run a one-sample t test but the data are two independent groups.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+one_sample_t-n06,one_sample_t,negative,Use one-sample t testing for clustered repeated measures.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+one_sample_t-n07,one_sample_t,negative,Calculate a known-sigma z-test p-value for a mean.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-p01,two_sample_t,positive,How do I run a Welch t test for two independent groups?,two_sample_t,Named supported scope and assumptions
+two_sample_t-p02,two_sample_t,positive,Compare two unrelated sample means with unequal variances using a t test.,two_sample_t,Named supported scope and assumptions
+two_sample_t-p03,two_sample_t,positive,Two-sample Welch test for independent numeric measurements.,two_sample_t,Named supported scope and assumptions
+two_sample_t-p04,two_sample_t,positive,Use t.test for unpaired samples without a pooled variance.,two_sample_t,Named supported scope and assumptions
+two_sample_t-p05,two_sample_t,positive,Calculate a two-sided independent samples t-test using Welch degrees of freedom.,two_sample_t,Named supported scope and assumptions
+two_sample_t-p06,two_sample_t,positive,Test a difference in means of two independent populations with estimated variances.,two_sample_t,Named supported scope and assumptions
+two_sample_t-p07,two_sample_t,positive,Welch t.test for different group sizes and independent observations.,two_sample_t,Named supported scope and assumptions
+two_sample_t-n01,two_sample_t,negative,Use an independent samples t test on matched pairs.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-n02,two_sample_t,negative,Run a two-sample t test for three independent groups.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-n03,two_sample_t,negative,Run a pooled equal-variance t-test rather than Welch.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-n04,two_sample_t,negative,Use a two-sample t test to compare binary success proportions.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-n05,two_sample_t,negative,Calculate a one-sided Welch t test.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-n06,two_sample_t,negative,Use Welch t testing for complex survey weighted data.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+two_sample_t-n07,two_sample_t,negative,Fit a two-sample t test with both paired and independent groups.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-p01,paired_t,positive,How do I run a paired t test on matched before and after measurements?,paired_t,Named supported scope and assumptions
+paired_t-p02,paired_t,positive,Test the mean within-person difference with a paired Student t procedure.,paired_t,Named supported scope and assumptions
+paired_t-p03,paired_t,positive,Use t.test with paired=TRUE on aligned pairs.,paired_t,Named supported scope and assumptions
+paired_t-p04,paired_t,positive,A two-sided matched-pairs t test for numeric differences.,paired_t,Named supported scope and assumptions
+paired_t-p05,paired_t,positive,Compare before-after means using a paired t-test with independent subjects.,paired_t,Named supported scope and assumptions
+paired_t-p06,paired_t,positive,Calculate the paired t statistic from each subjects after-minus-before difference.,paired_t,Named supported scope and assumptions
+paired_t-p07,paired_t,positive,Paired t test for repeated readings at exactly two times per subject.,paired_t,Named supported scope and assumptions
+paired_t-n01,paired_t,negative,Use a paired t test for unrelated independent samples.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-n02,paired_t,negative,Run a paired t test at three repeated measurement times.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-n03,paired_t,negative,Use a paired t test for changes in binary outcomes.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-n04,paired_t,negative,Calculate a one-sided paired t test.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-n05,paired_t,negative,Paired t testing with clustered subjects and random effects.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-n06,paired_t,negative,Use a paired t test to compare variances.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+paired_t-n07,paired_t,negative,Fit a paired t test for multilevel repeated measurements.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-p01,proportion_interval,positive,How do I calculate a Wilson confidence interval for a single binomial proportion?,proportion_interval,Named supported scope and assumptions
+proportion_interval-p02,proportion_interval,positive,Score confidence interval for one success proportion without continuity correction.,proportion_interval,Named supported scope and assumptions
+proportion_interval-p03,proportion_interval,positive,Estimate a population proportion with a two-sided Wilson interval.,proportion_interval,Named supported scope and assumptions
+proportion_interval-p04,proportion_interval,positive,Find binomial proportion confidence bounds using the Wilson score method.,proportion_interval,Named supported scope and assumptions
+proportion_interval-p05,proportion_interval,positive,Wilson interval from successes and the total number of independent trials.,proportion_interval,Named supported scope and assumptions
+proportion_interval-p06,proportion_interval,positive,Use prop.test for a one-group proportion confidence interval with correct=FALSE.,proportion_interval,Named supported scope and assumptions
+proportion_interval-p07,proportion_interval,positive,How do I build a confidence interval for the proportion of binary successes?,proportion_interval,Named supported scope and assumptions
+proportion_interval-n01,proportion_interval,negative,Calculate a Wald confidence interval for a binomial proportion.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-n02,proportion_interval,negative,Compute a Clopper-Pearson exact binomial confidence interval.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-n03,proportion_interval,negative,Find a one-sided Wilson confidence bound.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-n04,proportion_interval,negative,Calculate a confidence interval for the difference between two proportions.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-n05,proportion_interval,negative,Wilson interval for complex survey weighted binary observations.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-n06,proportion_interval,negative,Use a Wilson interval to test whether a proportion equals a null value.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+proportion_interval-n07,proportion_interval,negative,Construct a Wilson mean confidence interval for continuous measurements.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-p01,linear_regression,positive,Fit simple linear regression for a quantitative response and one predictor.,linear_regression,Named supported scope and assumptions
+linear_regression-p02,linear_regression,positive,How do I estimate an ordinary least squares slope and intercept?,linear_regression,Named supported scope and assumptions
+linear_regression-p03,linear_regression,positive,Use lm(y ~ x) for independent measurements and a continuous response.,linear_regression,Named supported scope and assumptions
+linear_regression-p04,linear_regression,positive,Simple OLS regression with one numeric predictor and an intercept.,linear_regression,Named supported scope and assumptions
+linear_regression-p05,linear_regression,positive,Estimate the slope confidence interval in simple linear regression.,linear_regression,Named supported scope and assumptions
+linear_regression-p06,linear_regression,positive,Fit a straight-line regression to independent quantitative observations.,linear_regression,Named supported scope and assumptions
+linear_regression-p07,linear_regression,positive,How do I interpret coefficients from an ordinary least squares linear model?,linear_regression,Named supported scope and assumptions
+linear_regression-n01,linear_regression,negative,Fit ordinary least squares to a binary response using logistic regression.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-n02,linear_regression,negative,Use simple linear regression for a random-intercept mixed model.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-n03,linear_regression,negative,Fit a nonlinear exponential regression model.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-n04,linear_regression,negative,Fit ridge penalized linear regression.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-n05,linear_regression,negative,Use OLS to establish a causal effect from observational association.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-n06,linear_regression,negative,Fit spatial autoregressive least squares with dependent sites.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+linear_regression-n07,linear_regression,negative,Fit simple linear regression with two numeric predictors.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-p01,anova_oneway,positive,Run Welch one-way ANOVA for three independent groups with unequal variances.,anova_oneway,Named supported scope and assumptions
+anova_oneway-p02,anova_oneway,positive,Compare several independent normal means using oneway.test without equal variance.,anova_oneway,Named supported scope and assumptions
+anova_oneway-p03,anova_oneway,positive,Welch ANOVA for unequal group sizes and different variances.,anova_oneway,Named supported scope and assumptions
+anova_oneway-p04,anova_oneway,positive,Calculate the one-way Welch F statistic for four independent samples.,anova_oneway,Named supported scope and assumptions
+anova_oneway-p05,anova_oneway,positive,Use oneway.test with var.equal=FALSE for independent quantitative groups.,anova_oneway,Named supported scope and assumptions
+anova_oneway-p06,anova_oneway,positive,Welch analysis of variance tests equality of independent group means.,anova_oneway,Named supported scope and assumptions
+anova_oneway-p07,anova_oneway,positive,Which native R command performs heteroscedastic one-way Welch ANOVA?,anova_oneway,Named supported scope and assumptions
+anova_oneway-n01,anova_oneway,negative,Run Welch ANOVA on repeated measurements from the same subjects.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-n02,anova_oneway,negative,Fit a two-way factorial ANOVA with interaction.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-n03,anova_oneway,negative,Use classical pooled-variance ANOVA with aov.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-n04,anova_oneway,negative,Run Welch one-way ANOVA for binomial success proportions.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-n05,anova_oneway,negative,Use Kruskal-Wallis instead of a Welch mean comparison.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-n06,anova_oneway,negative,Run one-way Welch ANOVA with clustered sample units.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+anova_oneway-n07,anova_oneway,negative,Use Welch ANOVA to prove all group means are equal.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-p01,regression_diagnostics,positive,Inspect residual diagnostics for an ordinary least squares linear regression.,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-p02,regression_diagnostics,positive,How do I check leverage and Cooks distance in a simple lm model?,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-p03,regression_diagnostics,positive,Plot residuals against fitted values after fitting a linear regression.,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-p04,regression_diagnostics,positive,Check an lm residual Q-Q plot and influential observations.,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-p05,regression_diagnostics,positive,Diagnose unequal residual spread in a simple linear model.,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-p06,regression_diagnostics,positive,Calculate leverage and standardized residuals for a least squares regression.,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-p07,regression_diagnostics,positive,How do I examine influence rather than automatically delete outliers in linear regression?,regression_diagnostics,Named supported scope and assumptions
+regression_diagnostics-n01,regression_diagnostics,negative,Use ordinary lm residual diagnostics for a logistic regression.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-n02,regression_diagnostics,negative,Inspect residuals from a random-intercept mixed model.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-n03,regression_diagnostics,negative,Check ARIMA residual diagnostics.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-n04,regression_diagnostics,negative,Use Cooks distance to automatically delete valid observations.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-n05,regression_diagnostics,negative,Use an OLS residual plot to prove sampling independence.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-n06,regression_diagnostics,negative,Calculate influence diagnostics for a nonlinear regression.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+regression_diagnostics-n07,regression_diagnostics,negative,Apply ordinary least squares diagnostics to complex survey weights.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-p01,glm_binomial,positive,Fit binomial logistic regression to independent grouped successes and failures.,glm_binomial,Named supported scope and assumptions
+glm_binomial-p02,glm_binomial,positive,How do I use glm with a binomial family and a logit link?,glm_binomial,Named supported scope and assumptions
+glm_binomial-p03,glm_binomial,positive,Estimate a logistic regression odds ratio from grouped binary trial counts.,glm_binomial,Named supported scope and assumptions
+glm_binomial-p04,glm_binomial,positive,Binomial GLM for independent trials with a numeric predictor.,glm_binomial,Named supported scope and assumptions
+glm_binomial-p05,glm_binomial,positive,Model success probabilities using a grouped binomial logistic model.,glm_binomial,Named supported scope and assumptions
+glm_binomial-p06,glm_binomial,positive,"Use glm(cbind(successes, failures) ~ dose, family=binomial) for logistic regression.",glm_binomial,Named supported scope and assumptions
+glm_binomial-p07,glm_binomial,positive,Fit a logit model for binary outcomes and inspect convergence and dispersion.,glm_binomial,Named supported scope and assumptions
+glm_binomial-n01,glm_binomial,negative,Fit a Poisson GLM for counts.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-n02,glm_binomial,negative,Fit a binomial and Poisson GLM to the same outcome without choosing a family.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-n03,glm_binomial,negative,Fit a random-intercept logistic mixed model.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-n04,glm_binomial,negative,Fit multinomial logistic regression for three outcome categories.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-n05,glm_binomial,negative,Use a quasibinomial GLM for overdispersion.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-n06,glm_binomial,negative,Fit a binomial GLM with a probit link.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+glm_binomial-n07,glm_binomial,negative,Use logistic regression to prove a causal treatment effect from observational data.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-p01,bootstrap_mean,positive,Construct an iid percentile bootstrap confidence interval for a sample mean.,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-p02,bootstrap_mean,positive,Resample independent observations with replacement to estimate mean uncertainty.,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-p03,bootstrap_mean,positive,How do I use a nonparametric bootstrap for the arithmetic mean?,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-p04,bootstrap_mean,positive,Percentile bootstrap interval for one numeric mean with reproducible sampling.,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-p05,bootstrap_mean,positive,Estimate the bootstrap standard error of a mean from iid data.,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-p06,bootstrap_mean,positive,Use sample.int with replacement for an iid mean bootstrap.,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-p07,bootstrap_mean,positive,Bootstrap the mean without changing the callers random number state.,bootstrap_mean,Named supported scope and assumptions
+bootstrap_mean-n01,bootstrap_mean,negative,Use an iid bootstrap mean interval for a dependent time series.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-n02,bootstrap_mean,negative,Construct a cluster bootstrap interval.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-n03,bootstrap_mean,negative,Compute a BCa bootstrap confidence interval.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-n04,bootstrap_mean,negative,Compute a studentized bootstrap t interval.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-n05,bootstrap_mean,negative,Bootstrap the median rather than the mean.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-n06,bootstrap_mean,negative,Use a parametric bootstrap for a fitted logistic model.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+bootstrap_mean-n07,bootstrap_mean,negative,Bootstrap a mean to repair biased convenience sampling.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-p01,multiple_testing_holm,positive,Adjust a prespecified family of p-values with the Holm method.,multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-p02,multiple_testing_holm,positive,"How do I use p.adjust(method=""holm"") to control familywise error?",multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-p03,multiple_testing_holm,positive,Holm step-down adjustment for several valid hypothesis-test p values.,multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-p04,multiple_testing_holm,positive,Control the family-wise error rate using Holm adjusted p-values.,multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-p05,multiple_testing_holm,positive,Apply the Holm-Bonferroni procedure to a full hypothesis family.,multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-p06,multiple_testing_holm,positive,Holm multiple-testing correction under arbitrary dependence of valid p-values.,multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-p07,multiple_testing_holm,positive,Report raw and Holm adjusted p values without selecting only significant tests.,multiple_testing_holm,Named supported scope and assumptions
+multiple_testing_holm-n01,multiple_testing_holm,negative,Apply Benjamini-Hochberg FDR adjustment.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-n02,multiple_testing_holm,negative,Use Holm to control the false discovery rate instead of familywise error.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-n03,multiple_testing_holm,negative,Run Hochberg multiple-testing adjustment.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-n04,multiple_testing_holm,negative,Use p.adjust with the BY method.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-n05,multiple_testing_holm,negative,Calculate raw p-values from a dataset using only Holm adjustment.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-n06,multiple_testing_holm,negative,Apply an ordinary Bonferroni correction instead of Holm.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
+multiple_testing_holm-n07,multiple_testing_holm,negative,Apply Holm only to significant p-values after dropping the other planned tests.,NO_MATCH,"Explicit incompatible model, operation, design, scope or invalid interpretation; no substitution"
