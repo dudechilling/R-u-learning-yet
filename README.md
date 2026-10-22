@@ -130,7 +130,20 @@ The package declares R 4.1 or newer. Current local execution uses R 4.5.2 on Lin
 
 ## Source, contribution and support boundaries
 
-Compact lessons live once in `inst/lessons/`. `R/` contains local search, rendering and compatibility helpers. `inst/help-pages/` contains the canonical short help fragments. The 46 older example scripts and walkthroughs remain available for compatibility; their existence is not a claim of newly reviewed compact coverage.
+The installed instructional materials have different consumers. `inst/lessons/<id>.md`
+is the source for each compact Viewer answer (including its embedded R code);
+`inst/guides/<id>.qmd` holds the legacy worked walkthrough and
+`inst/examples/<id>.R` its independently runnable script for `ru_code()`,
+`ru_run()` and `ru_edit()`. Where a Quarto guide embeds a runnable chunk,
+some guides import executable chunks from the paired R script. The two guided
+activities are maintained in `inst/help-pages/tutorials.html` and assembled
+into offline pages by `R/home.R`. Native help lives in `man/*.Rd`; distinct
+coverage, pathways, routing and reference contracts live in `inst/extdata/`.
+The five distributed SVGs in `inst/www/figures/` are reproducible through
+`scripts/generate-figures.R`. `R/` provides search, rendering and compatibility
+helpers. These formats serve separate teaching and package interfaces, not
+interchangeable copies of a lesson. Avoid duplicating an explanation when adding
+a new surface; consolidating older sources requires a tested consumer migration.
 
 Contributions must use original or demonstrably permitted material, synthetic examples or properly sourced data, explicit assumptions and frozen positive/negative cases. A new method needs independent numerical checks. Keep private data, raw assessment material, personal paths and confidential QA evidence out of the public tree. Do not hide mandatory third-party attribution.
 
@@ -147,6 +160,6 @@ R CMD check --no-manual rulearn_0.4.2.9001.tar.gz
 
 Use an isolated R library for installation and rerun every committed test against the installed archive. The original test cases remain; exact catalogue/version assertions change only when independently verified additions justify them. New tests cover method selection, numerical oracles, rejected inputs, RNG preservation and the home/attach contract.
 
-The candidate is not a published installer. Do not install an older public tag and expect these new features. The current `LICENSE` grants MIT terms for expressly listed newly authored code and CC BY 4.0 terms for expressly listed original explanatory text, with code examples under MIT. The canonical scope is `inst/licensing/scope.csv`. Other files retain their preceding rights status. These grants do not clear redistribution of the whole archive or relicense dependencies. Do not describe the unapproved aggregate package as an open-source release.
+The package is installable from public GitHub `main` using the commands above; it is not a CRAN release or standalone Windows installer. An older public tag may not contain these features. The current `LICENSE` grants MIT terms for expressly listed newly authored code and CC BY 4.0 terms for expressly listed original explanatory text, with code examples under MIT. The canonical scope is `inst/licensing/scope.csv`. Other files retain their preceding rights status. These grants do not clear redistribution of the whole archive or relicense dependencies. Do not describe the unapproved aggregate package as an open-source release.
 
-CI is prepared for pinned Windows, macOS and Linux runners, including a minimum-series R check. Actions are pinned to reviewed commits and optional test dependencies to versions and SHA-256 values. A prepared workflow is not evidence that its remote matrix has run. `scripts/ci-check.R` builds, requires a zero-note check, installs the exact archive through R and reruns all committed regressions.
+This tree ships the local validation runner `scripts/ci-check.R`, but no tracked GitHub Actions workflow. The runner builds the package, requires a zero-note `R CMD check --no-manual`, installs the exact archive into a fresh library and reruns the committed regressions. `scripts/install-ci-deps.py` pins optional CI dependencies to versions and SHA-256 values; it is separate from the local runner. A Windows, macOS and Linux hosted matrix is not verified until a workflow and its execution evidence exist.

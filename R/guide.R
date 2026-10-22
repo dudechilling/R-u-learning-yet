@@ -1,5 +1,5 @@
-# Show one installed guide as a readable native Rd topic.
-# The existing Quarto and R files remain the one canonical source.
+# Open an installed walkthrough in the Viewer or return its Quarto path.
+# The guide explains the method; its paired R script supplies runnable code.
 ru_guide <- function(query) {
   hits <- .ru_search_results(query,n=3L,type="walkthrough")
   if(!nrow(hits)) return(invisible(NULL))
