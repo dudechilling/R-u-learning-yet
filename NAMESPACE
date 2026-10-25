@@ -55,3 +55,7 @@ export(ru_analyze_plan)
 export(ru_analyze_code)
 export(ru_analyze_execute)
 export(ru_analyze_export)
+
+# W3 question-to-guided-learning public interface.
+export(ru_solve)
+S3method(print,ru_solution)
