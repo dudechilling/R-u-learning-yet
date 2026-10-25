@@ -89,13 +89,35 @@ if (identical(ready$status,"READY")) {
   stale <- ru_analyze_execute(ready,reordered,confirm=TRUE)
   compare("row_reordering_revokes_run",stale,"REVALIDATION_REQUIRED",
           "CURRENT_EXPLICIT_ROW_NAMES_UNSUPPORTED")
-  # Result-bound export must refuse current-data absence and a stale execution.
+  # ru.export.refusal.v2 / SUP-RU-W2-R3-EXPORT-PRECEDENCE-30 rev30.
+  # Historical 13d8636c expected current-data reasons for UNAUTHORIZED raw
+  # string paths. That exact old source/log stays immutable. Current acceptance
+  # tests both sides of the authorization boundary without weakening it.
   target <- file.path(tempdir(),"ru-l5-w2-result-observed.txt")
   if (file.exists(target)) stop("Unsafe occupied QA export destination")
   refused <- ru_analyze_export(ready,run,path=target,data=NULL)
-  compare("export_without_current_frame",refused,"REFUSED","CURRENT_DATA_REQUIRED")
+  compare("raw_path_hides_missing_data",refused,"REFUSED",
+          "FRESH_EXPORT_CONSENT_REQUIRED")
   refused <- ru_analyze_export(ready,run,path=target,data=edited)
-  compare("export_with_changed_frame",refused,"REFUSED","REVALIDATION_REQUIRED")
+  compare("raw_path_hides_stale_data",refused,"REFUSED",
+          "FRESH_EXPORT_CONSENT_REQUIRED")
+  auth <- if (exists(".ru_an_authorize_export",inherits=TRUE))
+    get(".ru_an_authorize_export",inherits=TRUE) else
+    getFromNamespace(".ru_an_authorize_export","rulearn")
+  scoped <- auth(target,ready,run,consent=TRUE)
+  refused <- ru_analyze_export(ready,run,path=scoped,data=NULL)
+  compare("authorized_path_requires_current_data",refused,"REFUSED",
+          "CURRENT_DATA_REQUIRED")
+  refused <- ru_analyze_export(ready,run,path=scoped,data=d)
+  compare("missing_data_refusal_consumes_authorization",refused,"REFUSED",
+          "FRESH_EXPORT_CONSENT_REQUIRED")
+  scoped <- auth(target,ready,run,consent=TRUE)
+  refused <- ru_analyze_export(ready,run,path=scoped,data=edited)
+  compare("authorized_path_revalidates_stale_data",refused,"REFUSED",
+          "REVALIDATION_REQUIRED")
+  refused <- ru_analyze_export(ready,run,path=scoped,data=d)
+  compare("stale_data_refusal_consumes_authorization",refused,"REFUSED",
+          "FRESH_EXPORT_CONSENT_REQUIRED")
   ok <- !file.exists(target)
   cat("L5_AN01 REFUSALS_DID_NOT_WRITE ",if(ok)"PASS" else "FAIL","\n",sep="")
   if(!ok)failed<-failed+1L
