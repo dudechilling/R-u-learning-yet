@@ -8,10 +8,21 @@ learn_source <- Sys.getenv("RU_L2_LEARNING_SOURCE",unset="")
 if(nzchar(learn_source)) source(learn_source,local=FALSE)
 if(!nzchar(src)) .ru_learning_checker <- getFromNamespace(".ru_learning_checker","rulearn")
 if(!nzchar(learn_source)) ru_learn <- getFromNamespace("ru_learn","rulearn")
+# Rscript passes --file; R CMD check executes tests via R CMD BATCH without it.
 self <- grep("^--file=", commandArgs(trailingOnly=FALSE), value=TRUE)
-stopifnot(length(self)==1L)
-fixture <- file.path(dirname(normalizePath(sub("^--file=", "", self),mustWork=TRUE)),
-                     "fixtures", "w2-learning-expected.R")
+if (length(self) == 1L) {
+  test_dir <- dirname(normalizePath(sub("^--file=", "", self),
+                                    winslash="/", mustWork=TRUE))
+} else if (length(self) == 0L) {
+  test_dir <- normalizePath(getwd(), winslash="/", mustWork=TRUE)
+} else stop("Ambiguous test execution entrypoint")
+stopifnot(file.exists(file.path(test_dir, "production-w2-learning.R")))
+fixture_dir <- normalizePath(file.path(test_dir, "fixtures"),
+                             winslash="/", mustWork=TRUE)
+stopifnot(identical(fixture_dir, file.path(test_dir, "fixtures")))
+fixture <- normalizePath(file.path(fixture_dir, "w2-learning-expected.R"),
+                         winslash="/", mustWork=TRUE)
+stopifnot(identical(dirname(fixture), fixture_dir))
 source(fixture,local=TRUE)
 ru_w2_learning_oracle_selftest()
 expected <- ru_w2_learning_expectations()
