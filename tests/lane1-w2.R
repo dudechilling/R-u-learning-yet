@@ -13,12 +13,55 @@ for (id in refs) {
   row <- catalogue[catalogue$surface == "reference" &
                    catalogue$id == id &
                    catalogue$representation == "compact_md", , drop = FALSE]
-  stopifnot(nrow(row) == 1L, row$rights_status == "NOT_CLEARED")
+  expected_path <- paste0("references/w2/", id, ".md")
+  stopifnot(nrow(row) == 1L,
+            identical(row$relative_path, expected_path),
+            identical(row$content_version, "ru-w2-reference-v1"),
+            identical(row$source_type, "authored_md"),
+            identical(row$rights_status, "NOT_CLEARED"),
+            identical(row$review_status, "NOT_REVIEWED"))
+  root <- system.file(package = "rulearn")
+  stopifnot(!file.exists(file.path(root, "lessons", paste0(id, ".md"))))
+  installed <- system.file("references", "w2", paste0(id, ".md"),
+                           package = "rulearn")
+  stopifnot(nzchar(installed), file.exists(installed))
   result <- ru_reference(id, open = FALSE)
-  present <- nzchar(system.file(row$relative_path, package = "rulearn"))
-  stopifnot(result$status == if (present) "SINGLE_MATCH" else "UNAVAILABLE")
-  if (present) stopifnot(result$resolution$locator_status == "AVAILABLE")
+  stopifnot(identical(result$status, "SINGLE_MATCH"),
+            identical(result$resolution$locator_status, "AVAILABLE"),
+            identical(result$resolution$validated_locator,
+                      normalizePath(installed, winslash = "/", mustWork = TRUE)))
+  page <- getFromNamespace(".ru_lesson_read", "rulearn")(id)
+  stopifnot(identical(page$meta$status, "AUTHORED"),
+            identical(page$meta$collection, "w2.reference.v1"))
 }
+# The original physical Viewer directory is an immutable 84-page contract.
+root <- system.file(package = "rulearn")
+stopifnot(length(list.files(file.path(root, "lessons"),
+                             pattern = "[.]md$")) == 84L,
+          length(list.files(file.path(root, "references", "w2"),
+                             pattern = "[.]md$")) == 5L)
+old_index <- getFromNamespace(".ru_lesson_index", "rulearn")()
+stopifnot(nrow(old_index) == 84L, all(old_index$status == "VERIFIED"))
+
+# A stale legacy locator must not resolve; unsafe locators must remain typed.
+locator <- getFromNamespace(".ru_content_locator", "rulearn")
+for (id in refs)
+  stopifnot(is.null(locator(paste0("lessons/", id, ".md"), root)))
+unsafe <- c("../lessons/mean.md", "/etc/passwd",
+            "references//w2/missing_values.md",
+            "references/w2/../lessons/mean.md",
+            "references\\\\w2\\\\missing_values.md",
+            "references/w2/%2e%2e/mean.md")
+for (path in unsafe) {
+  error <- tryCatch(locator(path, root), error = identity)
+  stopifnot(inherits(error, "ru_unavailable_content"))
+}
+mismatch <- getFromNamespace(".ru_content_resolve", "rulearn")(
+  "missing_values", "reference", representation = "compact_md",
+  content_version = "unsupported-reference-version")
+stopifnot(identical(mismatch$locator_status, "UNAVAILABLE"),
+          identical(mismatch$reason_code, "INCOMPATIBLE_CONTENT_VERSION"))
+
 stopifnot(ru_reference("hist", open = FALSE)$status == "MULTIPLE_MATCHES")
 legacy <- ru_reference("missing_values", representation = "legacy_guide_qmd",
                        open = FALSE)
