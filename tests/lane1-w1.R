@@ -65,7 +65,14 @@ stopifnot(mean$status=="SINGLE_MATCH",mean$resolution$locator_status=="AVAILABLE
 missing <- ru_reference("missing_values",open=FALSE)
 stopifnot(missing$resolution$representation_resolved=="compact_md",
           missing$resolution$alternatives[[2L]]$locator_status=="AVAILABLE")
-if (nzchar(system.file("lessons","missing_values.md",package="rulearn"))) {
+# Physical placement may change between W1 and W2. Availability is
+# governed by the versioned compact registry locator, not a legacy path.
+entry <- ns(".ru_content_catalogue")()
+entry <- entry[entry$surface == "reference" &
+               entry$id == "missing_values" &
+               entry$representation == "compact_md", , drop = FALSE]
+stopifnot(nrow(entry) == 1L)
+if (nzchar(system.file(entry$relative_path[[1L]], package = "rulearn"))) {
   stopifnot(missing$status=="SINGLE_MATCH",
             missing$resolution$locator_status=="AVAILABLE",
             "compact_md" %in% unlist(missing$available_representations),
