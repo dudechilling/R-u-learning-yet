@@ -38,3 +38,12 @@ export(ru_text)
 export(ru_palette)
 
 export(ru_home)
+
+# W1 platform contracts; legacy 21 exports remain unchanged.
+export(ru_workspace)
+export(ru_reference)
+export(ru_capabilities)
+export(ru_progress)
+export(ru_source_context)
+S3method(print,ru_workspace_result)
+S3method(print,ru_reference_result)

@@ -10,7 +10,7 @@ License: file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1)
 Imports: graphics, grDevices, stats, utils
-Suggests: palmerpenguins, rstudioapi
+Suggests: palmerpenguins, rstudioapi, shiny, bslib, learnr, filelock, digest
 NeedsCompilation: no
 Packaged: 2026-10-22 06:39:25 UTC; earl
 Author: R-u-learning-yet Contributors [aut, cre]

@@ -1,0 +1,19 @@
+surface,id,representation,title,relative_path,content_version,source_type,rights_status,review_status
+reference,mean,compact_md,Mean and arithmetic average,lessons/mean.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+reference,inspect_columns,compact_md,Inspect data frame columns,lessons/inspect_columns.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+reference,missing_values,compact_md,Missing values,lessons/missing_values.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+reference,missing_values,legacy_guide_qmd,Missing values guide,guides/missing_values.qmd,rulearn-0.4.2.9001,legacy_qmd,NOT_CLEARED,NOT_REVIEWED
+reference,import_csv,compact_md,Import CSV,lessons/import_csv.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+reference,import_csv,legacy_guide_qmd,Import CSV guide,guides/import_csv.qmd,rulearn-0.4.2.9001,legacy_qmd,NOT_CLEARED,NOT_REVIEWED
+reference,histogram,compact_md,Histogram,lessons/histogram.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+reference,histogram_breaks,compact_md,Histogram bin boundaries,lessons/histogram_breaks.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+example,missing_values,r_script,Missing values example,examples/missing_values.R,rulearn-0.4.2.9001,legacy_example,NOT_CLEARED,NOT_REVIEWED
+example,import_csv,r_script,Import CSV example,examples/import_csv.R,rulearn-0.4.2.9001,legacy_example,NOT_CLEARED,NOT_REVIEWED
+asset,histogram-bins.svg,svg,Histogram bin illustration,www/figures/histogram-bins.svg,rulearn-0.4.2.9001,legacy_asset,NOT_CLEARED,NOT_REVIEWED
+asset,ru.learning.foundation.03.sites-intro-v1,csv,Foundation synthetic CSV,tutorials/ru-learning-foundations/data/sites-intro-v1.csv,ru-learning-foundation-v1,not_implemented,NOT_CLEARED,NOT_REVIEWED
+native_help,r_mean,rd_alias,mean native R Help,,R-current,base_help,UNKNOWN,NOT_REVIEWED
+native_help,r_hist,rd_alias,hist native R Help,,R-current,base_help,UNKNOWN,NOT_REVIEWED
+native_help,r_cor,rd_alias,cor native R Help,,R-current,base_help,UNKNOWN,NOT_REVIEWED
+learn,ru.learning.foundation.01,tutorial,Foundation 01: R objects and columns,tutorials/ru-learning-foundations/foundation-01.Rmd,ru-learning-foundation-v1,not_implemented,NOT_CLEARED,NOT_REVIEWED
+learn,ru.learning.foundation.03.bridge,exercise,Foundation 03: Source transfer,tutorials/ru-learning-foundations/foundation-03.Rmd,ru-learning-foundation-v1,not_implemented,NOT_CLEARED,NOT_REVIEWED
+analyze,describe.numeric,analysis_method,Describe numerical values,,1.1-draft.v2,not_implemented,NOT_CLEARED,NOT_REVIEWED
