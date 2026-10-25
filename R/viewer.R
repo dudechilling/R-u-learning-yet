@@ -4,9 +4,31 @@
 .ru_lesson_root <- function() system.file("lessons",package="rulearn")
 
 .ru_lesson_read <- function(id) {
-  if(!grepl("^[a-z][a-z0-9_]*$",id)) return(NULL)
-  file <- file.path(.ru_lesson_root(),paste0(id,".md"))
-  if(!file.exists(file)) return(NULL)
+  # The original Viewer index is exclusively inst/lessons. These five
+  # authored W2 references occupy a distinct, closed package collection.
+  if(!is.character(id) || length(id)!=1L || is.na(id) ||
+     !grepl("^[a-z][a-z0-9_]*$",id)) return(NULL)
+  w2_ids <- c("rstudio_contexts","vectors_indexing","missing_values",
+              "describe_numeric","histogram_interpret")
+  is_w2 <- id %in% w2_ids
+  pkg <- system.file(package="rulearn")
+  if(!nzchar(pkg)) return(NULL)
+  pkg <- normalizePath(pkg,winslash="/",mustWork=TRUE)
+  folder <- if(is_w2) file.path(pkg,"references","w2") else
+    file.path(pkg,"lessons")
+  if(!dir.exists(folder)) return(NULL)
+  actual_folder <- tryCatch(normalizePath(folder,winslash="/",
+    mustWork=TRUE),error=function(e) "")
+  # Reject collection-directory symlinks, including outside-package links.
+  if(!identical(actual_folder,folder)) return(NULL)
+  file <- file.path(folder,paste0(id,".md"))
+  if(!file.exists(file) || dir.exists(file)) return(NULL)
+  link <- Sys.readlink(file)
+  if(length(link)==1L && !is.na(link) && nzchar(link)) return(NULL)
+  actual <- tryCatch(normalizePath(file,winslash="/",mustWork=TRUE),
+                     error=function(e) "")
+  if(!nzchar(actual) || !identical(dirname(actual),actual_folder))
+    return(NULL)
   lines <- readLines(file,warn=FALSE,encoding="UTF-8")
   if(length(lines)<15L || lines[1L]!="---")
     stop("Invalid lesson source: ",id,call.=FALSE)
@@ -23,6 +45,9 @@
                 "visual","alt","caption","sources","status")
   if(!all(required %in% names(meta)) || !identical(meta$id,id))
     stop("Incomplete lesson metadata: ",id,call.=FALSE)
+  if(is_w2 && (!identical(meta$collection,"w2.reference.v1") ||
+               !identical(meta$status,"AUTHORED")))
+    stop("Invalid W2 reference collection metadata: ",id,call.=FALSE)
   sections <- list(); section <- ""; title <- ""
   if(end<length(lines))
     for(line in lines[seq.int(end+1L,length(lines))]) {

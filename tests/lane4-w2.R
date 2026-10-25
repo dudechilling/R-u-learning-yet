@@ -6,9 +6,31 @@ ids <- c("rstudio_contexts", "vectors_indexing", "missing_values",
          "describe_numeric", "histogram_interpret")
 read_topic <- ns(".ru_lesson_read")
 page_html <- ns(".ru_page_html")
+root <- system.file(package = "rulearn")
+legacy <- file.path(root, "lessons")
+folder <- system.file("references", "w2", package = "rulearn")
+stopifnot(nzchar(root), nzchar(folder), dir.exists(folder),
+          length(list.files(legacy,pattern = "[.]md$")) == 84L,
+          nrow(ns(".ru_lesson_index")()) == 84L,
+          all(ns(".ru_lesson_index")()$status == "VERIFIED"),
+          length(list.files(folder, pattern = "[.]md$")) == 5L,
+          setequal(list.files(folder,pattern="[.]md$"),
+                   paste0(ids,".md")),
+          file.exists(file.path(root,"extdata","coverage.csv")))
+for (unsafe in list(NULL, NA_character_, "", "../missing_values",
+                    "/etc/passwd", "%2e%2e", "missing_values/../../",
+                    c("mean","missing_values"), ".hidden")) {
+  stopifnot(is.null(read_topic(unsafe)))
+}
 for (id in ids) {
+  path <- file.path(folder,paste0(id,".md"))
+  stopifnot(file.exists(path),
+            !file.exists(file.path(legacy,paste0(id,".md"))))
   page <- read_topic(id)
-  stopifnot(identical(page$id, id), identical(page$meta$status, "AUTHORED"),
+  stopifnot(identical(normalizePath(page$source,winslash="/"),
+                      normalizePath(path,winslash="/")),
+            identical(page$meta$collection,"w2.reference.v1"),
+            identical(page$id, id), identical(page$meta$status, "AUTHORED"),
             nzchar(page$title), nzchar(page$code),
             all(c("immediate answer","use this in r","what to edit","what to check",
                   "interpret your results","learn more") %in% names(page$sections)),
@@ -49,7 +71,7 @@ stopifnot(any(grepl("<title",fig,fixed=TRUE)),
           any(grepl("<desc",fig,fixed=TRUE)))
 scope <- utils::read.csv(system.file("licensing","scope.csv",package="rulearn"),
                         stringsAsFactors=FALSE)
-for (path in c(paste0("inst/lessons/",ids,".md"),
+for (path in c(paste0("inst/references/w2/",ids,".md"),
                "inst/www/figures/observed-missing-flow.svg",
                "tests/lane4-w2.R"))
   stopifnot(sum(scope$source_path==path)==1L)
