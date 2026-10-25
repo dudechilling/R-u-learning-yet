@@ -47,3 +47,11 @@ export(ru_progress)
 export(ru_source_context)
 S3method(print,ru_workspace_result)
 S3method(print,ru_reference_result)
+
+# W2 real, committed L2/L3 public consumers (not provisional placeholders).
+export(ru_learn)
+export(ru_analyze)
+export(ru_analyze_plan)
+export(ru_analyze_code)
+export(ru_analyze_execute)
+export(ru_analyze_export)

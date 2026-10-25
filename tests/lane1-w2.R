@@ -60,24 +60,36 @@ for (i in seq_along(assets)) {
 entries <- getNamespaceExports("rulearn")
 w2 <- c("ru_learn", "ru_analyze", "ru_analyze_plan",
         "ru_analyze_code", "ru_analyze_execute", "ru_analyze_export")
-if (all(w2 %in% entries)) stopifnot(length(entries) == 32L)
-if ("ru_learn" %in% entries) {
-  route <- ru_workspace("learn")
-  stopifnot(route$status == "SELECTOR", route$mode == "learn",
-            inherits(route$consumer, "ru_learning_route"),
-            nrow(route$consumer$lessons) == 3L, !route$opened)
+stopifnot(length(entries) == 32L, setequal(entries,
+         c("ru","ru_find","ru_plan","ru_run","ru_code","ru_topics",
+           "ru_inputs","ru_hist","ru_bar","ru_box","ru_scatter",
+           "ru_data","ru_datasets","ru_columns","ru_apply",
+           "ru_guide","ru_edit","ru_open","ru_text","ru_palette","ru_home",
+           "ru_workspace","ru_reference","ru_capabilities","ru_progress",
+           "ru_source_context",w2)),
+           all(w2 %in% entries))
+stopifnot(identical(names(formals(ru_learn)),
+                    c("path","lesson","resume")),
+          identical(names(formals(ru_analyze)),c("data","spec")),
+          identical(names(formals(ru_analyze_plan)),
+                    c("spec","data","source_context")),
+          identical(names(formals(ru_analyze_code)),c("plan")),
+          identical(names(formals(ru_analyze_execute)),
+                    c("plan","data","confirm")),
+          identical(names(formals(ru_analyze_export)),
+                    c("plan","result","path","include_data","data")))
+route <- ru_workspace("learn")
+stopifnot(route$status == "SELECTOR", route$mode == "learn",
+          inherits(route$consumer, "ru_learning_route"),
+          nrow(route$consumer$lessons) == 3L, !route$opened)
+analysis <- ru_workspace("analyze")
+if (requireNamespace("shiny", quietly = TRUE)) {
+  stopifnot(analysis$status == "READY_TO_LAUNCH",
+            inherits(analysis$consumer, "shiny.appobj"),
+            analysis$capability_status == "UNTESTED", !analysis$opened)
 } else {
-  stopifnot(ru_workspace("learn")$status == "UNAVAILABLE",
-            ru_workspace("learn")$reason_code == "NOT_IMPLEMENTED")
-}
-if ("ru_analyze" %in% entries) {
-  route <- ru_workspace("analyze")
-  stopifnot(route$status == "READY_TO_LAUNCH",
-            inherits(route$consumer, "shiny.appobj"),
-            route$capability_status == "UNTESTED", !route$opened)
-} else {
-  stopifnot(ru_workspace("analyze")$status == "UNAVAILABLE",
-            ru_workspace("analyze")$reason_code == "NOT_IMPLEMENTED")
+  stopifnot(analysis$status == "UNAVAILABLE",
+            analysis$reason_code == "UNAVAILABLE_DEPENDENCY", !analysis$opened)
 }
 stopifnot(ru_workspace("reference")$status == "CATALOGUE",
           identical(names(formals(ru_plan)), c("query", "have", "missing")))
