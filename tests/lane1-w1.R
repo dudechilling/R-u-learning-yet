@@ -23,9 +23,28 @@ stopifnot(inherits(selection,"ru_workspace_result"),selection$status=="SELECTOR"
   is.null(selection$consumer), !selection$opened)
 reference <- ru_workspace("reference")
 stopifnot(reference$status=="CATALOGUE",reference$consumer$status=="CATALOGUE")
-for(mode in c("learn","analyze"))
-  stopifnot(ru_workspace(mode)$status=="UNAVAILABLE",
-            ru_workspace(mode)$reason_code=="NOT_IMPLEMENTED")
+# W2 can attach real consumers while preserving the W1 unavailable
+# boundary on packages that do not yet contain the owned implementation.
+if ("ru_learn" %in% getNamespaceExports("rulearn")) {
+  learn_route <- ru_workspace("learn")
+  stopifnot(learn_route$status=="SELECTOR", identical(learn_route$mode,"learn"),
+            inherits(learn_route$consumer,"ru_learning_route"),
+            !learn_route$opened, !learn_route$consumer$opened,
+            nrow(learn_route$consumer$lessons)==3L)
+} else {
+  stopifnot(ru_workspace("learn")$status=="UNAVAILABLE",
+            ru_workspace("learn")$reason_code=="NOT_IMPLEMENTED")
+}
+if ("ru_analyze" %in% getNamespaceExports("rulearn")) {
+  analysis_route <- ru_workspace("analyze")
+  stopifnot(analysis_route$status=="READY_TO_LAUNCH",
+            inherits(analysis_route$consumer,"shiny.appobj"),
+            !analysis_route$opened,
+            analysis_route$capability_status=="UNTESTED")
+} else {
+  stopifnot(ru_workspace("analyze")$status=="UNAVAILABLE",
+            ru_workspace("analyze")$reason_code=="NOT_IMPLEMENTED")
+}
 for(value in list(NULL,NA_character_,"","ref","other",
                   c("learn","analyze"),c("learn","analyze","reference")))
   expect_condition(ru_workspace(mode=value),"ru_invalid_argument")
@@ -33,7 +52,8 @@ for(value in list(NULL,NA_character_,"","ref","other",
 caps <- ru_capabilities()
 stopifnot(caps$schema_version==1L,all(c("shiny","bslib","learnr","filelock") %in%
             caps$packages$package),
-  caps$routes$status[caps$routes$mode=="learn"]=="UNAVAILABLE",
+  caps$routes$status[caps$routes$mode=="learn"] %in%
+    c("UNAVAILABLE","UNTESTED"),
   !caps$rstudio_detected)
 catalogue <- ru_reference(open=FALSE)
 stopifnot(catalogue$status=="CATALOGUE",length(catalogue$matches)>3L,
@@ -43,12 +63,19 @@ stopifnot(mean$status=="SINGLE_MATCH",mean$resolution$locator_status=="AVAILABLE
           mean$resolution$source_status=="INSTALLED_VALIDATED",
           file.exists(mean$resolution$validated_locator),!mean$opened)
 missing <- ru_reference("missing_values",open=FALSE)
-stopifnot(missing$status=="UNAVAILABLE",missing$reason_code=="MISSING_ASSET",
-          missing$resolution$representation_resolved=="compact_md",
-          identical(unlist(missing$available_representations),
-                    "legacy_guide_qmd"),
-          missing$resolution$alternatives[[1L]]$locator_status=="UNAVAILABLE",
+stopifnot(missing$resolution$representation_resolved=="compact_md",
           missing$resolution$alternatives[[2L]]$locator_status=="AVAILABLE")
+if (nzchar(system.file("lessons","missing_values.md",package="rulearn"))) {
+  stopifnot(missing$status=="SINGLE_MATCH",
+            missing$resolution$locator_status=="AVAILABLE",
+            "compact_md" %in% unlist(missing$available_representations),
+            "legacy_guide_qmd" %in% unlist(missing$available_representations))
+} else {
+  stopifnot(missing$status=="UNAVAILABLE",missing$reason_code=="MISSING_ASSET",
+            identical(unlist(missing$available_representations),
+                      "legacy_guide_qmd"),
+            missing$resolution$alternatives[[1L]]$locator_status=="UNAVAILABLE")
+}
 stopifnot(all(vapply(catalogue$matches, function(x)
   all(c("source_status","review_status","rights_status",
         "capability_status") %in% names(x)), logical(1L))))
@@ -81,12 +108,26 @@ asset <- resolved("histogram-bins.svg","asset",representation="svg")
 stopifnot(asset$locator_status=="AVAILABLE",file.exists(asset$validated_locator))
 future <- resolved("ru.learning.foundation.03.sites-intro-v1","asset",
                    representation="csv")
-stopifnot(future$locator_status=="UNAVAILABLE",
-          future$reason_code=="NOT_IMPLEMENTED")
+if (nzchar(system.file("tutorials","ru-learning-foundations",
+                       "data","sites-intro-v1.csv",package="rulearn"))) {
+  stopifnot(future$locator_status=="AVAILABLE",
+            future$source_status=="INSTALLED_VALIDATED")
+} else {
+  stopifnot(future$locator_status=="UNAVAILABLE",
+            future$reason_code=="MISSING_ASSET")
+}
 wrong_version <- resolved("mean","reference",content_version="old-version")
 stopifnot(wrong_version$reason_code=="INCOMPATIBLE_CONTENT_VERSION")
 dotted <- resolved("ru.learning.foundation.03.bridge","learn")
-stopifnot(dotted$reason_code=="NOT_IMPLEMENTED")
+if (nzchar(system.file("tutorials","ru-foundation-03",
+                       "ru-foundation-03.Rmd",package="rulearn"))) {
+  stopifnot(dotted$reason_code=="MISSING_ASSET")
+  selected_bridge <- resolved("ru.learning.foundation.03.bridge","learn",
+                              representation="exercise")
+  stopifnot(selected_bridge$locator_status=="AVAILABLE")
+} else {
+  stopifnot(dotted$reason_code=="MISSING_ASSET")
+}
 expect_condition(resolved("../mean","reference"),"ru_invalid_argument")
 
 # State is isolated to an explicit test directory, not learner storage.

@@ -1,7 +1,7 @@
 surface,id,representation,title,relative_path,content_version,source_type,rights_status,review_status
 reference,mean,compact_md,Mean and arithmetic average,lessons/mean.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
 reference,inspect_columns,compact_md,Inspect data frame columns,lessons/inspect_columns.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
-reference,missing_values,compact_md,Missing values,lessons/missing_values.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
+reference,missing_values,compact_md,Missing values - W2 compact,lessons/missing_values.md,ru-w2-reference-v1,authored_md,NOT_CLEARED,NOT_REVIEWED
 reference,missing_values,legacy_guide_qmd,Missing values guide,guides/missing_values.qmd,rulearn-0.4.2.9001,legacy_qmd,NOT_CLEARED,NOT_REVIEWED
 reference,import_csv,compact_md,Import CSV,lessons/import_csv.md,rulearn-0.4.2.9001,legacy_md,NOT_CLEARED,NOT_REVIEWED
 reference,import_csv,legacy_guide_qmd,Import CSV guide,guides/import_csv.qmd,rulearn-0.4.2.9001,legacy_qmd,NOT_CLEARED,NOT_REVIEWED
@@ -10,10 +10,18 @@ reference,histogram_breaks,compact_md,Histogram bin boundaries,lessons/histogram
 example,missing_values,r_script,Missing values example,examples/missing_values.R,rulearn-0.4.2.9001,legacy_example,NOT_CLEARED,NOT_REVIEWED
 example,import_csv,r_script,Import CSV example,examples/import_csv.R,rulearn-0.4.2.9001,legacy_example,NOT_CLEARED,NOT_REVIEWED
 asset,histogram-bins.svg,svg,Histogram bin illustration,www/figures/histogram-bins.svg,rulearn-0.4.2.9001,legacy_asset,NOT_CLEARED,NOT_REVIEWED
-asset,ru.learning.foundation.03.sites-intro-v1,csv,Foundation synthetic CSV,tutorials/ru-learning-foundations/data/sites-intro-v1.csv,ru-learning-foundation-v1,not_implemented,NOT_CLEARED,NOT_REVIEWED
+asset,ru.learning.foundation.03.sites-intro-v1,csv,Guided source CSV,tutorials/ru-learning-foundations/data/sites-intro-v1.csv,ru-learning-foundation-v1,authored_csv,NOT_CLEARED,NOT_REVIEWED
 native_help,r_mean,rd_alias,mean native R Help,,R-current,base_help,UNKNOWN,NOT_REVIEWED
 native_help,r_hist,rd_alias,hist native R Help,,R-current,base_help,UNKNOWN,NOT_REVIEWED
 native_help,r_cor,rd_alias,cor native R Help,,R-current,base_help,UNKNOWN,NOT_REVIEWED
-learn,ru.learning.foundation.01,tutorial,Foundation 01: R objects and columns,tutorials/ru-learning-foundations/foundation-01.Rmd,ru-learning-foundation-v1,not_implemented,NOT_CLEARED,NOT_REVIEWED
-learn,ru.learning.foundation.03.bridge,exercise,Foundation 03: Source transfer,tutorials/ru-learning-foundations/foundation-03.Rmd,ru-learning-foundation-v1,not_implemented,NOT_CLEARED,NOT_REVIEWED
+learn,ru.learning.foundation.01,tutorial,Foundation 01: Where R runs,tutorials/ru-foundation-01/ru-foundation-01.Rmd,ru-learning-foundation-v1,learnr_tutorial,NOT_CLEARED,NOT_REVIEWED
+learn,ru.learning.foundation.03.bridge,exercise,Foundation 03: Source and Console transfer,tutorials/ru-foundation-03/ru-foundation-03.Rmd,ru-learning-foundation-v1,learnr_exercise,NOT_CLEARED,NOT_REVIEWED
 analyze,describe.numeric,analysis_method,Describe numerical values,,1.1-draft.v2,not_implemented,NOT_CLEARED,NOT_REVIEWED
+learn,ru.learning.foundation.02,tutorial,Foundation 02: Scripts and objects,tutorials/ru-foundation-02/ru-foundation-02.Rmd,ru-learning-foundation-v1,learnr_tutorial,NOT_CLEARED,NOT_REVIEWED
+learn,ru.learning.foundation.03,tutorial,Foundation 03: Import and missingness,tutorials/ru-foundation-03/ru-foundation-03.Rmd,ru-learning-foundation-v1,learnr_tutorial,NOT_CLEARED,NOT_REVIEWED
+asset,ru.learning.foundation.03.sites-transfer-v1,csv,Held-out Source transfer CSV,tutorials/ru-learning-foundations/data/sites-transfer-v1.csv,ru-learning-foundation-v1,authored_csv,NOT_CLEARED,NOT_REVIEWED
+reference,rstudio_contexts,compact_md,RStudio Source and Console execution,lessons/rstudio_contexts.md,ru-w2-reference-v1,authored_md,NOT_CLEARED,NOT_REVIEWED
+reference,vectors_indexing,compact_md,R vectors and indexing,lessons/vectors_indexing.md,ru-w2-reference-v1,authored_md,NOT_CLEARED,NOT_REVIEWED
+reference,describe_numeric,compact_md,Describe a numeric outcome,lessons/describe_numeric.md,ru-w2-reference-v1,authored_md,NOT_CLEARED,NOT_REVIEWED
+reference,histogram_interpret,compact_md,Interpret histogram bins,lessons/histogram_interpret.md,ru-w2-reference-v1,authored_md,NOT_CLEARED,NOT_REVIEWED
+asset,observed-missing-flow.svg,svg,Constructed missingness figure,www/figures/observed-missing-flow.svg,ru-w2-reference-v1,authored_asset,NOT_CLEARED,NOT_REVIEWED
