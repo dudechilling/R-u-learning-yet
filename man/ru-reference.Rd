@@ -44,9 +44,14 @@ An indexed entry or package source alone is not evidence that content
 was displayed, reviewed, accessible, or cleared for redistribution.
 
 For reference topics the default representation is \code{"compact_md"}.
-For example, \code{"missing_values"} lacks the compact source while
-its separately represented legacy Quarto guide can be found with
-\code{representation = "legacy_guide_qmd"}. Native Help IDs such as
+The accepted G1 source indexed \code{"missing_values"} as a compact
+reference but lacked that compact page. The W2 L4 source separately
+authors \code{lessons/missing_values.md}. It becomes available as
+\code{"compact_md"} only when actually installed and resolved from the
+registered locator; the distinct legacy Quarto guide remains available
+under \code{representation = "legacy_guide_qmd"}. Do not treat the
+guide as a substitute compact page or infer installation from a registry
+row alone. Native Help IDs such as
 \code{"r_mean"} use \code{"rd_alias"}, not a fabricated compact page.
 A single ID with several representations is not a multiple-ID search
 match. The structured \code{resolution} differentiates requested
@@ -81,7 +86,8 @@ one$status
 ambiguous <- ru_reference("hist", open = FALSE)
 ambiguous$status
 missing <- ru_reference("missing_values", open = FALSE)
-missing$reason_code
+missing$status
+missing$selected_representation
 guide <- ru_reference("missing_values",
                       representation = "legacy_guide_qmd", open = FALSE)
 guide$selected_representation

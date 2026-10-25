@@ -45,3 +45,38 @@ document.addEventListener("click", async function(event) {
       "Clipboard access unavailable. The code is selected; press Ctrl+C (Command+C on macOS) to copy.";
   }
 });
+/* W2 local reference focus restoration; no raw learner data is persisted. */
+(function () {
+  const key = "ru-w2-focus-v1";
+  function restore() {
+    let id = null;
+    try { id = sessionStorage.getItem(key); }
+    catch (_) { return; }
+    if (!id || !/^[a-z0-9_-]+$/.test(id)) return;
+    const target = document.getElementById(id);
+    if (target && target.matches(".results a")) {
+      try { sessionStorage.removeItem(key); } catch (_) { /* blocked */ }
+      target.focus({preventScroll:true});
+      target.scrollIntoView({block:"nearest"});
+    } else {
+      const heading = document.querySelector("#content h1");
+      if (heading) { heading.tabIndex = -1; heading.focus({preventScroll:true}); }
+    }
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".results a").forEach(function (link, index) {
+      if (!link.id) link.id = "ru-choice-" + index;
+      link.addEventListener("click", function () {
+        if (!/^[a-z0-9_-]+$/.test(link.id)) return;
+        try { sessionStorage.setItem(key, link.id); } catch (_) { /* local storage blocked */ }
+      });
+    });
+    restore();
+    const back = document.querySelector("button.w2-return-context");
+    if (back) back.addEventListener("click", function () {
+      if (history.length > 1) history.back();
+      else window.location.assign("results.html");
+    });
+  });
+  window.addEventListener("pageshow", function (event) { if (event.persisted) restore(); });
+})();

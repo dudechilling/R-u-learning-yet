@@ -293,3 +293,21 @@ tests/student-tutorials.R,MIT,Original offline tutorial code and navigation cont
 tests/transfer.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
 tests/viewer.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
 tests/windows-variables-qa.R,MIT,"Original project software, scripts, fixtures, tests or metadata"
+inst/lessons/rstudio_contexts.md,"CC-BY-4.0; code examples MIT","W2 L4 assistant-drafted instructional source; NOT_CLEARED; original author and human rights/editorial review pending"
+inst/lessons/vectors_indexing.md,"CC-BY-4.0; code examples MIT","W2 L4 assistant-drafted instructional source; NOT_CLEARED; original author and human rights/editorial review pending"
+inst/lessons/missing_values.md,"CC-BY-4.0; code examples MIT","W2 L4 assistant-drafted instructional source; NOT_CLEARED; original author and human rights/editorial review pending"
+inst/lessons/describe_numeric.md,"CC-BY-4.0; code examples MIT","W2 L4 assistant-drafted instructional source; NOT_CLEARED; original author and human rights/editorial review pending"
+inst/lessons/histogram_interpret.md,"CC-BY-4.0; code examples MIT","W2 L4 assistant-drafted instructional source; NOT_CLEARED; original author and human rights/editorial review pending"
+inst/www/figures/observed-missing-flow.svg,"CC-BY-4.0; code examples MIT","W2 L4 assistant-drafted instructional source; NOT_CLEARED; original author and human rights/editorial review pending"
+tests/lane4-w2.R,MIT,W2 L4 original authored validation script; human technical review pending
+man/ru-workspace.Rd,CC-BY-4.0; code examples MIT,L4 W1 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-reference.Rd,CC-BY-4.0; code examples MIT,L4 W1 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-capabilities.Rd,CC-BY-4.0; code examples MIT,L4 W1 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-progress.Rd,CC-BY-4.0; code examples MIT,L4 W1 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-source-context.Rd,CC-BY-4.0; code examples MIT,L4 W1 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-learn.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-analyze-plan.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-analyze-code.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-analyze-execute.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-analyze-export.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
+man/ru-analyze.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending

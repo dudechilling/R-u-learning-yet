@@ -76,8 +76,14 @@
   if(!nzchar(folder)) return(blank)
   paths <- sort(list.files(folder,pattern="^[a-z0-9_]+[.]md$",full.names=FALSE))
   if(!length(paths)) return(blank)
-  do.call(rbind,lapply(paths,function(x) {
-    item <- .ru_lesson_read(tools::file_path_sans_ext(x))
+  items <- lapply(paths,function(x)
+    .ru_lesson_read(tools::file_path_sans_ext(x)))
+  # A W2 reference collection is registered through ru-content.csv.
+  # Never mix pending or future W2 representations into the legacy
+  # fixed 84-topic Viewer index, regardless of editorial review status.
+  legacy <- Filter(function(item) is.null(item$meta$collection),items)
+  if(!length(legacy))return(blank)
+  do.call(rbind,lapply(legacy,function(item) {
     data.frame(id=item$id,type=item$meta$type,title=item$title,
                keywords=paste(item$meta$aliases,item$meta$domain),
                status=item$meta$status,stringsAsFactors=FALSE)
@@ -179,6 +185,7 @@
     if(!identical(item$meta$status,"VERIFIED"))
       "<p class='review-status'>Authored draft: source and editorial verification pending.</p>"
     else "",
+    "<div class='w2-ref-grid'><div class='w2-ref-main'>",
     "<section class='immediate' aria-label='Immediate answer'><h2>Quick answer</h2>",
     .ru_rich_paragraphs(item$sections[["immediate answer"]]),"</section>",
     .ru_optional_page_section(item, "what the question asks", "What the question asks"),
@@ -211,11 +218,12 @@
     .ru_rich_paragraphs(item$sections[["what to check"]]),"</section>",
     "<section><h2>Interpret your results</h2>",
     .ru_rich_paragraphs(item$sections[["interpret your results"]]),"</section>",
+    "</div><aside class='w2-ref-aside' aria-label='Supporting reference'>",
     .ru_visual(item),
     "<details><summary>Learn more</summary><div class='details-body'>",
     .ru_rich_paragraphs(item$sections[["learn more"]]),
     .ru_source_links(item),"</div></details>",
-    .ru_related(item),"</article>")
+    .ru_related(item),"</aside></div></article>")
 }
 .ru_short_fallback <- function(item) {
   legacy <- identical(item$type,"walkthrough")
@@ -243,6 +251,8 @@
          "<link href='reference.css' rel='stylesheet'></head>",
          "<body><a class='skip-link' href='#content'>Skip to content</a><main class='page'><header class='site-head'><a href='home.html'>",
          "<strong>R-u-learning-yet</strong></a><span>Offline RStudio reference</span></header>",
-         "<nav class='site-nav' aria-label='Local library'><a href='home.html'>Home</a> <a href='tutorials.html'>Tutorials</a> <a href='results.html'>References</a> <a href='catalog.html'>Coverage</a></nav><div id='content'>",body,"</div><footer>Running R code does not verify sampling or model assumptions.</footer></main>",
+         "<nav class='site-nav' aria-label='Local library'><a href='home.html'>Home</a> <a href='tutorials.html'>Tutorials</a> <a href='results.html'>References</a> <a href='catalog.html'>Coverage</a></nav>",
+         "<nav class='w2-mode-nav' aria-label='Three RU experiences'><a href='tutorials.html'>Learning materials</a><span class='w2-not-launched'>Analyzing: launch separately when installed</span><a href='results.html' >Referencing</a></nav>",
+         "<div class='w2-return-row'><button class='w2-return-context' type='button'>Back to previous page</button><a href='results.html'>Reference catalogue</a></div><div id='content' tabindex='-1'>",body,"</div><footer>Running R code does not verify sampling or model assumptions.</footer></main>",
          "<script defer src='reference.js'></script></body></html>")
 }
