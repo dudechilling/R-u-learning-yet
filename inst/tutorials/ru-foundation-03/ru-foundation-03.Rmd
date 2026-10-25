@@ -1,0 +1,239 @@
+---
+title: "03 — Inspect, import and explain data"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Foundation R-03, R-04 and DAT-01; data types and missingness"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+learnr::tutorial_options(
+  exercise.checker = rulearn:::.ru_learning_checker,
+  exercise.error.check.code = "TRUE",
+  exercise.reveal_solution = FALSE,
+  exercise.timelimit = 25
+)
+```
+
+## Prerequisites, provenance and outcomes
+
+**Hints:** H0 means attempt the exercise without help. Open H1 first; H2 appears inside H1 and H3 inside H2. H3 reveals a worked approach and is guided practice only.
+
+**Lesson ID:** `ru.learning.foundation.03`. **Outcomes:** R-03, R-04, DAT-01.
+Review ORI-03 and R-01/R-02 first. This lesson teaches indexing and
+missingness **before** data frames and CSV import.
+
+Two files are synthetic instructional constructions. A CSV field named
+`reading` has no physical units by itself. The **RU L2 guided source card**
+explicitly declares `reading` in **degrees Celsius**. Repeated `site_group`
+labels identify categories, distinct `row_key` entries identify **log rows**,
+and neither one proves that different people or independent units were sampled.
+
+## Indexing, logical selection and missing values — R-03
+
+Vectors can be selected by position: `x[3]` is the third reading. The
+symbol `NA` means missing/unknown, not zero. `is.na(x)` returns logical
+values showing missing positions; the `!` operator reverses TRUE and FALSE.
+`x[!is.na(x)]` therefore selects observations that are present.
+
+`sum(is.na(x))` counts missing entries because R treats TRUE as one in a sum.
+An alternative is `length(which(is.na(x)))`: `which()` returns positions
+and `length()` counts them. These functions have now been introduced
+before they are assessed.
+
+```{r ru-f03-index-worked}
+x <- c(13, NA_real_, 18, 20)
+x[3]
+is.na(x)
+x[!is.na(x)]
+length(which(is.na(x)))
+```
+
+```{r ru-f03-index-setup}
+x <- c(13, NA_real_, 18, 20)
+```
+```{r ru-f03-index, exercise=TRUE}
+# Find the number of missing entries using is.na()
+```
+```{r ru-f03-index-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Ask which entries are missing, not which are equal to NA.
+<details><summary>H2 — location</summary>Use is.na(x) and count its TRUE values.
+<details><summary>H3 — worked reveal (assisted)</summary>`sum(is.na(x))` and `length(which(is.na(x)))` are both valid here.</details>
+</details>
+</details>
+
+## Data frames, columns, lists and factors — R-04
+
+`data.frame()` puts variables into named columns and records into rows.
+`nrow(d)` counts rows; `names(d)` gives the column names and `str(d)`
+shows types. `d$reading` and `d[["reading"]]` select a numeric vector;
+`d["reading"]` selects a **one-column data frame**.
+
+A **list** created by `list()` can contain different kinds of objects.
+Use `[[ ]]` to extract an individual list member. A **factor** created
+by `factor()` represents categories, with `levels()` describing their
+labels. Factor integer codes do not turn category names into
+measured quantities.
+
+```{r ru-f03-frame-worked}
+x <- c(13, NA_real_, 18, 20)
+d <- data.frame(site_group = c("North","North","South","South"),
+                reading = x)
+str(d)
+names(d)
+nrow(d)
+d[["reading"]]
+d["reading"]
+group <- factor(d$site_group)
+levels(group)
+parts <- list(group = group, observed = d$reading[!is.na(d$reading)])
+parts[["observed"]]
+```
+
+```{r ru-f03-frame-setup}
+x <- c(13, NA_real_, 18, 20)
+```
+```{r ru-f03-frame, exercise=TRUE}
+# Create d using data.frame(), with character site_group and numeric reading
+```
+```{r ru-f03-frame-check}
+TRUE
+```
+
+```{r ru-f03-types-setup}
+d <- data.frame(site_group=c("North","North","South","South"),
+                reading=c(13,NA_real_,18,20))
+```
+```{r ru-f03-types, exercise=TRUE}
+# Create factor group from site_group, then list parts
+# with group and an observed numeric vector
+```
+```{r ru-f03-types-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>One data-frame column may be character, while a reading is numeric.
+<details><summary>H2 — location</summary>Inspect names, str, factor levels and list members using [[ ]].
+<details><summary>H3 — worked reveal (assisted)</summary>`group <- factor(d$site_group); parts <- list(group=group, observed=d$reading[!is.na(d$reading)])`. This is guided practice only.</details>
+</details>
+</details>
+
+```{r ru-f03-role-question, echo=FALSE}
+question("What does the value North identify in these synthetic records?",
+  answer("A repeated site category; it is not a participant ID",correct=TRUE),
+  answer("A unique sampled person",message="The same category occurs twice, and no participant ID was supplied."),
+  answer("A numerical temperature",message="The source card assigns degrees Celsius to reading, not site_group."),
+  allow_retry=TRUE)
+```
+
+## Guided CSV import — DAT-01 introduction
+
+The **guided** UTF-8 comma-separated source file has a header, one
+blank temperature, repeated category names, and a character log-record
+key. `read.csv()` reads it. Its `na.strings` argument specifies which
+tokens represent missingness and `colClasses` declares storage types.
+Inspect `names()`, `str()` and `nrow()` **before calculating**.
+
+The installed package locator is provided by `system.file()`; it is
+different from a file path relative to your own RStudio Project.
+Reading an installed file does not copy it to that project.
+
+```{r ru-f03-csv, exercise=TRUE}
+source_path <- system.file("tutorials","ru-learning-foundations",
+                           "data","sites-intro-v1.csv",
+                           package="rulearn",mustWork=TRUE)
+guided <- read.csv(source_path,stringsAsFactors=FALSE,
+                   na.strings=c("","NA"),
+                   colClasses=c("character","character","numeric"))
+str(guided)
+```
+```{r ru-f03-csv-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Read the installed CSV, then check the schema.
+<details><summary>H2 — location</summary>Use the supplied system.file() location, read.csv(), and explicit column classes.
+<details><summary>H3 — worked reveal (assisted)</summary>The complete guided import appears in the editor; Run it and inspect its columns. This does not earn independent DAT-01 competence.</details>
+</details>
+</details>
+
+## A transparent missingness decision — R-03 / R-04
+
+The guided source card declares Celsius. There are four synthetic
+log rows, one absent reading and three observed temperatures. If you
+explicitly agree to omit the missing entry **for this observed-case
+description**, `mean(guided$reading, na.rm=TRUE)` computes their average.
+Without a decision, `mean(guided$reading)` returns NA. Replacing NA
+with zero would instead describe a different fabricated dataset.
+
+```{r ru-f03-summary-setup}
+source_path <- system.file("tutorials","ru-learning-foundations",
+                           "data","sites-intro-v1.csv",
+                           package="rulearn",mustWork=TRUE)
+guided <- read.csv(source_path,stringsAsFactors=FALSE,
+                   na.strings=c("","NA"),
+                   colClasses=c("character","character","numeric"))
+```
+```{r ru-f03-summary, exercise=TRUE}
+# Replace the blank after explicit consideration of missingness
+exclude_missing <- ___
+average <- mean(guided$reading, na.rm = exclude_missing)
+average
+```
+```{r ru-f03-summary-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>The missing value is not a measured zero.
+<details><summary>H2 — location</summary>Choose logical TRUE only if you consent to an observed-case mean; na.rm controls exclusion.
+<details><summary>H3 — worked reveal (assisted)</summary>`exclude_missing <- TRUE; average <- mean(guided$reading, na.rm=exclude_missing)` yields 17 degrees Celsius from three observed readings.</details>
+</details>
+</details>
+
+## Unfamiliar-data Source/Console transfer — DAT-01
+
+**This is a separate assessment outside learnr; its answer key and rows
+are not displayed here.** The independently constructed transfer file
+is named `sites-transfer-v1.csv`. The RU L2 **source card** declares
+its `reading` values in **degrees Fahrenheit**. Other columns include
+a character log-record code (leading zeros matter), a category which
+may contain a quoted comma and a missing numeric value. No column
+identifies participants or establishes independent sampling.
+
+In your ordinary RStudio Project, write and save a new `.R` script.
+Use a read-only installed path from `system.file("tutorials",
+"ru-learning-foundations","data","sites-transfer-v1.csv",
+package="rulearn",mustWork=TRUE)`, or knowingly copy that file to a
+**new**, collision-checked project location yourself. RU does not
+automatically modify project files. Import using a quote-aware CSV
+reader, retain the code field as character, inspect types, row count,
+missingness and source-declared Fahrenheit units, and justify any
+exclusion before interpreting an observed-case summary.
+
+Execute through the ordinary Source editor and R Console, restart the
+real R session, and rerun the saved file. An instructor must separately
+observe and assess this work. A learnr Check button cannot certify
+independent DAT-01 or ORI-03 transfer; the instructor rubric covers
+provenance/units, schema/types, missingness and reproducible
+interpretation (25% each).
+
+## Connect to Referencing and later learning
+
+For related installed reference material, the ordinary R Console can
+call `ru_reference("mean",open=FALSE)`,
+`ru_reference("inspect_columns",open=FALSE)`, or
+`ru_reference("import_csv",open=FALSE)`. These return descriptions of
+local content; an untested Viewer is not claimed to have opened.
+The native Help alias `r_mean` is a distinct reference route.
+
+The AN-01 `describe.numeric` link is a **future G2 bridge**, not an
+already running analysis engine. A valid plan needs actual data binding,
+units from this source card and explicit missing-case consent.
+This example does not teach histogram binning and awards no EXP-01/02
+credit or inference about population independence.

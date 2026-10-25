@@ -1,0 +1,158 @@
+---
+title: "02 — Objects, functions and reproducible Source files"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Foundation R-01, R-02 and ORI-03"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+learnr::tutorial_options(
+  exercise.checker = rulearn:::.ru_learning_checker,
+  exercise.error.check.code = "TRUE",
+  exercise.reveal_solution = FALSE,
+  exercise.timelimit = 20
+)
+```
+
+## From the Console to a saved file
+
+**Hints:** H0 means attempt the exercise without help. Open H1 first; H2 appears inside H1 and H3 inside H2. H3 reveals a worked approach and is guided practice only.
+
+**Lesson ID:** `ru.learning.foundation.02`. **Outcomes:** R-01, R-02,
+ORI-03. You should first know the difference between the ordinary
+R Console, the RStudio Source editor and the terminal (ORI-01/02).
+This tutorial explains the new operations before using them.
+
+A saved `.R` file remains on disk when R restarts; objects in the current
+R session do not. The exercises below run in a **learnr sandbox**, not
+in your ordinary RStudio Console.
+
+## Create, inspect and modify R objects
+
+`<-` assigns a value to a name; `==` compares values and does **not**
+create or update an object. For a simple assignment, `=` is also valid.
+The function `c()` combines numbers into a vector. Typing an object's
+name in the Console prints its current value.
+
+```{r ru-f02-worked}
+scores <- c(6, 8, 10)
+scores
+```
+
+### Guided vector creation — R-01
+
+Complete the missing number. This guided blank **does not** test whether
+you can write an entire assignment using another valid operator.
+
+```{r ru-f02-assignment, exercise=TRUE}
+scores <- c(6, ___, 10)
+scores
+```
+```{r ru-f02-assignment-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Build a numeric vector containing three values.
+<details><summary>H2 — location</summary>The middle value is between six and ten.
+<details><summary>H3 — worked reveal (assisted)</summary>`scores <- c(6, 8, 10)`. Assisted answers remain practised.</details>
+</details>
+</details>
+
+### Separate free-form assignment — R-01
+
+Write the **whole assignment** to make `scores` contain 2, 4 and 6.
+You may use either `<-` or `=`. Run `scores` to inspect the object.
+
+```{r ru-f02-assign-create, exercise=TRUE}
+# Write a complete scores assignment, then inspect scores
+```
+```{r ru-f02-assign-create-check}
+TRUE
+```
+
+Now the exercise starts with a vector already stored in `scores`.
+Reassign the whole vector so the middle value changes to five.
+Element indexing will be taught in lesson 03.
+
+```{r ru-f02-assign-modify-setup}
+scores <- c(2, 4, 6)
+```
+```{r ru-f02-assign-modify, exercise=TRUE}
+# Reassign scores to the new vector (2, 5, 6)
+```
+```{r ru-f02-assign-modify-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Inspection prints an object; assignment changes it.
+<details><summary>H2 — location</summary>Write a complete vector and assign it back to scores.
+<details><summary>H3 — worked reveal (assisted)</summary>`scores = c(2, 5, 6)` is valid. This is guided help, not independent evidence.</details>
+</details>
+</details>
+
+## Functions, arguments and Help — R-02
+
+A function call supplies input values through arguments. `mean(scores)`
+returns their arithmetic mean. `sum(scores)` totals the observations;
+`length(scores)` counts them. Dividing sum by length is a second valid
+way to calculate the same mean when no observations are missing.
+
+A named argument lets you state a function setting explicitly.
+`round(8.246, digits = 1)` gives 8.2, whereas
+`round(8.246, digits = 2)` gives 8.25. In ordinary R Console,
+`?mean` and `?round` open installed Help.
+
+```{r ru-f02-functions}
+scores <- c(6, 8, 10)
+mean(scores)
+sum(scores) / length(scores)
+round(8.246, digits = 1)
+round(8.246, digits = 2)
+```
+
+```{r ru-f02-average-setup}
+scores <- c(6, 8, 10)
+```
+```{r ru-f02-average, exercise=TRUE}
+# Calculate the arithmetic mean using a function (not the literal result)
+```
+```{r ru-f02-average-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Use a function for the arithmetic mean, not the median.
+<details><summary>H2 — location</summary>Read `?mean` or combine the taught `sum` and `length` operations.
+<details><summary>H3 — worked reveal (assisted)</summary>`mean(scores)` or `sum(scores) / length(scores)` are both valid for this example.</details>
+</details>
+</details>
+
+```{r ru-f02-functions-question, echo=FALSE}
+question("What does the named argument digits control in round(8.246, digits = 2)?",
+  answer("The number of decimal places retained", correct=TRUE),
+  answer("The number of vector elements", message="That is unrelated to rounding precision."),
+  answer("The R session's working directory", message="Arguments control the function, not the IDE."),
+  allow_retry=TRUE)
+```
+
+## Genuine Source/Console transfer — ORI-03
+
+**This task must be done outside learnr.** Open RStudio's ordinary
+Source editor, create an empty project if necessary, and save a new `.R`
+script using a different numeric vector `c(4, 7, 10)`. Have the script
+create the vector, calculate and print its mean. Run the saved Source
+file, restart the real R session, and source the file again. Record whether
+the result was reproduced without relying on the previous session.
+
+The grader in this tutorial cannot see your IDE save/restart actions.
+A reviewer must independently observe the real operation before calling
+ORI-03 `performed_independently`. An unseen script and genuine restart
+cannot be replaced by a learnr Check button.
+
+## Continue
+
+From the ordinary R Console, launch lesson 03 with
+`learnr::run_tutorial("ru-foundation-03", package="rulearn")`.

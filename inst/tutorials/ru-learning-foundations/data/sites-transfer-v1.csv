@@ -1,0 +1,6 @@
+record_code,location_group,reading,quality_flag
+"0007","Bay, West",64,ok
+"0008","Bay, West",68,ok
+"0009",Hill,,missing
+"0010",Hill,72,ok
+"0011","Bay, West",76,ok

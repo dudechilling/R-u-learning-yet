@@ -1,0 +1,120 @@
+---
+title: "01 — Where R runs"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Foundation ORI-01 and ORI-02: Console, Source, terminal and error repair"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+learnr::tutorial_options(
+  exercise.checker = rulearn:::.ru_learning_checker,
+  exercise.error.check.code = "TRUE",
+  exercise.reveal_solution = FALSE,
+  exercise.timelimit = 20
+)
+```
+
+## Start: different execution surfaces
+
+**Hints:** H0 means attempt the exercise without help. Open H1 first; H2 appears inside H1 and H3 inside H2. H3 reveals a worked approach and is guided practice only.
+
+**Lesson ID:** `ru.learning.foundation.01`. **Outcomes:** ORI-01 and ORI-02.
+No previous R knowledge is assumed. In this tutorial, practice answers are **not**
+evidence of independently using ordinary RStudio Source/Console.
+
+**R** is a language and runtime. **RStudio** is an editor/IDE which can run R.
+The **R Console** evaluates R expressions. A **Source** tab contains saved R code.
+A **system terminal** executes shell commands, including the external `Rscript`
+program. The displayed Console `>` is a prompt, not text you enter.
+
+| Surface | Instruction (do not type the leading prompt) |
+|---|---|
+| R Console | `2 + 3` |
+| RStudio Source (.R file) | `2 + 3` saved in a script, then sourced |
+| System terminal | `Rscript --version` |
+
+The terminal example is an explanation, **not** an R Console exercise.
+
+```{r ru-f01-surface, echo=FALSE}
+question("Where should you enter the shell command Rscript --version?",
+  answer("System terminal", correct=TRUE),
+  answer("R Console", message="The Console parses R syntax, not shell programs."),
+  answer("Inside a data frame", message="A data frame stores data, not commands."),
+  allow_retry=TRUE)
+```
+
+## Read and calculate a first expression
+
+In the R Console, `2 + 3` produces `[1] 5`. The `[1]` shows the index
+of the first displayed value; the result is `5`. R arithmetic uses `+`,
+`-`, `*` and `/`. Parentheses group operations; every opening `(` needs
+a closing `)`.
+
+```{r ru-f01-worked}
+2 + 3
+```
+
+### Guided arithmetic — ORI-02
+
+Complete `7 - ___` so the result is five. Equivalent correct arithmetic,
+not spelling or spaces, matters for this formative exercise.
+
+```{r ru-f01-guided, exercise=TRUE}
+7 - ___
+```
+```{r ru-f01-guided-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Subtraction removes a quantity.
+<details><summary>H2 — location</summary>Ask what must be subtracted from seven to leave five.
+<details><summary>H3 — worked reveal (assisted)</summary>`7 - 2` is one way. Revealing this never counts as independent performance.</details>
+</details>
+</details>
+
+## Repair syntax before evaluation
+
+A syntax error prevents a numerical answer. The unfinished expression below
+is missing one closing parenthesis. Repair it, then run it.
+
+```{r ru-f01-repair, exercise=TRUE}
+3 * (4 - 2
+```
+```{r ru-f01-repair-check}
+TRUE
+```
+
+<details><summary>H1 — concept</summary>Parentheses come in pairs.
+<details><summary>H2 — location</summary>Compare the opening and closing marks after the multiplication.
+<details><summary>H3 — worked reveal (assisted)</summary>`3 * (4 - 2)` evaluates to six. Treat this as guided practice.</details>
+</details>
+</details>
+
+## New practice, no solution shown
+
+Choose the correct execution surface for a different R expression and a
+terminal command. Then calculate `(18 - 6) / 4` in R. Type a calculation,
+not only its final number. If the code fails, explain what R reported.
+
+```{r ru-f01-transfer, exercise=TRUE}
+# Enter the new arithmetic expression here
+```
+```{r ru-f01-transfer-check}
+TRUE
+```
+
+A correct learnr check remains **practice**; it cannot confirm a real
+RStudio project, saved file, restart or independent competence.
+
+## Continue
+
+When ready, leave this exercise editor and open the **ordinary R Console**
+to launch lesson 02 with:
+`learnr::run_tutorial("ru-foundation-02", package="rulearn")`.
+This command needs the installed optional `learnr` package and is not a
+system-terminal command. Your exercise objects do not automatically exist
+in the ordinary Console.
