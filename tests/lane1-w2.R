@@ -103,13 +103,16 @@ for (i in seq_along(assets)) {
 entries <- getNamespaceExports("rulearn")
 w2 <- c("ru_learn", "ru_analyze", "ru_analyze_plan",
         "ru_analyze_code", "ru_analyze_execute", "ru_analyze_export")
-stopifnot(length(entries) == 32L, setequal(entries,
+# W2 requires the frozen 32 exports; W3 adds ONLY ru_solve (33 total).
+w3 <- "ru_solve" %in% entries
+expected_count <- if (w3) 33L else 32L
+stopifnot(length(entries) == expected_count, setequal(entries,
          c("ru","ru_find","ru_plan","ru_run","ru_code","ru_topics",
            "ru_inputs","ru_hist","ru_bar","ru_box","ru_scatter",
            "ru_data","ru_datasets","ru_columns","ru_apply",
            "ru_guide","ru_edit","ru_open","ru_text","ru_palette","ru_home",
            "ru_workspace","ru_reference","ru_capabilities","ru_progress",
-           "ru_source_context",w2)),
+           "ru_source_context",w2,if (w3) "ru_solve")),
            all(w2 %in% entries))
 stopifnot(identical(names(formals(ru_learn)),
                     c("path","lesson","resume")),
