@@ -312,3 +312,7 @@ man/ru-analyze-execute.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API hel
 man/ru-analyze-export.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
 man/ru-analyze.Rd,CC-BY-4.0; code examples MIT,L4 W2-R2 authored API help; rights NOT_CLEARED; human editorial/rights review pending
 tests/lane4-w2-privacy.R,MIT,W2 L4 original authored privacy validation; human technical review pending
+R/ru-w3-render.R,MIT,"W3 A4 original renderer; rights NOT_CLEARED pending human review"
+inst/www/ru-w3-copy.js,MIT,"W3 A4 original offline clipboard script; rights NOT_CLEARED pending human review"
+man/ru-solve.Rd,"CC-BY-4.0; code examples MIT","W3 A4 original help documentation; rights NOT_CLEARED pending human review"
+tests/lane4-w3.R,MIT,"W3 A4 original regression tests; rights NOT_CLEARED pending human review"
