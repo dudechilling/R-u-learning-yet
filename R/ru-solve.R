@@ -97,16 +97,31 @@ ru_solve <- function(question, open = TRUE, level = c("beginner", "concise")) {
     # INVALID still follows the same teaching/rendering contract.
     computed <- parsed
   } else {
-    parsed <- .ru_w3_parse(question)
-    computed <- .ru_w3_compute(parsed)
+    # W4 is additive: without an A3-recognized W4 intent the complete W3
+    # parser, computation, safeguards and output remain unchanged.
+    w4 <- .ru_w4_dispatch(question)
+    if (is.null(w4)) {
+      parsed <- .ru_w3_parse(question)
+      computed <- .ru_w3_compute(parsed)
+    } else {
+      computed <- w4
+    }
   }
-  lesson <- .ru_w3_teach(computed)
+  # A qualified W4 numerical family requires its own approved teaching
+  # and Viewer adapters. Candidate families return honest non-SOLVED
+  # guidance through the still-supported W3 lesson/Viewer fallback.
+  w4_solved <- inherits(computed, "ru_w4_computed") &&
+    identical(computed$status, "SOLVED")
+  lesson <- if (w4_solved)
+    .ru_w4_peer_function("teach")(computed) else .ru_w3_teach(computed)
   if (identical(level, "concise"))
     lesson <- .ru_w3_concise_guide(lesson)
   else
     lesson$presentation_level <- "beginner"
-  # The renderer owns the Viewer capability check and may decline to open.
-  rendering <- .ru_w3_render(lesson, open = open)
+  # Viewer truthfulness and code-preview-only behavior are unchanged.
+  rendering <- if (w4_solved)
+    .ru_w4_peer_function("render")(lesson, open = open) else
+    .ru_w3_render(lesson, open = open)
   .ru_w3_as_solution(computed, lesson, rendering, level)
 }
 
