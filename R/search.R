@@ -673,21 +673,34 @@ ru_find <- function(query,n=10L,type=NULL) {
      is.na(query) || !nzchar(trimws(query)))
     return(invisible(.ru_catalog()[FALSE,,drop=FALSE]))
   hits <- .ru_search_results(query,n=n,type=type)
-  # Preserve the ordinary data.frame search contract and all method filters.
-  # Only question-specific, confidently solved prompts gain guided rendering.
-  # Concept-only PMF remains a reference, with no invented die operands.
-  guided <- NULL
-  if (nchar(query, type = "bytes") <= 4096L &&
-      grepl("[[:space:]]", trimws(query)) &&
-      grepl("(?i)(die|dice|probability|pmf|cdf|expected value|variance)",
-            query, perl = TRUE)) {
-    candidate <- .ru_w3_parse(query)
-    if (identical(candidate$status, "SOLVED") &&
-        identical(candidate$family_id, "dice_sum_independent_fair"))
-      guided <- ru_solve(query, open = TRUE)
+  # Search and n/type filtering are always the legacy search engine's job.
+  # Guided pages are an optional VIEW of a confidently recognized question,
+  # not a replacement for the invisible data.frame result.
+  viewer_ready <- isTRUE(.ru_rstudio_ready("viewer"))
+  guided <- FALSE
+  if (viewer_ready && nchar(query, type = "bytes") <= 4096L &&
+      (is.null(type) || identical(type, "walkthrough")) &&
+      grepl("\\b(die|dice|probability|pmf|cdf|expected value|variance)\\b",
+            tolower(query), perl = TRUE)) {
+    candidate <- tryCatch(.ru_w3_parse(query), error = function(e) NULL)
+    solved <- is.list(candidate) &&
+      identical(candidate$status, "SOLVED") &&
+      identical(candidate$family_id, "dice_sum_independent_fair")
+    # Short conceptual PMF/CDF questions must not acquire fictitious dice.
+    # Only open the guided reference if the corresponding legacy hit survived
+    # method compatibility, explicit type filtering and n selection.
+    concept <- is.list(candidate) &&
+      identical(candidate$status, "GUIDED_REFERENCE") &&
+      (identical(candidate$family_id, "discrete_pmf") ||
+       identical(candidate$family_id, "discrete_cdf")) &&
+      candidate$family_id %in% hits$id
+    if (solved || concept)
+      guided <- isTRUE(tryCatch({
+        ru_solve(query, open = TRUE, level = "beginner")
+        TRUE
+      }, error = function(e) FALSE))
   }
-  if (is.null(guided) && .ru_rstudio_ready("viewer"))
-    .ru_viewer_show(hits,query)
+  if (!guided && viewer_ready) .ru_viewer_show(hits, query)
   invisible(hits)
 }
 

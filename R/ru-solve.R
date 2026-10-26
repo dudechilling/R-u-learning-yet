@@ -52,6 +52,28 @@
                  level = level), class = "ru_solution")
 }
 
+.ru_w3_concise_guide <- function(lesson) {
+  # Presentation-only reduction of A2 teaching content. Never change A3
+  # mathematics, the structured answer, code, assumptions, checks, hints,
+  # interpretations, edit instructions, or an unsupported/refusal status.
+  if (!is.list(lesson))
+    stop("Expected a structured W3 lesson.", call. = FALSE)
+  explanation <- lesson$explanation_sections
+  if (is.character(explanation) && length(explanation) > 3L)
+    lesson$explanation_sections <- explanation[unique(c(1L, 2L, length(explanation)))]
+  steps <- lesson$step_by_step
+  if (is.character(steps) && length(steps) > 3L) {
+    keep <- unique(c(1L, if (length(steps) >= 5L) 3L else 2L,
+                     seq.int(max(1L, length(steps)-2L), length(steps))))
+    # The renderer already numbers ordered steps; remove old embedded numbers
+    # after selecting steps so the reduced sequence is not misleading.
+    lesson$step_by_step <- sub("^[[:space:]]*[0-9]+[.)][[:space:]]*",
+                               "", steps[keep], perl = TRUE)
+  }
+  lesson$presentation_level <- "concise"
+  lesson
+}
+
 #' Solve or guide a statistical assignment question
 #'
 #' Interpret one quoted question using installed deterministic lessons. The
@@ -79,6 +101,10 @@ ru_solve <- function(question, open = TRUE, level = c("beginner", "concise")) {
     computed <- .ru_w3_compute(parsed)
   }
   lesson <- .ru_w3_teach(computed)
+  if (identical(level, "concise"))
+    lesson <- .ru_w3_concise_guide(lesson)
+  else
+    lesson$presentation_level <- "beginner"
   # The renderer owns the Viewer capability check and may decline to open.
   rendering <- .ru_w3_render(lesson, open = open)
   .ru_w3_as_solution(computed, lesson, rendering, level)
