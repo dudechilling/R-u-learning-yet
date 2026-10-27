@@ -62,23 +62,88 @@
   .ru_w4_num(z[[1L]],integer,lo,hi)
 }
 .ru_w4_vec<-function(s,name=NULL,free=FALSE) {
-  # Accept only literal comma-separated decimal arrays, never R code.
-  part<-character()
-  numbers<-paste0("(",.ru_w4_numre,"(?:\\s*,\\s*",.ru_w4_numre,"){1,255})")
+  # A comma-separated literal must be consumed in full. A successful prefix
+  # is not evidence of a valid list: [1,2,NA], 1,2,Inf, a trailing comma,
+  # 257 observations, and damaged brackets must never become [1,2].
+  # The question is NEVER parsed or evaluated as R source.
+  sequence<-paste0(.ru_w4_numre,"(?:\\s*,\\s*",.ru_w4_numre,"){1,255}")
+  bad<-NA_real_
+  # Also reject invalid tokens that precede a later valid-looking sequence.
+  # Otherwise "NA and 1,2,3" could be misread as just [1,2,3].
+  if(.ru_w4_hit("(?<![[:alnum:]_])(?:na|nan|inf(?:inity|inite)?)(?![[:alnum:]_])\\s*(?:[,\\]\\).]|\\b(?:and|or)\\b)",s))
+    return(bad)
+  named<-FALSE
+  body<-NULL
+  before<-""
   if(!is.null(name)) {
-    z<-.ru_w4_group(paste0("\\b(?:",name,")\\s*(?:=|:)\\s*(?:c\\s*\\(\\s*|\\[\\s*)?",numbers),s)
-    if(length(z))part<-z
+    label<-paste0("\\b(?:",name,")\\s*(?:=|:)\\s*")
+    m<-regexpr(label,s,perl=TRUE)
+    if(m[[1L]]>0L) {
+      named<-TRUE
+      body<-substr(s,m[[1L]]+attr(m,"match.length"),nchar(s))
+    }
   }
-  if(!length(part)&&free) {
-    z<-.ru_w4_group(paste0("(?<![[:alnum:].])",numbers),s)
-    if(length(z))part<-z
+  if(is.null(body)) {
+    if(!free)return(NULL)
+    # An unmatched comma before the candidate disqualifies a later suffix
+    # as the complete list (e.g., NA,2,3 or 1,foo,2,3).
+    match<-regexpr(paste0("(?<![[:alnum:].,])",sequence),s,perl=TRUE)
+    if(match[[1L]]<1L)return(NULL)
+    before<-if(match[[1L]]>1L)substr(s,1L,match[[1L]]-1L) else ""
+    body<-substr(s,match[[1L]],nchar(s))
+    # Unlabeled numeric lists may be bracketed or c(...) literals, too.
+    # Refuse an incomplete prefix that follows an earlier bare number.
+    if(.ru_w4_hit(paste0("(?:^|\\s)",.ru_w4_numre,"\\s+$"),before))
+      return(bad)
   }
-  if(!length(part))return(NULL)
-  v<-strsplit(part[[1L]],"\\s*,\\s*",perl=TRUE)[[1L]]
-  if(length(v)>256L)return(NA_real_)
-  result<-lapply(v,.ru_w4_num)
-  if(any(vapply(result,is.null,logical(1L))))return(NA_real_)
-  unlist(result,use.names=FALSE)
+  wrapper<-""
+  if(named) {
+    open<-regexpr("^\\s*(?:c\\s*\\(|\\[)",body,perl=TRUE)
+    if(open[[1L]]==1L) {
+      token<-regmatches(body,open)
+      wrapper<-if(.ru_w4_hit("\\[",token)) "]" else ")"
+      body<-substr(body,attr(open,"match.length")+1L,nchar(body))
+    }
+  } else {
+    preceding<-trimws(before,which="right")
+    if(nzchar(preceding)) {
+      ch<-substr(preceding,nchar(preceding),nchar(preceding))
+      if(ch%in%c("[","("))wrapper<-if(ch=="[") "]" else ")"
+    }
+  }
+  m<-regexpr(paste0("^",sequence),body,perl=TRUE)
+  if(m[[1L]]!=1L)return(if(named)bad else NULL)
+  part<-regmatches(body,m)
+  suffix<-substr(body,attr(m,"match.length")+1L,nchar(body))
+  if(nzchar(wrapper)) {
+    close<-regexpr(paste0("^\\s*\\",wrapper),suffix,perl=TRUE)
+    if(close[[1L]]!=1L)return(bad)
+    suffix<-substr(suffix,attr(close,"match.length")+1L,nchar(suffix))
+  }
+  # A completed vector cannot leave an extra item, unmatched bracket, or
+  # arithmetic continuation. In paired data only a named second vector may
+  # follow a bracketed first vector after a comma.
+  if(.ru_w4_hit("^\\s*[,\\]\\)]",suffix) &&
+     !(nzchar(wrapper) &&
+       .ru_w4_hit(paste0("^\\s*,\\s*(?:(?:x|y)\\s*(?:=|:)|",
+                         "(?:test|compute|calculate|find|give|report|fit|",
+                         "predict|estimate|construct|and\\s+(?:find|compute|",
+                         "calculate|give|test|fit|construct|estimate))\\b)"),
+                  suffix)))
+    return(bad)
+  if(.ru_w4_hit("^\\s*(?:[;|]\\s*|[+*/^]\\s*)",suffix) &&
+     .ru_w4_hit(paste0("^\\s*(?:[;|+*/^]\\s*)",.ru_w4_numre),suffix))
+    return(bad)
+  if(.ru_w4_hit("^[[:alnum:]_]",suffix) ||
+     .ru_w4_hit(paste0("^\\s*(?:and|or|plus)\\s+(?:\\[|c\\s*\\(|",
+                        .ru_w4_numre,")"),suffix) ||
+     .ru_w4_hit(paste0("^\\s+",.ru_w4_numre,"(?:\\s|[,;.]|$)"),suffix))
+    return(bad)
+  values<-strsplit(part,"\\s*,\\s*",perl=TRUE)[[1L]]
+  if(length(values)>256L)return(bad)
+  numbers<-lapply(values,.ru_w4_num)
+  if(any(vapply(numbers,is.null,logical(1L))))return(bad)
+  unlist(numbers,use.names=FALSE)
 }
 .ru_w4_event<-function(text) {
   inner<-.ru_w4_group("\\bp\\s*\\(([^()]*)\\)",text)
@@ -167,6 +232,11 @@
     return(ret("UNSUPPORTED","STATISTICAL_METHOD_NOT_IMPLEMENTED"))
   if(family=="unspecified.statistical_model")
     return(ret("NEEDS_INPUT","SPECIFIC_MODEL_REQUIRED",missing="statistical_model"))
+  if(family=="distribution.poisson" &&
+     .ru_w4_hit("\\b(?:waiting\\s*[- ]?time|wait\\s+(?:until|for)|inter[- ]?arrival|interarrival|time\\s+(?:to|until|between)\\s+(?:(?:the|a)\\s+)?(?:first|next|events?|arrivals?)|continuous\\s+(?:time|duration)|exponential\\s+(?:waiting|time))\\b",s))
+    # A Poisson random variable counts events; continuous waiting time needs
+    # a separate, explicitly specified duration model and assumptions.
+    return(ret("UNSUPPORTED","POISSON_WAITING_TIME_MODEL_INCOMPATIBLE"))
   if(.ru_w4_hit("\\b(?:and|plus)\\s+(?:a\\s+)?(?:histogram|boxplot|chi[- ]square|bootstrap|permutation|skewness|kurtosis|standard error|correlation|anova|plot|forecast)\\b",s))
     return(ret("UNSUPPORTED","ADDITIONAL_OUTPUT_UNSUPPORTED"))
   if(.ru_w4_hit("\\b(?:my dataframe|my data frame|my dataset|from csv|from file|read\\.csv|in column|from dataset)\\b",s))

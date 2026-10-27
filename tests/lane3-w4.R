@@ -282,6 +282,106 @@ mark("hard numeric input caps and invalid probability parameters",{
   assert_refusal("Given P(A)=1.3 find the complement probability of A.",
                  "INVALID","PROBABILITY_OUT_OF_RANGE")
 })
+mark("A5 H028 Poisson counts are not continuous waiting times",{
+  waiting<-c(
+    "Poisson lambda=3 calculate continuous waiting time P(X>2).",
+    "For a Poisson process lambda=3, find P(X>2) for the interarrival time.",
+    "Poisson lambda=3 find the exponential waiting-time probability P(X>2).",
+    "With Poisson lambda=2, find the time until the next arrival P(X>3).",
+    "Poisson lambda=3 calculate waiting time.")
+  for(q in waiting) {
+    p<-assert_refusal(q,"UNSUPPORTED",
+                      "POISSON_WAITING_TIME_MODEL_INCOMPATIBLE")
+    stopifnot(identical(p$family_id,"distribution.poisson"),
+              identical(p$original_question,q),
+              identical(p$method_id,"poisson_exact"),
+              identical(p$model_id,"poisson_count_fixed_exposure"))
+  }
+  # Identical event syntax with an explicitly COUNT-valued random variable
+  # remains legitimately solvable and must preserve its R-code parity.
+  prob<-1-exp(-3)*(1+3+9/2)
+  assert_answer("For Poisson arrivals with lambda=3 per interval, compute P(X>2).",
+                "distribution.poisson",list(probability=prob))
+})
+mark("A5 H062/H063 and malformed vectors cannot silently truncate",{
+  exact<-c(
+    "Compute mean of values = 1,2,NA.",
+    "Compute mean of values = 1,2,Inf.")
+  malformed<-c(exact,
+    "Find median of values=1,2,NaN.",
+    "Calculate mean of values = NA,1,2.",
+    "Calculate mean of values = 1,2,NA,4.",
+    "Compute mean of values = [1,2,Inf].",
+    "Compute mean of values = c(1,2,NA).",
+    "Compute mean of values = 1,2,.",
+    "Compute mean of values = [1,2,3.",
+    "Compute mean of values = [1,2,3,",
+    "Compute mean of values = 1,2,3,",
+    "Compute mean of values = 1,2,3,4,",
+    "Compute mean of values = 1,2,3abc.",
+    "Compute mean of values = 1,2,3 4.",
+    "Compute mean of values = 1,2,3+4.",
+    "Compute mean of values = 1,2,3;4.",
+    "Compute mean of values = 1,2,3,4,not_a_number.",
+    "Calculate mean of values=[1,2,3] and 4.",
+    "Compute mean of values = [1,2,3] ]",
+    "Compute mean of NA and 1,2,3.",
+    "Compute mean of Inf and 1,2,3.",
+    "Find mean of 1,2,3 or 4,5,6.",
+    "Compute mean of values=1,2,3 or 4,5,6.",
+    "Compute mean of values=[1,2,3] or [4,5,6].")
+  for(q in malformed) {
+    p<-assert_refusal(q,"INVALID","NUMERIC_DATA_INVALID")
+    stopifnot(identical(p$family_id,"descriptive.numeric"),
+              !("values"%in%names(p$inputs)))
+  }
+  for(token in c("NA","Inf","NaN","undefined","NULL","FALSE",
+                 "missing","1e309","3foo","-Inf","NA_real_")) {
+    q<-paste0("Compute mean of values = 1,2,",token,".")
+    p<-parse_w4(q)
+    stopifnot(!is.null(p),p$status!="SOLVED",
+              identical(p$original_question,q),
+              compute_w4(p)$status!="SOLVED")
+  }
+})
+mark("invalid inline numeric tokens reject t and paired OLS too",{
+  assert_refusal(
+    paste("For independent approximately normal sample x=[1,2,NA],",
+          "test mu0=2 with a two-sided one-sample t test."),
+    "INVALID","SAMPLE_VALUES_INVALID")
+  assert_refusal(
+    "Fit simple OLS regression with x=[1,2,3] and y=[2,3,Inf], give slope.",
+    "INVALID","OLS_DESIGN_INVALID")
+  assert_refusal(
+    "Fit simple OLS regression with x=[1,2,NA] and y=[2,3,4], give slope.",
+    "INVALID","OLS_DESIGN_INVALID")
+  huge<-paste0("Compute mean of values = ",paste(seq_len(257L),collapse=","))
+  assert_refusal(huge,"UNSUPPORTED","INPUT_CAP_EXCEEDED")
+})
+mark("complete numeric literals preserve supported math and code parity",{
+  assert_answer("Calculate mean of values = 1,2,3.",
+                "descriptive.numeric",list(mean=2))
+  assert_answer("Calculate mean of values = [1,2,3].",
+                "descriptive.numeric",list(mean=2))
+  assert_answer("Calculate mean of values=c(1,2,3).",
+                "descriptive.numeric",list(mean=2))
+  assert_answer("Calculate mean of values=1e-3,2e-3,3e-3.",
+                "descriptive.numeric",list(mean=2e-3))
+  assert_answer(paste0("Calculate mean of values = ",
+                       paste(seq_len(256L),collapse=","),"."),
+                "descriptive.numeric",list(mean=128.5))
+})
+mark("A5 H034 honest normal SD refusal retains exact reason",{
+  q<-"Normal mu=0 sigma=0 calculate P(X<=1)."
+  p<-assert_refusal(q,"INVALID","NORMAL_SD_INVALID")
+  stopifnot(identical(p$family_id,"distribution.normal"),
+            identical(p$method_id,"normal_between"),
+            identical(p$model_id,"normal_continuous_measurement"),
+            isTRUE(all.equal(p$inputs$sigma,0)),
+            isTRUE(all.equal(p$inputs$mu,0)),
+            identical(p$inputs$event$type,"cdf"),
+            identical(p$requested_outputs,"probability"))
+})
 mark("bounded repeated deterministic parsing",{
   q<-"For a continuous uniform U(2,8), compute P(3<X<5)."
   first<-serialize(parse_w4(q),NULL,version=3L)
@@ -366,6 +466,25 @@ if(nzchar(a1_source_dir)){
                 isTRUE(env$.ru_w4_validate_computed(computed,p)),
                 identical(computed$code_preview,""),
                 identical(computed$executed,FALSE))
+    }
+    # SUP56: the A1 R4 trust boundary must preserve precise refusal
+    # reasons, especially the invalid-but-finite sigma=0 case (H034).
+    if(identical(Sys.getenv("RU_A3_W4_A1_R4",unset=""),"1")){
+      for(q in c("Poisson lambda=3 calculate continuous waiting time P(X>2).",
+                 "Compute mean of values = 1,2,NA.",
+                 "Compute mean of values = 1,2,Inf.",
+                 "Normal mu=0 sigma=0 calculate P(X<=1).")){
+        p<-env$.ru_w4_parse(q)
+        r<-env$.ru_w4_compute(p)
+        stopifnot(p$status!="SOLVED",
+                  identical(p$status,r$status),
+                  identical(p$reason_code,r$reason_code),
+                  isTRUE(env$.ru_w4_validate_parsed(p,q)),
+                  isTRUE(env$.ru_w4_validate_computed(r,p)),
+                  is.list(r$answer),length(r$answer)==0L,
+                  identical(r$code_preview,""),
+                  identical(r$executed,FALSE))
+      }
     }
     p<-env$.ru_w4_parse("For Binomial(n=10,p=0.2), find P(X=2).")
     corrupt<-p
