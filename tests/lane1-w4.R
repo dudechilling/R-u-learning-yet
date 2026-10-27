@@ -414,7 +414,7 @@ pass("closed operations exclude unimplemented aliases", {
       unique(unlist(lapply(registry(),function(x)x$operations))))
   }
 })
-pass("installed package without A3 routes W3 dice and concept questions exactly", {
+pass("installed W3 dice and conceptual PMF CDF routes stay unchanged", {
   stopifnot(is.null(dispatch("PMF of the sum of a d6 and d4")))
   q <- "Find PMF CDF expected value and variance for the sum of a d6 and d4."
   ans <- ru_solve(q, open = FALSE)
@@ -430,7 +430,9 @@ pass("installed package without A3 routes W3 dice and concept questions exactly"
             identical(ans$code_status, "NOT_EXECUTED"),
             identical(ans$executed, FALSE), identical(ans$opened, FALSE),
             identical(ans$capability_status, "NOT_REQUESTED"))
-  for (q in c("PMF", "CDF")) {
+  for (q in c("PMF", "CDF", "What is a PMF?",
+              "What is a CDF?", "Explain the PMF",
+              "Define the CDF")) {
     z <- ru_solve(q, open = FALSE)
     stopifnot(identical(z$status, "GUIDED_REFERENCE"),
               identical(z$executed, FALSE),

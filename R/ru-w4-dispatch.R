@@ -547,6 +547,13 @@
 .ru_w4_dispatch <- function(question) {
   parser <- .ru_w4_peer_function("parse")
   if (is.null(parser)) return(NULL)
+  # Bare/conceptual PMF and CDF queries have an established W3
+  # GUIDED_REFERENCE path. Missing a numerical model in A3 must not
+  # replace that beginner lesson with a false needs-input prompt.
+  if (grepl(
+      "^(?:(?:what\\s+is|define|explain)\\s+(?:(?:a|the)\\s+)?)?(?:pmf|cdf)\\s*\\??$",
+      trimws(tolower(question)), perl = TRUE))
+    return(NULL)
   # The frozen W3 dice parser owns every dice question, including its
   # adversarial extra-components, dependence and transformation refusals.
   # A newly recognized W4 model must never override those protections.
