@@ -1,0 +1,412 @@
+# Deterministic W4 candidate recognition. No ambient objects or command execution.
+# Independently frozen IDs from SUP49/A1 exact c931d1f8 registry. The map
+# is immutable and never accepts a function or method string from question text.
+.ru_w4_method_model <- function(family_id) {
+  ids <- list(
+    "descriptive.numeric" = c("describe.numeric", "observed_numeric_list"),
+    "probability.event_scalar" = c("event_probability", "finite_scalar_event_probabilities"),
+    "distribution.binomial" = c("binomial_exact", "iid_bernoulli_fixed_n_p"),
+    "distribution.poisson" = c("poisson_exact", "poisson_count_fixed_exposure"),
+    "distribution.normal" = c("normal_between", "normal_continuous_measurement"),
+    "distribution.uniform_continuous" = c("uniform_interval", "continuous_uniform_bounded_interval"),
+    "inference.one_sample_t" = c("one_sample_t", "iid_unknown_sigma_one_sample_mean"),
+    "regression.simple_ols" = c("linear_regression", "simple_gaussian_ols_with_intercept")
+  )
+  if (!is.character(family_id) || length(family_id) != 1L ||
+      is.na(family_id) || !family_id %in% names(ids))
+    return(c(method_id="unregistered_method", model_id="unregistered_model"))
+  stats::setNames(ids[[family_id]], c("method_id", "model_id"))
+}
+.ru_w4_result <- function(status, reason_code, original_question, family_id,
+                          inputs=list(), requested_outputs=character(),
+                          assumptions=list(), missing_inputs=character(),
+                          parser_rule_id="w4.family.v1") {
+  structure(list(schema_version="ru.guided.v1",status=status,
+    reason_code=reason_code,original_question=original_question,
+    family_id=family_id, inputs=inputs,
+    requested_outputs=unique(as.character(requested_outputs)),
+    assumptions=assumptions,missing_inputs=unique(as.character(missing_inputs)),
+    parser_rule_id=parser_rule_id,
+    method_id=unname(.ru_w4_method_model(family_id)[["method_id"]]),
+    model_id=unname(.ru_w4_method_model(family_id)[["model_id"]]),
+    estimand=if (identical(family_id,"inference.one_sample_t")) "population_mean" else
+      "model_quantity",
+    study_design=if (identical(family_id,"inference.one_sample_t")) "one_sample" else
+      if (identical(family_id,"regression.simple_ols")) "observed_pairs" else "theoretical",
+    execution_scope="INLINE_LITERAL_ONLY"),class=c("ru_w4_parsed","list"))
+}
+.ru_w4_norm <- function(s) {
+  s<-gsub("[\u2010-\u2015\u2212]","-",s,perl=TRUE)
+  s<-gsub("\u2264","<=",s,fixed=TRUE)
+  s<-gsub("\u2265",">=",s,fixed=TRUE)
+  tolower(gsub("\\s+"," ",trimws(s),perl=TRUE))
+}
+.ru_w4_hit<-function(re,s) grepl(re,s,perl=TRUE)
+.ru_w4_group<-function(re,s) {
+  m<-regexec(re,s,perl=TRUE); z<-regmatches(s,m)[[1L]]
+  if(length(z))z[-1L] else character()
+}
+.ru_w4_numre<-"[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:e[+-]?[0-9]+)?"
+.ru_w4_num<-function(s, integer=FALSE,lo=-1e9,hi=1e9) {
+  if(length(s)!=1L||!is.character(s)||is.na(s)||!
+     .ru_w4_hit(paste0("^",.ru_w4_numre,"$"),trimws(s)))return(NULL)
+  x<-suppressWarnings(as.double(s))
+  if(!is.finite(x)||x<lo||x>hi||(integer&&x!=floor(x)))return(NULL)
+  if(integer)as.integer(x) else x
+}
+.ru_w4_key<-function(s,keys,integer=FALSE,lo=-1e9,hi=1e9) {
+  z<-.ru_w4_group(paste0("\\b(?:",keys,")\\s*(?:=|:)\\s*(",
+                         .ru_w4_numre,")"),s)
+  if(!length(z)) z<-.ru_w4_group(paste0("\\b(?:",keys,")\\s+(",.ru_w4_numre,")"),s)
+  if(!length(z))return(NULL)
+  .ru_w4_num(z[[1L]],integer,lo,hi)
+}
+.ru_w4_vec<-function(s,name=NULL,free=FALSE) {
+  # Accept only literal comma-separated decimal arrays, never R code.
+  part<-character()
+  numbers<-paste0("(",.ru_w4_numre,"(?:\\s*,\\s*",.ru_w4_numre,"){1,255})")
+  if(!is.null(name)) {
+    z<-.ru_w4_group(paste0("\\b(?:",name,")\\s*(?:=|:)\\s*(?:c\\s*\\(\\s*|\\[\\s*)?",numbers),s)
+    if(length(z))part<-z
+  }
+  if(!length(part)&&free) {
+    z<-.ru_w4_group(paste0("(?<![[:alnum:].])",numbers),s)
+    if(length(z))part<-z
+  }
+  if(!length(part))return(NULL)
+  v<-strsplit(part[[1L]],"\\s*,\\s*",perl=TRUE)[[1L]]
+  if(length(v)>256L)return(NA_real_)
+  result<-lapply(v,.ru_w4_num)
+  if(any(vapply(result,is.null,logical(1L))))return(NA_real_)
+  unlist(result,use.names=FALSE)
+}
+.ru_w4_event<-function(text) {
+  inner<-.ru_w4_group("\\bp\\s*\\(([^()]*)\\)",text)
+  if(!length(inner))return(NULL)
+  s<-trimws(inner[[1L]])
+  re<-paste0("^(",.ru_w4_numre,")\\s*<\\s*(?:x|z)\\s*<\\s*(",
+             .ru_w4_numre,")$")
+  range<-.ru_w4_group(re,s)
+  if(length(range)==2L) return(list(type="interval",
+    lower=.ru_w4_num(range[[1L]]),upper=.ru_w4_num(range[[2L]])))
+  for(op in c("<=",">=","<",">","==","=")) {
+    z<-.ru_w4_group(paste0("^(?:x|z)\\s*",op,"\\s*(",.ru_w4_numre,")$"),s)
+    if(length(z))return(list(type=switch(op,"<="="cdf",">="="at_least",
+      "<"="below",">"="above","="="exact","=="="exact"),
+      k=.ru_w4_num(z[[1L]])))
+  }
+  z<-.ru_w4_group(paste0("^(?:x|z)\\s+at least\\s+(",.ru_w4_numre,")$"),s)
+  if(length(z))return(list(type="at_least",k=.ru_w4_num(z[[1L]])))
+  NULL
+}
+.ru_w4_parse<-function(question) {
+  if(!is.character(question)||length(question)!=1L||is.na(question)||
+     !nzchar(trimws(question))||!validUTF8(question)||
+     nchar(question,type="bytes")>4096L)
+    return(.ru_w4_result("INVALID","QUESTION_INVALID","",NA_character_))
+  s<-.ru_w4_norm(question)
+  flags<-c(
+    .ru_w4_hit("\\b(?:mean|median|standard deviation|variance|quantile|percentile|quartile|average)\\b",s),
+    .ru_w4_hit("\\bp\\s*\\(\\s*a\\b|\\b(?:union|intersection|complement|conditional probability)\\b",s),
+    .ru_w4_hit("\\b(?:binomial|bernoulli trials?)\\b",s),
+    .ru_w4_hit("\\bpoisson\\b",s),
+    .ru_w4_hit("\\b(?:normal|gaussian)\\b",s),
+    .ru_w4_hit("\\b(?:continuous uniform|uniform distribution|uniform u\\s*\\()\\b",s),
+    .ru_w4_hit("\\b(?:one[- ]sample\\s+t|student'?s?\\s+t|t[- ]test|t\\s+confidence interval)\\b",s),
+    .ru_w4_hit("\\b(?:ordinary least squares|\\bols\\b|simple linear regression|linear regression|regression line)\\b",s))
+  ids<-c("descriptive.numeric","probability.event_scalar","distribution.binomial",
+         "distribution.poisson","distribution.normal","distribution.uniform_continuous",
+         "inference.one_sample_t","regression.simple_ols")
+  if(flags[[7L]] &&
+     .ru_w4_hit("\\b(?:approximately normal|normally distributed|normality|normal population)\\b",s) &&
+     !.ru_w4_hit("\\bnormal distribution\\b",s))
+    flags[[5L]]<-FALSE
+  if(any(flags[3:8]) &&
+     !.ru_w4_hit("\\b(?:population|sample)\\s+(?:variance|standard deviation)\\s+of\\s+(?:data|observations|numbers)\\b",s))
+    flags[[1L]]<-FALSE
+  dice<-.ru_w4_hit("\\b(?:dice|die)\\b|(?<![a-z])[0-9]*d[0-9]+\\b",s)
+  other<-.ru_w4_hit("\\b(?:permutation|bootstrap|holm|chi[- ]?square|anova|welch|paired|multiple regression|multivariable regression|nonlinear regression|two[- ]predictor linear model|hypergeometric|exponential|arima|acf|moran|kriging|geog(?:raphy|raphic)?|gis|spatial|geodesic|time series|survey|sampling|hypothesis test|confidence interval|correlation|covariance|factorial|resampling|logistic|categorical|histogram)\\b",s)
+  hits<-which(flags)
+  if(dice&&!length(hits))return(NULL)
+  family<-if(length(hits))ids[[hits[[1L]]]] else
+    if(other)"unimplemented.statistical_method" else
+    if(.ru_w4_hit("\\bp\\s*\\(\\s*[xz]|\\b(?:cdf|pmf|distribution)\\b",s))
+      "unspecified.statistical_model" else return(NULL)
+  ret<-function(status,reason,inp=list(),outs=character(),missing=character(),
+               assum=list(),fam=family) {
+    # Omit absent/invalid optional literals; never serialize NULL or NA as a
+    # supplied numeric value even in a NEEDS_INPUT or INVALID refusal.
+    if(is.list(inp)&&length(inp))
+      inp<-inp[!vapply(inp,function(z)is.null(z) ||
+        (is.atomic(z)&&anyNA(z)),logical(1L))]
+    .ru_w4_result(status,reason,question,fam,inp,outs,assum,missing)
+  }
+  # Do not misinterpret a legitimate P(3<X<5) as HTML.
+  if(.ru_w4_hit("<\\s*/?\\s*[a-z][a-z0-9]*(?:\\s+[^>]*?)?\\s*/?>|\\x60|\\b(?:system|eval|parse|unlink|source|setwd|file\\.remove)\\s*\\(|ignore\\s+(?:all\\s+)?(?:previous|prior)\\s+instructions",s))
+    return(ret("INVALID","UNSAFE_QUESTION_CONTENT"))
+  # A complete model cannot include an unnoticed random operand,
+  # shifted output, unexplained transformation, or unsupported side request.
+  if(.ru_w4_hit("\\b(?:coin toss|coin flip|flipped coin|spinner|independent coin|random noise|random number|stochastic noise|plus (?:a|an|one) die)\\b",s))
+    return(ret("UNSUPPORTED","ADDITIONAL_RANDOM_COMPONENT_UNSUPPORTED"))
+  if(.ru_w4_hit("\\b(?:plus|minus|subtract|add)\\s+[0-9]+(?:\\.[0-9]+)?\\s*(?:to|from)?\\s*(?:the\\s+)?(?:sum|answer|result)?\\s*$|\\b(?:shifted|(?<!r-)squared|scaled|doubled|twice the|multiplied|divide by)\\b",s))
+    return(ret("UNSUPPORTED","OUTPUT_TRANSFORMATION_UNSUPPORTED"))
+  tokens<-regmatches(s,gregexpr(.ru_w4_numre,s,perl=TRUE))[[1L]]
+  if(length(tokens)>256L)
+    return(ret("UNSUPPORTED","INPUT_CAP_EXCEEDED"))
+  if(length(hits)>1L||dice&&length(hits))
+    return(ret("INVALID","CONFLICTING_STATISTICAL_MODELS"))
+  if(.ru_w4_hit("\\b(?:without replacement|clustered|autocorrelated|mixed effects|spatial dependence|repeated measures|paired observations|survey weighted)\\b",s))
+    return(ret("UNSUPPORTED","DESIGN_INCOMPATIBLE"))
+  # Disjoint statistical methods have priority over an incidental word
+  # such as "mean", "variance", "sample", or a numeric vector. This is the
+  # specific negative gate for independent A5 holdout challenges.
+  if(.ru_w4_hit("\\b(?:bootstrap|permutation|resampling|moving average|acf|arima|holm|benjamini|spatial|moran|kriging|anova|chi[- ]?square|logistic|sample correlation|pearson|randomization|semivariogram|time series)\\b",s) &&
+     !.ru_w4_hit("\\b(?:a normal distribution|binomial distribution|poisson distribution)\\b",s))
+    return(ret("UNSUPPORTED","STATISTICAL_METHOD_NOT_IMPLEMENTED"))
+  if(family=="unimplemented.statistical_method")
+    return(ret("UNSUPPORTED","STATISTICAL_METHOD_NOT_IMPLEMENTED"))
+  if(family=="unspecified.statistical_model")
+    return(ret("NEEDS_INPUT","SPECIFIC_MODEL_REQUIRED",missing="statistical_model"))
+  if(.ru_w4_hit("\\b(?:and|plus)\\s+(?:a\\s+)?(?:histogram|boxplot|chi[- ]square|bootstrap|permutation|skewness|kurtosis|standard error|correlation|anova|plot|forecast)\\b",s))
+    return(ret("UNSUPPORTED","ADDITIONAL_OUTPUT_UNSUPPORTED"))
+  if(.ru_w4_hit("\\b(?:my dataframe|my data frame|my dataset|from csv|from file|read\\.csv|in column|from dataset)\\b",s))
+    return(ret("NEEDS_INPUT","INLINE_DATA_REQUIRED",missing="inline_data"))
+  if(family=="descriptive.numeric" &&
+     .ru_w4_hit("\\b(?:without stating whether|without specifying whether|not specifying whether|unspecified whether|unclear whether)\\b",s))
+    return(ret("NEEDS_INPUT","VARIANCE_CONVENTION_REQUIRED",
+               missing="sample_or_population"))
+  if(family=="descriptive.numeric"){
+    if(.ru_w4_hit("\\b(?:weighted|frequency weights)\\b",s))
+      return(ret("UNSUPPORTED","WEIGHTED_METHOD_UNSUPPORTED"))
+    if(.ru_w4_hit("\\b(?:metres?|kilometres?|fahrenheit|celsius)\\b",s))
+      return(ret("UNSUPPORTED","UNIT_COMPARABILITY_NOT_ESTABLISHED"))
+    outs<-character()
+    if(.ru_w4_hit("\\b(?:mean|average)\\b",s))outs<-c(outs,"mean")
+    if(.ru_w4_hit("\\bmedian\\b",s))outs<-c(outs,"median")
+    v<-.ru_w4_hit("\\bvariance\\b",s); sd<-.ru_w4_hit("\\bstandard deviation\\b",s)
+    conv<-if(.ru_w4_hit("\\b(?:population|entire population|denominator\\s+n(?!\\s*-))\\b",s))"population" else
+      if(.ru_w4_hit("\\b(?:sample|n\\s*-\\s*1)\\b",s))"sample" else NA_character_
+    if((v||sd)&&is.na(conv))return(ret("NEEDS_INPUT","VARIANCE_CONVENTION_REQUIRED",
+                                     missing="sample_or_population"))
+    if(v)outs<-c(outs,paste0(conv,"_variance"))
+    if(sd)outs<-c(outs,paste0(conv,"_sd"))
+    if(.ru_w4_hit("\\b(?:quantile|quartile|percentile)\\b",s))outs<-c(outs,"quantile")
+    if(!length(outs))return(ret("NEEDS_INPUT","STATISTIC_REQUIRED",missing="requested_outputs"))
+    x<-.ru_w4_vec(s,"x|values|observations|sample|data|numbers",TRUE)
+    if(is.null(x))return(ret("NEEDS_INPUT","INLINE_NUMERIC_VALUES_REQUIRED",
+                          outs=outs,missing="values"))
+    if(anyNA(x)||length(x)<2L)return(ret("INVALID","NUMERIC_DATA_INVALID",outs=outs))
+    inp<-list(values=x)
+    if (!is.na(conv)) inp$convention<-conv
+    if("quantile"%in%outs){
+      z<-.ru_w4_group(paste0("\\b(",.ru_w4_numre,")(?:st|nd|rd|th)?\\s*percentile"),s)
+      if(!length(z))z<-.ru_w4_group(paste0("\\bquantile\\s*(?:at|of|=)?\\s*(",.ru_w4_numre,")"),s)
+      if(!length(z))return(ret("NEEDS_INPUT","QUANTILE_LEVEL_REQUIRED",inp,outs,"quantile_probability"))
+      prob<-.ru_w4_num(z[[1L]])
+      if(is.null(prob))return(ret("INVALID","QUANTILE_LEVEL_INVALID",inp,outs))
+      if(.ru_w4_hit("percentile",s)||prob>1)prob<-prob/100
+      if(prob<0||prob>1)return(ret("INVALID","QUANTILE_LEVEL_INVALID",inp,outs))
+      if(!.ru_w4_hit("\\btype[- ]?7\\b",s))
+        return(ret("NEEDS_INPUT","QUANTILE_METHOD_REQUIRED",inp,outs,"quantile_method"))
+      inp$quantile_probability<-prob
+    }
+    assum<-list(missing="No missing observations are supplied.")
+    if(!is.na(conv))assum$convention<-conv
+    return(ret("SOLVED","W4_INPUTS_VALID",inp,outs,assum=assum))
+  }
+  if(family=="probability.event_scalar"){
+    op<-if(.ru_w4_hit("\\bunion\\b|a\\s+or\\s+b",s))"union" else
+      if(.ru_w4_hit("\\b(?:given b|conditional)\\b|p\\s*\\(\\s*a\\s*\\|\\s*b",s))"conditional" else
+      if(.ru_w4_hit("\\bcomplement\\b|a\\s*\\^\\s*c\\b",s))"complement" else NULL
+    if(is.null(op))return(ret("NEEDS_INPUT","EVENT_OPERATION_REQUIRED",missing="event_operation"))
+    a<-.ru_w4_key(s,"p\\s*\\(\\s*a\\s*\\)",lo=0,hi=1)
+    b<-.ru_w4_key(s,"p\\s*\\(\\s*b\\s*\\)",lo=0,hi=1)
+    joint<-.ru_w4_key(s,"p\\s*\\(\\s*a\\s*(?:intersection|and)\\s*b\\s*\\)",lo=0,hi=1)
+    raw_a<-.ru_w4_key(s,"p\\s*\\(\\s*a\\s*\\)")
+    raw_b<-.ru_w4_key(s,"p\\s*\\(\\s*b\\s*\\)")
+    raw_j<-.ru_w4_key(s,"p\\s*\\(\\s*a\\s*(?:intersection|and)\\s*b\\s*\\)")
+    if(any(vapply(list(raw_a,raw_b,raw_j),function(z)!is.null(z)&&(z<0||z>1),logical(1L))))
+      return(ret("INVALID","PROBABILITY_OUT_OF_RANGE"))
+    inp<-list(p_a=a,p_b=b,p_intersection=joint)
+    # Unstated event operands are missing, never present-as-NULL typed numbers.
+    inp<-inp[!vapply(inp,is.null,logical(1L))]
+    needed<-switch(op,union=c("p_a","p_b","p_intersection"),
+                   conditional=c("p_b","p_intersection"),complement="p_a")
+    missing<-needed[vapply(needed,function(n)is.null(inp[[n]]),logical(1L))]
+    if(length(missing))return(ret("NEEDS_INPUT","EVENT_PROBABILITIES_REQUIRED",inp,op,missing))
+    if(!is.null(a)&&!is.null(b)&&!is.null(joint)&&
+       (joint<max(0,a+b-1)-1e-12||joint>min(a,b)+1e-12))
+      return(ret("INVALID","PROBABILITY_AXIOMS_VIOLATED",inp,op))
+    if(op=="conditional"&&b==0)return(ret("INVALID","ZERO_CONDITIONING_PROBABILITY",inp,op))
+    return(ret("SOLVED","W4_INPUTS_VALID",inp,op,
+               assum=list(model="Events share one consistent probability space.")))
+  }
+  if(family%in%c("distribution.binomial","distribution.poisson",
+                 "distribution.normal","distribution.uniform_continuous")){
+    moments<-character()
+    if(.ru_w4_hit("\\b(?:expected value|expectation|mean of (?:the )?distribution)\\b",s))
+      moments<-c(moments,"expected_value")
+    if(.ru_w4_hit("\\bvariance\\b",s))
+      moments<-c(moments,"variance")
+    event<-.ru_w4_event(s)
+    if(is.null(event) && family=="distribution.normal" &&
+       .ru_w4_hit("\\b(?:percentile|quantile)\\b",s)) {
+      z<-.ru_w4_group(paste0("\\b(",.ru_w4_numre,")(?:st|nd|rd|th)?\\s*percentile\\b"),s)
+      if(!length(z))z<-.ru_w4_group(paste0("\\bquantile\\s*(?:at|of|=)?\\s*(",.ru_w4_numre,")"),s)
+      if(!length(z))return(ret("NEEDS_INPUT","QUANTILE_LEVEL_REQUIRED",missing="quantile_probability"))
+      qp<-.ru_w4_num(z[[1L]])
+      if(is.null(qp))return(ret("INVALID","QUANTILE_LEVEL_INVALID"))
+      if(.ru_w4_hit("percentile",s)||qp>1)qp<-qp/100
+      if(qp<=0||qp>=1)return(ret("INVALID","QUANTILE_LEVEL_INVALID"))
+      event<-list(type="quantile",probability=qp)
+    }
+    wants_event<-.ru_w4_hit("\\bp\\s*\\(|\\b(?:pmf|cdf|tail|probability)\\b",s)
+    if(is.null(event) && (wants_event||!length(moments)))
+      return(ret("NEEDS_INPUT","EVENT_THRESHOLD_REQUIRED",outs=moments,missing="event"))
+    if(!is.null(event)&&any(vapply(event,is.null,logical(1L))))
+      return(ret("INVALID","EVENT_LITERAL_INVALID"))
+    outputs<-c(if(!is.null(event))if(event$type=="quantile")"quantile" else "probability",
+               moments)
+    if(family=="distribution.binomial"){
+      n<-.ru_w4_key(s,"n|trials?",TRUE,0,5000)
+      prob<-.ru_w4_key(s,"p|success probability",FALSE,0,1)
+      raw_n<-.ru_w4_key(s,"n|trials?",FALSE)
+      raw_p<-.ru_w4_key(s,"p|success probability",FALSE)
+      if(!is.null(raw_n)&&(raw_n<0||raw_n!=floor(raw_n)))
+        return(ret("INVALID","BINOMIAL_TRIALS_INVALID"))
+      if(!is.null(raw_n)&&raw_n>5000)
+        return(ret("UNSUPPORTED","INPUT_CAP_EXCEEDED"))
+      if(!is.null(raw_p)&&(raw_p<0||raw_p>1))
+        return(ret("INVALID","PROBABILITY_OUT_OF_RANGE"))
+      inp<-list(n=n,p=prob)
+      if(!is.null(event))inp$event<-event
+      missing<-c(if(is.null(n))"n",if(is.null(prob))"p")
+      if(length(missing))return(ret("NEEDS_INPUT","BINOMIAL_PARAMETERS_REQUIRED",inp,outputs,missing))
+      if(.ru_w4_hit("\\b(?:waiting time|minutes|without replacement)\\b",s))
+        return(ret("UNSUPPORTED","INCOMPATIBLE_VARIABLE_MODEL",inp,outputs))
+      if(!is.null(event)&&event$type%in%c("interval","quantile"))return(ret("UNSUPPORTED","DISCRETE_INTERVAL_UNSUPPORTED",inp,outputs))
+      if(!is.null(event)&&(is.null(event$k)||event$k!=floor(event$k)))return(ret("INVALID","DISCRETE_THRESHOLD_INVALID",inp,outputs))
+      return(ret("SOLVED","W4_INPUTS_VALID",inp,outputs,
+                 assum=list(model="n iid Bernoulli trials with fixed success probability.")))
+    }
+    if(family=="distribution.poisson"){
+      lambda<-.ru_w4_key(s,"lambda|rate",FALSE,0,1e6)
+      raw_lambda<-.ru_w4_key(s,"lambda|rate")
+      if(!is.null(raw_lambda)&&raw_lambda<0)
+        return(ret("INVALID","POISSON_RATE_INVALID"))
+      if(!is.null(raw_lambda)&&raw_lambda>1e6)
+        return(ret("UNSUPPORTED","INPUT_CAP_EXCEEDED"))
+      inp<-list(lambda=lambda)
+      if(!is.null(event))inp$event<-event
+      if(is.null(lambda))return(ret("NEEDS_INPUT","POISSON_RATE_REQUIRED",inp,outputs,"lambda"))
+      if(!is.null(event)&&(is.null(event$k)||event$type%in%c("interval","quantile")||event$k!=floor(event$k)))
+        return(ret("UNSUPPORTED","COUNT_EVENT_UNSUPPORTED",inp,outputs))
+      return(ret("SOLVED","W4_INPUTS_VALID",inp,outputs,
+                 assum=list(model="Poisson number of arrivals in the specified interval.")))
+    }
+    if(family=="distribution.normal"){
+      standard<-.ru_w4_hit("\\bstandard normal\\b|\\bp\\s*\\(\\s*z",s)
+      mu<-if(standard)0 else .ru_w4_key(s,"mu|mean")
+      sigma<-if(standard)1 else .ru_w4_key(s,"sigma|sd|standard deviation")
+      inp<-list(mu=mu,sigma=sigma)
+      if(!is.null(event))inp$event<-event
+      missing<-c(if(is.null(mu))"mu",if(is.null(sigma))"sigma")
+      if(length(missing))return(ret("NEEDS_INPUT","NORMAL_PARAMETERS_REQUIRED",inp,outputs,missing))
+      if(sigma<=0)return(ret("INVALID","NORMAL_SD_INVALID",inp,outputs))
+      if(!is.null(event)&&event$type=="exact")return(ret("UNSUPPORTED","CONTINUOUS_POINT_EVENT_UNSUPPORTED",inp,outputs))
+      return(ret("SOLVED","W4_INPUTS_VALID",inp,outputs,
+                 assum=list(model="Continuous normal with stated mu and sigma.")))
+    }
+    if(family=="distribution.uniform_continuous"){
+      ab<-.ru_w4_group(paste0("\\bu\\s*\\(\\s*(",.ru_w4_numre,")\\s*,\\s*(",
+                               .ru_w4_numre,")\\s*\\)"),s)
+      a<-if(length(ab)==2L).ru_w4_num(ab[[1L]]) else .ru_w4_key(s,"a|lower")
+      b<-if(length(ab)==2L).ru_w4_num(ab[[2L]]) else .ru_w4_key(s,"b|upper")
+      inp<-list(a=a,b=b)
+      if(!is.null(event))inp$event<-event
+      missing<-c(if(is.null(a))"a",if(is.null(b))"b")
+      if(length(missing))return(ret("NEEDS_INPUT","UNIFORM_BOUNDS_REQUIRED",inp,outputs,missing))
+      if(a>=b)return(ret("INVALID","UNIFORM_BOUNDS_INVALID",inp,outputs))
+      if(!is.null(event)&&event$type=="exact")return(ret("UNSUPPORTED","CONTINUOUS_POINT_EVENT_UNSUPPORTED",inp,outputs))
+      return(ret("SOLVED","W4_INPUTS_VALID",inp,outputs,
+                 assum=list(model="Continuous uniform distribution with finite ordered bounds.")))
+    }
+  }
+  if(family=="inference.one_sample_t"){
+    if(.ru_w4_hit("\\b(?:known population sigma|z[- ]test|known sigma)\\b",s))
+      return(ret("UNSUPPORTED","KNOWN_SIGMA_Z_METHOD_REQUIRED"))
+    mode<-if(.ru_w4_hit("\\b(?:confidence interval|\\bci\\b)\\b",s))"interval" else "test"
+    outs<-if(mode=="test")c("t_statistic","degrees_freedom","p_value") else c("ci_lower","ci_upper")
+    x<-.ru_w4_vec(s,"x|observations|sample|data|values",TRUE)
+    if(is.null(x))return(ret("NEEDS_INPUT","INLINE_SAMPLE_REQUIRED",outs=outs,missing="values"))
+    if(anyNA(x)||length(x)<3L||stats::sd(x)==0)return(ret("INVALID","SAMPLE_VALUES_INVALID",outs=outs))
+    declared_independent<-.ru_w4_hit("\\b(?:independent|iid|random sample)\\b",s)
+    declared_normal<-.ru_w4_hit("\\b(?:normal population|approximately normal|normally distributed|normality)\\b",s)
+    if(!declared_independent||!declared_normal)
+      return(ret("NEEDS_INPUT","T_DESIGN_ASSUMPTIONS_REQUIRED",
+                 list(values=x),outs,
+                 c(if(!declared_independent)"independent_sampling",
+                   if(!declared_normal)"normality_assumption")))
+    if(mode=="test"){
+      mu0<-.ru_w4_key(s,"mu0|mu_0|null mean|null value")
+      if(is.null(mu0))return(ret("NEEDS_INPUT","NULL_MEAN_REQUIRED",list(values=x),outs,"mu0"))
+      alternative<-if(.ru_w4_hit("\\b(?:two[- ]sided|two[- ]tailed)\\b",s))"two.sided" else
+        if(.ru_w4_hit("\\b(?:greater|right[- ]tailed)\\b",s))"greater" else
+        if(.ru_w4_hit("\\b(?:less|left[- ]tailed)\\b",s))"less" else NULL
+      if(is.null(alternative))return(ret("NEEDS_INPUT","TEST_ALTERNATIVE_REQUIRED",
+                                       list(values=x,mu0=mu0),outs,"alternative"))
+      inp<-list(values=x,mode=mode,mu0=mu0,alternative=alternative)
+    } else {
+      z<-.ru_w4_group(paste0("\\b(",.ru_w4_numre,")\\s*%\\s*(?:student\\s+t\\s+)?confidence"),s)
+      if(!length(z))return(ret("NEEDS_INPUT","CONFIDENCE_LEVEL_REQUIRED",list(values=x),outs,"confidence_level"))
+      level<-.ru_w4_num(z[[1L]])
+      if(is.null(level)||level<=0||level>=100)return(ret("INVALID","CONFIDENCE_LEVEL_INVALID",list(values=x),outs))
+      if(!.ru_w4_hit("\\btwo[- ]sided\\b",s))
+        return(ret("NEEDS_INPUT","INTERVAL_SIDE_REQUIRED",list(values=x),outs,"side"))
+      inp<-list(values=x,mode=mode,confidence_level=level/100,alternative="two.sided")
+    }
+    return(ret("SOLVED","W4_INPUTS_VALID",inp,outs,
+               assum=list(independence="Declared, not independently verified.",
+                          normality="Assumed approximately normal by question.")))
+  }
+  if(family=="regression.simple_ols"){
+    if(.ru_w4_hit("\\b(?:multiple|multivariable|logistic|mixed|polynomial|weighted|spatial)\\b",s))
+      return(ret("UNSUPPORTED","REGRESSION_MODEL_UNSUPPORTED"))
+    x<-.ru_w4_vec(s,"x");y<-.ru_w4_vec(s,"y")
+    if(is.null(x)||is.null(y)){
+      pairs<-regmatches(s,gregexpr(paste0("\\(\\s*",.ru_w4_numre,"\\s*,\\s*",
+                                          .ru_w4_numre,"\\s*\\)"),s,perl=TRUE))[[1L]]
+      if(length(pairs)>=3L&&length(pairs)<=256L){
+        coords<-lapply(pairs,function(pair)as.double(regmatches(pair,gregexpr(.ru_w4_numre,pair,perl=TRUE))[[1L]]))
+        x<-vapply(coords,function(z)z[[1L]],numeric(1L))
+        y<-vapply(coords,function(z)z[[2L]],numeric(1L))
+      }
+    }
+    outs<-character()
+    if(.ru_w4_hit("\\b(?:fit|regression|line|coefficients?|intercept|slope)\\b",s))
+      outs<-c("intercept","slope")
+    if(.ru_w4_hit("\\b(?:r[- ]?squared|r\\s*\\^\\s*2)\\b",s))
+      outs<-c(outs,"r_squared")
+    if(.ru_w4_hit("\\b(?:predict|prediction)\\b",s))outs<-c(outs,"prediction")
+    if(!length(outs))return(ret("NEEDS_INPUT","REGRESSION_OUTPUT_REQUIRED",missing="requested_outputs"))
+    if(is.null(x)||is.null(y))
+      return(ret("NEEDS_INPUT","PAIRED_NUMERIC_DATA_REQUIRED",outs=outs,missing=c("x","y")))
+    inp<-list(x=x,y=y)
+    if(length(x)!=length(y)||length(x)<3L||anyNA(x)||anyNA(y)||
+       stats::var(x)==0||stats::var(y)==0)
+      return(ret("INVALID","OLS_DESIGN_INVALID",inp,outs))
+    if(.ru_w4_hit("\\b(?:p[- ]value|standard error|confidence interval|causes|causal)\\b",s))
+      return(ret("UNSUPPORTED","OLS_INFERENCE_UNSUPPORTED",inp,outs))
+    if("prediction"%in%outs){
+      at<-.ru_w4_key(s,"x0|x_new|predict\\s+(?:y\\s+)?at\\s+x")
+      if(is.null(at))return(ret("NEEDS_INPUT","PREDICTION_VALUE_REQUIRED",inp,outs,"prediction_x"))
+      if(at<min(x)||at>max(x))
+        return(ret("UNSUPPORTED","EXTRAPOLATION_REQUIRES_REVIEW",inp,outs))
+      inp$prediction_x<-at
+    }
+    return(ret("SOLVED","W4_INPUTS_VALID",inp,outs,
+               assum=list(model="Simple descriptive OLS; x predictor, y response.",
+                          inference="No causal claim or independent-error inference.")))
+  }
+  ret("UNSUPPORTED","FAMILY_NOT_IMPLEMENTED")
+}
