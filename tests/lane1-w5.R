@@ -161,7 +161,11 @@ legacy <- list(
  c("Can I use a paired t test?","independent_paired"),
  c("What is the difference between standard deviation and standard error?",
    "sampling_distributions"),
- c("What does a p-value mean?","hypothesis_tests_pvalues")
+ c("What does a p-value mean?","hypothesis_tests_pvalues"),
+ c("With known population variance 9, calculate a 90% confidence interval for average rainfall",
+   "mean_ci_z"),
+ c("Given a known population variance, estimate a mean confidence interval",
+   "mean_ci_z")
 )
 for (item in legacy)
   check(identical(find_one(item[[1L]]),item[[2L]]),
@@ -228,7 +232,8 @@ negative <- c(
 )
 negative <- c(negative,
   "Compute the sample mean and run a paired t-test",
-  "Calculate sample standard deviation and perform an independent two sample t-test")
+  "Calculate sample standard deviation and perform an independent two sample t-test",
+  "Compute population variance and estimate a mean confidence interval")
 check(length(negative)>=40L && !anyDuplicated(negative),
       "40 independently distinct incompatible prompts")
 for (q in negative) {

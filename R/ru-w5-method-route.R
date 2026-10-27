@@ -122,6 +122,11 @@
   add("normal_right_tail","\\bnormal\\b.*\\b(right\\s+tail|greater\\s+than|above)\\b")
   add("normal_percentile","\\bnormal\\b.*\\b(percentile|quantile)\\b")
   add("percentile_cutoff","\\bpercentile\\s+cutoff\\b")
+  # Known population variance is an input for a mean interval, not a
+  # second request to calculate sample variance.
+  if (has("\\bconfidence\\s+interval\\b|\\bci\\b") &&
+      has("\\b((known|given|provided|specified)\\s+(population\\s+)?variance|population\\s+variance\\s+(is\\s+)?(known|given|provided|specified))\\b"))
+    ops <- setdiff(ops,"variance")
   # A regression coefficient's confidence interval belongs to the fitted
   # regression, rather than an unrelated second interval-estimation method.
   if ("linear_regression" %in% ops &&
