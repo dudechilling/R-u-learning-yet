@@ -26,6 +26,18 @@
   found <- ids[vapply(ids,function(id)
     grepl(paste0("(?<![[:alnum:]_])",id,"(?![[:alnum:]_])"),
           q,perl=TRUE),logical(1))]
+  if (!length(found)) {
+    # The fixed bank's actual walkthrough questions are the only accepted
+    # natural-language aliases. Never fuzzy-match incompatible operations.
+    bank <- .ru_db("problems.csv")
+    bank <- bank[bank$id %in% ids,,drop=FALSE]
+    if (nrow(bank) && "question" %in% names(bank)) {
+      normalized <- function(x) gsub("[^[:alnum:]]+"," ",
+                                    tolower(trimws(x)),perl=TRUE)
+      hits <- bank$id[normalized(bank$question)==normalized(query)]
+      found <- unique(hits)
+    }
+  }
   if (length(found)!=1L) return(NULL)
   id <- found[[1L]]
   args <- .ru_allowed_arguments(id)
