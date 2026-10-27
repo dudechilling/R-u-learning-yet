@@ -115,7 +115,8 @@
 
 .ru_w4_validate_typed_inputs <- function(inputs, family_id,
                                          status = "SOLVED",
-                                         requested_outputs = character()) {
+                                         requested_outputs = character(),
+                                         reason_code = "") {
   item <- .ru_w4_family(family_id)
   if (!is.list(inputs) || !identical(class(inputs), "list") ||
       (length(inputs) && (is.null(names(inputs)) ||
@@ -131,6 +132,13 @@
     # A3 may preserve missing optional fields as NULL in NEEDS_INPUT.
     # NULL is not numerical input and cannot silently supply a required role.
     if (is.null(value)) next
+    # A nonpositive normal SD is truthful INVALID evidence, not an input
+    # eligible for SOLVED. Preserve finite values and the exact reason only.
+    if (identical(family_id, "distribution.normal") &&
+        identical(name, "sigma") && identical(status, "INVALID") &&
+        identical(reason_code, "NORMAL_SD_INVALID") &&
+        .ru_w4_typed_field(value, "finite_scalar") && value <= 0)
+      next
     if (!.ru_w4_typed_field(value, item$input_schema[[name]],
                             cap = item$resource_caps$max_vector))
       return(FALSE)
@@ -251,7 +259,7 @@
       !is.list(x$inputs) || !identical(class(x$inputs), "list") ||
       length(x$inputs) > 36L || !isTRUE(.ru_w4_literal(x$inputs)) ||
       !.ru_w4_validate_typed_inputs(x$inputs, x$family_id, x$status,
-                                    x$requested_outputs) ||
+                                    x$requested_outputs, x$reason_code) ||
       !is.character(x$requested_outputs) ||
       anyNA(x$requested_outputs) ||
       anyDuplicated(x$requested_outputs) ||
@@ -283,6 +291,12 @@
       !identical(x$execution_scope, "INLINE_LITERAL_ONLY"))
     return(FALSE)
   item <- .ru_w4_family(x$family_id)
+  if (identical(x$status, "INVALID") &&
+      identical(x$family_id, "distribution.normal") &&
+      identical(x$reason_code, "NORMAL_SD_INVALID") &&
+      (!.ru_w4_typed_field(x$inputs$sigma, "finite_scalar") ||
+       x$inputs$sigma > 0))
+    return(FALSE)
   if (identical(x$status, "SOLVED")) {
     if (is.null(item) ||
         !identical(x$reason_code, "W4_INPUTS_VALID") ||
@@ -400,7 +414,7 @@
   TRUE
 }
 
-.ru_w4_validate_computed <- function(x, parsed) {
+.ru_w4_validate_computed_schema <- function(x, parsed) {
   required <- c("schema_version", "status", "reason_code",
                 "original_question", "family_id", "inputs",
                 "requested_outputs", "assumptions", "answer",
@@ -469,6 +483,37 @@
       return(FALSE)
   }
   TRUE
+}
+
+# Separate semantic trust boundary: a schema-valid SOLVED object cannot
+# authorize teaching, display or Copy on asserted checks alone.
+# Re-derive from the bounded, typed parsed question using the sole fixed,
+# package-local A3 computation adapter. This never executes generated R code.
+.ru_w4_validate_result_integrity <- function(computed, parsed) {
+  if (!.ru_w4_validate_computed_schema(computed, parsed))
+    return(FALSE)
+  if (!identical(computed$status, "SOLVED"))
+    return(TRUE)
+  if (!identical(parsed$status, "SOLVED") ||
+      !.ru_w4_validate_typed_inputs(parsed$inputs, parsed$family_id,
+                                    parsed$status, parsed$requested_outputs,
+                                    parsed$reason_code))
+    return(FALSE)
+  producer <- .ru_w4_peer_function("compute")
+  if (is.null(producer)) return(FALSE)
+  expected <- tryCatch(producer(parsed), error = function(e) NULL)
+  if (is.null(expected) ||
+      !.ru_w4_validate_computed_schema(expected, parsed) ||
+      !identical(expected$status, "SOLVED"))
+    return(FALSE)
+  # Equality covers every output value and its ID/order, checks, declared
+  # assumptions, and the entire static code preview. No textual allowlist
+  # alone can make an arbitrary substituted preview trustworthy.
+  identical(computed, expected)
+}
+
+.ru_w4_validate_computed <- function(x, parsed) {
+  .ru_w4_validate_result_integrity(x, parsed)
 }
 
 .ru_w4_refusal <- function(parsed, status = "UNSUPPORTED",
@@ -544,6 +589,34 @@
   structure(computed, class = c("ru_w4_computed", "list"))
 }
 
+.ru_w4_dice_composite_unsupported <- function(question) {
+  if (!is.character(question) || length(question) != 1L ||
+      is.na(question) || !validUTF8(question) ||
+      nchar(question, type = "bytes") > 4096L)
+    return(FALSE)
+  s <- tolower(question)
+  dice <- grepl("\\b(?:die|dice)\\b|(?<![[:alpha:]])[0-9]*d[0-9]+\\b",
+                s, perl = TRUE)
+  if (!dice) return(FALSE)
+  # An explicit separate requested method is not licensed by a correct
+  # calculation of the dice component. This additive gate deliberately
+  # leaves the frozen W3 dice parser, math and ordinary error gates intact.
+  methods <- paste0(
+    "(?:ols|(?:simple|multiple|linear|logistic|polynomial)?\\s*",
+    "regression|anova|chi[- ]?square|t[- ]?test|bootstrap|permutation",
+    "|hypothesis\\s+test|confidence\\s+interval|histogram",
+    "|scatter\\s*plot|time\\s+series|moran(?:'s)?\\s+i",
+    "|spatial\\s+(?:model|regression|interpolation))")
+  conjunction <- "(?:\\b(?:and|also|then|plus|as\\s+well\\s+as|followed\\s+by|in\\s+addition)\\b|[,;])"
+  action <- "(?:fit|run|perform|compute|calculate|estimate|construct|draw|plot|test|model|make|give|provide)"
+  forward <- paste0(conjunction, ".{0,100}\\b", action,
+                    "\\b.{0,60}\\b", methods, "\\b")
+  reverse <- paste0("\\b", action, "\\b.{0,60}\\b",
+                    methods, "\\b.{0,100}", conjunction,
+                    ".{0,100}\\b(?:dice|die|[0-9]*d[0-9]+)\\b")
+  grepl(forward, s, perl = TRUE) || grepl(reverse, s, perl = TRUE)
+}
+
 .ru_w4_dispatch <- function(question) {
   parser <- .ru_w4_peer_function("parse")
   if (is.null(parser)) return(NULL)
@@ -554,6 +627,12 @@
       "^(?:(?:what\\s+is|define|explain)\\s+(?:(?:a|the)\\s+)?)?(?:pmf|cdf)\\s*\\??$",
       trimws(tolower(question)), perl = TRUE))
     return(NULL)
+  # Refuse a genuinely separate requested analysis BEFORE W3's dice
+  # fallback, which historically could return a misleading partial SOLVED.
+  if (.ru_w4_dice_composite_unsupported(question))
+    return(.ru_w4_refusal(
+      list(original_question = question, family_id = "dice_sum_independent_fair"),
+      "UNSUPPORTED", "ADDITIONAL_ANALYSIS_UNSUPPORTED"))
   # The frozen W3 dice parser owns every dice question, including its
   # adversarial extra-components, dependence and transformation refusals.
   # A newly recognized W4 model must never override those protections.

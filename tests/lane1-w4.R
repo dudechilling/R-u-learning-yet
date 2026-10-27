@@ -13,6 +13,8 @@ valid_registry <- private(".ru_w4_validate_registry")
 valid_family <- private(".ru_w4_validate_family")
 valid_parsed <- private(".ru_w4_validate_parsed")
 valid_computed <- private(".ru_w4_validate_computed")
+valid_computed_schema <- private(".ru_w4_validate_computed_schema")
+valid_integrity <- private(".ru_w4_validate_result_integrity")
 valid_answer <- private(".ru_w4_validate_answer")
 valid_inputs <- private(".ru_w4_validate_typed_inputs")
 dispatch_parsed <- private(".ru_w4_dispatch_parsed")
@@ -205,8 +207,11 @@ pass("SOLVED requires complete exact outputs and validated answer shape", {
   out$status<-"SOLVED";out$reason_code<-"W4_COMPUTATION_VERIFIED"
   out$answer<-ans;out$checks<-list(verified=TRUE,parity=TRUE)
   out$code_preview<-"stats::dbinom(2L,10L,.2)";out$executed<-FALSE
+  # This is a deliberately synthetic schema fixture, not an A3 answer.
+  # A structural pass is not semantic or code-preview integrity.
   stopifnot(valid_answer(ans,p$requested_outputs,p$family_id),
-            valid_computed(out,p))
+            valid_computed_schema(out,p),
+            !valid_computed(out,p),!valid_integrity(out,p))
   bad<-out;bad$requested_outputs<-c("probability","variance")
   stopifnot(!valid_computed(bad,p))
   req<-p;req$requested_outputs<-c("probability","variance")
@@ -388,6 +393,126 @@ pass("nested event payloads and model forgeries are rejected", {
     inputs=list(lambda=-1,event=list(type="exact",k=0)),
     assumptions=list(model="Poisson model."))
   stopifnot(!valid_parsed(p,p$original_question))
+})
+
+pass("SUP56 H034 truthful invalid normal SD survives every boundary", {
+  q <- "Normal mu=0 sigma=0 calculate P(X<=1)"
+  parse_w4 <- peer("parse"); compute_w4 <- peer("compute")
+  stopifnot(is.function(parse_w4), is.function(compute_w4))
+  p <- parse_w4(q)
+  stopifnot(identical(p$status,"INVALID"),
+            identical(p$reason_code,"NORMAL_SD_INVALID"),
+            identical(p$inputs$sigma,0),
+            valid_parsed(p,q))
+  c <- compute_w4(p)
+  stopifnot(identical(c$status,"INVALID"),
+            identical(c$reason_code,"NORMAL_SD_INVALID"),
+            valid_computed_schema(c,p),valid_computed(c,p))
+  z <- dispatch_parsed(p,q)
+  stopifnot(identical(z$status,"INVALID"),
+            identical(z$reason_code,"NORMAL_SD_INVALID"),
+            identical(z$code_preview,""),identical(z$executed,FALSE))
+  public <- ru_solve(q,open=FALSE)
+  stopifnot(identical(public$status,"INVALID"),
+            identical(public$reason_code,"NORMAL_SD_INVALID"),
+            identical(public$executed,FALSE),
+            identical(public$code_preview,""))
+  bad <- p;bad$status <- "SOLVED";bad$reason_code <- "W4_INPUTS_VALID"
+  stopifnot(!valid_parsed(bad,q))
+  bad <- p;bad$inputs$sigma <- Inf
+  stopifnot(!valid_parsed(bad,q))
+  bad <- p;bad$inputs$sigma <- NA_real_
+  stopifnot(!valid_parsed(bad,q))
+  bad <- p;bad$inputs$sigma <- 1
+  stopifnot(!valid_parsed(bad,q))
+  bad <- p;bad$inputs$sigma <- quote(unsafe())
+  stopifnot(!valid_parsed(bad,q))
+})
+
+pass("SUP56 H070 explicit compound dice analysis refuses partial answer", {
+  q <- paste("For independent fair dice d6 plus d4 compute",
+             "P(sum=4) and fit an OLS model.")
+  stopifnot(isTRUE(private(".ru_w4_dice_composite_unsupported")(q)))
+  raw <- dispatch(q)
+  stopifnot(identical(raw$status,"UNSUPPORTED"),
+            identical(raw$reason_code,"ADDITIONAL_ANALYSIS_UNSUPPORTED"),
+            identical(raw$answer,list()),identical(raw$code_preview,""))
+  pub <- ru_solve(q,open=FALSE)
+  stopifnot(identical(pub$status,"UNSUPPORTED"),
+            identical(pub$reason_code,"ADDITIONAL_ANALYSIS_UNSUPPORTED"),
+            !isTRUE(pub$executed),identical(pub$code_preview,""))
+  other <- c(
+    "For d6 and d4 compute the PMF and run an ANOVA.",
+    "For two fair dice d6 plus d4 calculate the mean; also perform a t-test.",
+    "For d6 and d4 calculate P(sum=6), and draw a histogram.",
+    "Fit a simple linear regression and then calculate the sum of d6 and d4.")
+  for (q in other)
+    stopifnot(identical(ru_solve(q,open=FALSE)$status,"UNSUPPORTED"))
+  for (q in c("PMF and expected value for sum of d6 and d4.",
+              "For independent fair d6 and d4, find P(sum=4).",
+              "Find PMF CDF expected value and variance for sum of d6 and d4.")) {
+    ans <- ru_solve(q,open=FALSE)
+    stopifnot(identical(ans$status,"SOLVED"),
+              identical(ans$answer$total_outcomes,24L))
+  }
+})
+
+pass("SUP56 genuine A3 result integrity rejects numeric and code forgeries", {
+  q <- "Binomial n=10 p=0.2 calculate P(X=2)."
+  parse_w4 <- peer("parse"); compute_w4 <- peer("compute")
+  stopifnot(is.function(parse_w4),is.function(compute_w4))
+  p <- parse_w4(q);a <- compute_w4(p)
+  stopifnot(identical(a$status,"SOLVED"),valid_parsed(p,q),
+            valid_computed_schema(a,p),valid_integrity(a,p),
+            valid_computed(a,p))
+  changed <- a
+  changed$answer$quantities$value[[1L]] <- 0.987654
+  stopifnot(valid_computed_schema(changed,p),
+            !valid_integrity(changed,p),!valid_computed(changed,p))
+  preview <- a
+  preview$code_preview <- paste0("system","('touch /tmp/A5-W4-DO-NOT-CREATE')")
+  stopifnot(valid_computed_schema(preview,p),
+            !valid_integrity(preview,p),!valid_computed(preview,p),
+            !file.exists("/tmp/A5-W4-DO-NOT-CREATE"))
+  checks <- a; checks$checks$verified <- FALSE
+  stopifnot(!valid_computed_schema(checks,p),
+            !valid_integrity(checks,p))
+  z <- dispatch_parsed(p,q)
+  stopifnot(identical(z$status,"UNSUPPORTED"),
+            identical(z$reason_code,"FAMILY_NOT_QUALIFIED"),
+            identical(z$code_preview,""))
+})
+
+pass("SUP56 eight actual A3 families cross the semantic integrity gate", {
+  queries <- c(
+    "Find mean of numbers 2,4,6,8.",
+    "Given P(A intersection B)=0.2 and P(B)=0.5, compute P(A given B).",
+    "For Binomial(n=10,p=0.2), find P(X=2).",
+    "For Poisson(lambda=2), find P(X=0).",
+    "For Normal(mu=100,sigma=15), find P(X<=115).",
+    "For a continuous uniform U(2,8), compute P(3<X<5).",
+    paste("For independent approximately normal sample",
+      "x=[7,9,10,12,12], test mu0=8 with a two-sided one-sample t test."),
+    paste("Fit simple OLS regression with x=[1,2,3,4] and",
+      "y=[2,3,5,7], give intercept slope and r-squared."))
+  parse_w4 <- peer("parse");compute_w4 <- peer("compute")
+  for(i in seq_along(ids)) {
+    q <- queries[[i]]
+    p <- parse_w4(q)
+    stopifnot(identical(p$status,"SOLVED"),
+              identical(p$family_id,ids[[i]]),
+              valid_parsed(p,q))
+    computed <- compute_w4(p)
+    stopifnot(identical(computed$status,"SOLVED"),
+              valid_computed_schema(computed,p),
+              valid_integrity(computed,p),
+              valid_computed(computed,p))
+    tampered <- computed
+    tampered$answer$quantities$value[[1L]] <-
+      tampered$answer$quantities$value[[1L]] + 0.125
+    stopifnot(!valid_integrity(tampered,p),
+              !valid_computed(tampered,p))
+  }
 })
 
 pass("closed operations exclude unimplemented aliases", {
