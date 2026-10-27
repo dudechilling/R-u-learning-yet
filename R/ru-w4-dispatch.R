@@ -28,6 +28,9 @@
 # Inline literals only: no data.frames, calls, expressions, environments,
 # formulas, objects, classed vectors, or arbitrary user workspace references.
 .ru_w4_literal <- function(x, depth = 0L, budget = 20000L) {
+  # NULL represents an absent optional A3 field. Base R also regards NULL
+  # as an empty pairlist, so validate absence before banning pairlists.
+  if (is.null(x)) return(TRUE)
   if (depth > 4L || length(x) > budget ||
       is.object(x) || is.environment(x) || is.language(x) ||
       is.expression(x) || is.function(x) || is.pairlist(x))
@@ -52,38 +55,178 @@
   is.null(x)
 }
 
-.ru_w4_typed_field <- function(value, type, cap = 20000L) {
-  number <- is.numeric(value) && length(value) == 1L &&
-    !is.object(value) && !is.na(value) && is.finite(value)
+.ru_w4_typed_field <- function(value, type, cap = 256L) {
+  number <- (is.double(value) || is.integer(value)) &&
+    !is.object(value) && length(value) == 1L && !is.na(value) &&
+    is.finite(value) && abs(value) <= 1e9
+  vector <- (is.double(value) || is.integer(value)) &&
+    !is.object(value) && length(value) >= 1L &&
+    length(value) <= min(cap, 256L) && !anyNA(value) &&
+    all(is.finite(value)) && all(abs(value) <= 1e9)
   switch(type,
     finite_scalar = number,
     positive_scalar = number && value > 0,
+    nonnegative_scalar = number && value >= 0,
     bounded_probability = number && value >= 0 && value <= 1,
     bounded_integer = number && value >= 0 && value <= 1000000 &&
       value == trunc(value),
-    finite_vector = is.numeric(value) && !is.object(value) &&
-      length(value) >= 1L && length(value) <= cap &&
-      !anyNA(value) && all(is.finite(value)),
+    trial_count = number && value >= 0 && value <= 5000 &&
+      value == trunc(value),
+    signed_integer_threshold = number && value == trunc(value),
+    finite_vector = vector,
     operation_id = .ru_w4_output_id(value),
     side = .ru_w4_scalar(value) &&
       value %in% c("two.sided", "less", "greater"),
+    variance_convention = .ru_w4_scalar(value) &&
+      value %in% c("sample", "population"),
+    inference_mode = .ru_w4_scalar(value) &&
+      value %in% c("test", "interval"),
     declared_model = .ru_w4_scalar(value),
     confidence_level = number && value > 0 && value < 1,
+    typed_event = .ru_w4_valid_event(value),
     FALSE)
 }
 
-.ru_w4_validate_typed_inputs <- function(inputs, family_id) {
+.ru_w4_valid_event <- function(event) {
+  if (is.null(event)) return(TRUE)
+  if (!is.list(event) || !identical(class(event), "list") ||
+      is.null(names(event)) || anyNA(names(event)) ||
+      anyDuplicated(names(event)) || !.ru_w4_scalar(event$type))
+    return(FALSE)
+  type <- event$type
+  if (type %in% c("exact", "cdf", "below", "at_least", "above")) {
+    if (!setequal(names(event), c("type", "k"))) return(FALSE)
+    return(.ru_w4_typed_field(event$k, "finite_scalar"))
+  }
+  if (identical(type, "interval")) {
+    if (!setequal(names(event), c("type", "lower", "upper")))
+      return(FALSE)
+    return(.ru_w4_typed_field(event$lower, "finite_scalar") &&
+      .ru_w4_typed_field(event$upper, "finite_scalar") &&
+      event$lower < event$upper)
+  }
+  if (identical(type, "quantile")) {
+    if (!setequal(names(event), c("type", "probability")))
+      return(FALSE)
+    return(.ru_w4_typed_field(event$probability, "confidence_level"))
+  }
+  FALSE
+}
+
+.ru_w4_validate_typed_inputs <- function(inputs, family_id,
+                                         status = "SOLVED",
+                                         requested_outputs = character()) {
   item <- .ru_w4_family(family_id)
-  if (is.null(item)) return(TRUE) # Unimplemented families may still abstain.
   if (!is.list(inputs) || !identical(class(inputs), "list") ||
       (length(inputs) && (is.null(names(inputs)) ||
-       anyNA(names(inputs)) || anyDuplicated(names(inputs)))))
+        anyNA(names(inputs)) || anyDuplicated(names(inputs)) ||
+        !all(vapply(names(inputs), .ru_w4_output_id, logical(1L))))))
     return(FALSE)
-  known <- intersect(names(inputs), names(item$input_schema))
-  all(vapply(known, function(name)
-    .ru_w4_typed_field(inputs[[name]], item$input_schema[[name]],
-                       cap = item$resource_caps$max_vector),
-    logical(1L)))
+  # Unknown models may abstain, but cannot carry arbitrary pseudo-data.
+  if (is.null(item)) return(!identical(status, "SOLVED") &&
+                            !length(inputs))
+  if (!all(names(inputs) %in% names(item$input_schema))) return(FALSE)
+  for (name in names(inputs)) {
+    value <- inputs[[name]]
+    # A3 may preserve missing optional fields as NULL in NEEDS_INPUT.
+    # NULL is not numerical input and cannot silently supply a required role.
+    if (is.null(value)) next
+    if (!.ru_w4_typed_field(value, item$input_schema[[name]],
+                            cap = item$resource_caps$max_vector))
+      return(FALSE)
+  }
+  if (!identical(status, "SOLVED")) return(TRUE)
+  have <- function(name) name %in% names(inputs) &&
+    !is.null(inputs[[name]])
+  outs <- requested_outputs
+  id <- family_id
+  if (identical(id, "descriptive.numeric")) {
+    if (!have("values") || length(inputs$values) < 2L) return(FALSE)
+    if (any(outs %in% c("sample_variance", "population_variance",
+                       "sample_sd", "population_sd"))) {
+      if (!have("convention") ||
+          !identical(inputs$convention, if (any(grepl("^sample_", outs)))
+            "sample" else "population"))
+        return(FALSE)
+      if (any(grepl("^sample_", outs)) &&
+          any(grepl("^population_", outs))) return(FALSE)
+    }
+    if ("quantile" %in% outs && !have("quantile_probability"))
+      return(FALSE)
+  } else if (identical(id, "probability.event_scalar")) {
+    if (length(outs) != 1L) return(FALSE)
+    needed <- switch(outs[[1L]],
+      union = c("p_a", "p_b", "p_intersection"),
+      conditional = c("p_b", "p_intersection"),
+      complement = "p_a", character())
+    if (!length(needed) ||
+        !all(vapply(needed, have, logical(1L)))) return(FALSE)
+    a <- if (have("p_a")) inputs$p_a else NULL
+    b <- if (have("p_b")) inputs$p_b else NULL
+    j <- if (have("p_intersection")) inputs$p_intersection else NULL
+    if (!is.null(j) && !is.null(a) && j > a + 1e-12) return(FALSE)
+    if (!is.null(j) && !is.null(b) && j > b + 1e-12) return(FALSE)
+    if (!is.null(a) && !is.null(b) && !is.null(j) &&
+        j < max(0, a + b - 1) - 1e-12) return(FALSE)
+    if ("conditional" %in% outs && b <= 0) return(FALSE)
+  } else if (id %in% c("distribution.binomial", "distribution.poisson",
+                       "distribution.normal",
+                       "distribution.uniform_continuous")) {
+    required <- switch(id,
+      "distribution.binomial" = c("n", "p"),
+      "distribution.poisson" = "lambda",
+      "distribution.normal" = c("mu", "sigma"),
+      "distribution.uniform_continuous" = c("a", "b"))
+    if (!all(vapply(required, have, logical(1L)))) return(FALSE)
+    if (identical(id, "distribution.normal") && inputs$sigma <= 0)
+      return(FALSE)
+    if (identical(id, "distribution.uniform_continuous") &&
+        inputs$a >= inputs$b) return(FALSE)
+    ev <- inputs$event
+    needs_prob <- "probability" %in% outs
+    needs_quantile <- "quantile" %in% outs
+    if ((needs_prob || needs_quantile) && is.null(ev)) return(FALSE)
+    if (!is.null(ev)) {
+      tp <- ev$type
+      if (id %in% c("distribution.binomial", "distribution.poisson")) {
+        if (!tp %in% c("exact", "cdf", "below", "at_least", "above") ||
+            ev$k != trunc(ev$k) || !needs_prob) return(FALSE)
+      } else {
+        if (!tp %in% c("cdf", "below", "at_least", "above",
+                       "interval", "quantile")) return(FALSE)
+        if (identical(tp, "quantile")) {
+          if (!identical(id, "distribution.normal") ||
+              !needs_quantile || needs_prob) return(FALSE)
+        } else if (!needs_prob || needs_quantile) return(FALSE)
+      }
+    }
+  } else if (identical(id, "inference.one_sample_t")) {
+    if (!have("values") || length(inputs$values) < 3L ||
+        stats::var(inputs$values) <= 0 ||
+        !have("mode") || !have("alternative"))
+      return(FALSE)
+    if (identical(inputs$mode, "test")) {
+      if (!have("mu0") ||
+          !setequal(outs, c("t_statistic", "degrees_freedom", "p_value")))
+        return(FALSE)
+    } else if (!have("confidence_level") ||
+               !identical(inputs$alternative, "two.sided") ||
+               !setequal(outs, c("ci_lower", "ci_upper"))) {
+      return(FALSE)
+    }
+  } else if (identical(id, "regression.simple_ols")) {
+    if (!have("x") || !have("y") ||
+        length(inputs$x) != length(inputs$y) ||
+        length(inputs$x) < 3L ||
+        stats::var(inputs$x) <= 0 || stats::var(inputs$y) <= 0)
+      return(FALSE)
+    if ("prediction" %in% outs) {
+      if (!have("prediction_x") ||
+          inputs$prediction_x < min(inputs$x) ||
+          inputs$prediction_x > max(inputs$x)) return(FALSE)
+    } else if (have("prediction_x")) return(FALSE)
+  }
+  TRUE
 }
 
 .ru_w4_validate_parsed <- function(x, question) {
@@ -106,8 +249,9 @@
         (!identical(x$status, "SOLVED") &&
          identical(x$family_id, NA_character_))) ||
       !is.list(x$inputs) || !identical(class(x$inputs), "list") ||
-      length(x$inputs) > 36L || !.ru_w4_literal(x$inputs) ||
-      !.ru_w4_validate_typed_inputs(x$inputs, x$family_id) ||
+      length(x$inputs) > 36L || !isTRUE(.ru_w4_literal(x$inputs)) ||
+      !.ru_w4_validate_typed_inputs(x$inputs, x$family_id, x$status,
+                                    x$requested_outputs) ||
       !is.character(x$requested_outputs) ||
       anyNA(x$requested_outputs) ||
       anyDuplicated(x$requested_outputs) ||
@@ -115,7 +259,13 @@
       !all(vapply(x$requested_outputs, .ru_w4_output_id, logical(1L))) ||
       !is.list(x$assumptions) ||
       !identical(class(x$assumptions), "list") ||
-      length(x$assumptions) > 24L || !.ru_w4_literal(x$assumptions) ||
+      length(x$assumptions) > 24L ||
+      !isTRUE(.ru_w4_literal(x$assumptions)) ||
+      (length(x$assumptions) &&
+       (is.null(names(x$assumptions)) ||
+        anyDuplicated(names(x$assumptions)) ||
+        !all(vapply(names(x$assumptions), .ru_w4_output_id,
+                    logical(1L))))) ||
       !is.character(x$missing_inputs) ||
       anyNA(x$missing_inputs) || anyDuplicated(x$missing_inputs) ||
       length(x$missing_inputs) > 32L ||
@@ -123,21 +273,49 @@
       !.ru_w4_scalar(x$parser_rule_id))
     return(FALSE)
   for (key in intersect(optional, names(x))) {
-    if (!.ru_w4_scalar(x[[key]])) return(FALSE)
+    if (!.ru_w4_scalar(x[[key]]) &&
+        !(key %in% c("method_id", "model_id", "estimand") &&
+          !identical(x$status, "SOLVED") &&
+          identical(x[[key]], NA_character_)))
+      return(FALSE)
   }
   if ("execution_scope" %in% names(x) &&
       !identical(x$execution_scope, "INLINE_LITERAL_ONLY"))
     return(FALSE)
   item <- .ru_w4_family(x$family_id)
-  if (!is.null(item) && identical(x$status, "SOLVED")) {
-    if (!length(x$requested_outputs) || length(x$missing_inputs) ||
-        !all(x$requested_outputs %in% item$operations))
+  if (identical(x$status, "SOLVED")) {
+    if (is.null(item) ||
+        !identical(x$reason_code, "W4_INPUTS_VALID") ||
+        !length(x$requested_outputs) || length(x$missing_inputs) ||
+        !all(x$requested_outputs %in% item$operations) ||
+        !all(c("method_id", "model_id", "estimand", "study_design",
+               "execution_scope") %in% names(x)) ||
+        !identical(x$method_id, item$method_id) ||
+        !identical(x$model_id, item$model_id) ||
+        !identical(x$estimand, if (identical(x$family_id,
+                                             "inference.one_sample_t"))
+          "population_mean" else "model_quantity") ||
+        !identical(x$study_design,
+          if (identical(x$family_id, "inference.one_sample_t"))
+            "one_sample"
+          else if (identical(x$family_id, "regression.simple_ols"))
+            "observed_pairs" else "theoretical"))
       return(FALSE)
-    if ("method_id" %in% names(x) &&
-        !identical(x$method_id, item$method_id))
+    expected <- switch(x$family_id,
+      "descriptive.numeric" =
+        if ("convention" %in% names(x$inputs) &&
+            !is.null(x$inputs$convention))
+          c("convention", "missing") else "missing",
+      "probability.event_scalar" = "model",
+      "inference.one_sample_t" = c("independence", "normality"),
+      "regression.simple_ols" = c("model", "inference"),
+      "model")
+    if (!setequal(names(x$assumptions), expected) ||
+        !all(vapply(x$assumptions, .ru_w4_scalar, logical(1L))))
       return(FALSE)
-    if ("model_id" %in% names(x) &&
-        !identical(x$model_id, item$model_id))
+    if (identical(x$family_id, "descriptive.numeric") &&
+        "convention" %in% names(x$inputs) &&
+        !identical(x$assumptions$convention, x$inputs$convention))
       return(FALSE)
   }
   # Do not infer an answer from a single word naming a method. A complete
@@ -204,11 +382,22 @@
   } else if (is.na(tab) || !.ru_w4_output_id(tab)) {
     return(FALSE)
   }
-  ids <- unique(c(x$quantities$output_id, tab))
-  length(requested) > 0L && !anyDuplicated(requested) &&
-    setequal(ids, requested) &&
-    all(ids %in% item$operations) &&
-    all(requested %in% item$operations)
+  ids <- c(x$quantities$output_id, tab)
+  if (!length(requested) || anyDuplicated(requested) ||
+      anyDuplicated(ids) || length(ids) != length(requested) ||
+      !setequal(ids, requested) ||
+      !all(ids %in% item$operations) ||
+      !all(requested %in% item$operations))
+    return(FALSE)
+  q <- x$quantities
+  probability_ids <- c("probability", "union", "conditional",
+                       "complement", "p_value", "r_squared")
+  if (any(q$output_id %in% probability_ids &
+          (q$value < -1e-12 | q$value > 1+1e-12)))
+    return(FALSE)
+  df <- q$value[q$output_id == "degrees_freedom"]
+  if (length(df) && any(df < 1 | df != trunc(df))) return(FALSE)
+  TRUE
 }
 
 .ru_w4_validate_computed <- function(x, parsed) {
@@ -218,7 +407,11 @@
                 "checks", "code_preview", "executed", "missing_inputs")
   optional <- c("method_id", "model_id", "estimand",
                 "study_design", "execution_scope")
-  if (!is.list(x) || !all(required %in% names(x)) ||
+  if (!is.list(parsed) || !is.character(parsed$original_question) ||
+      length(parsed$original_question) != 1L ||
+      is.na(parsed$original_question) ||
+      !.ru_w4_validate_parsed(parsed, parsed$original_question) ||
+      !is.list(x) || !all(required %in% names(x)) ||
       anyDuplicated(names(x)) ||
       !all(names(x) %in% c(required, optional)) ||
       !identical(x$schema_version, "ru.guided.v1") ||
@@ -234,31 +427,45 @@
       !identical(x$missing_inputs, parsed$missing_inputs) ||
       !identical(x$executed, FALSE) ||
       !is.list(x$checks) || !identical(class(x$checks), "list") ||
+      (length(x$checks) &&
+       (is.null(names(x$checks)) || anyDuplicated(names(x$checks)))) ||
+      !all(vapply(x$checks, function(v)
+        is.logical(v) && length(v) == 1L && !is.na(v),
+        logical(1L))) ||
       !is.character(x$code_preview) ||
       length(x$code_preview) != 1L || is.na(x$code_preview) ||
       !validUTF8(x$code_preview) ||
-      nchar(x$code_preview, type = "bytes") > 65536L)
-    return(FALSE)
-  if (!all(intersect(optional, names(parsed)) %in% names(x)))
+      nchar(x$code_preview, type = "bytes") > 65536L ||
+      !identical(intersect(optional, names(x)),
+                 intersect(optional, names(parsed))))
     return(FALSE)
   for (key in intersect(optional, names(x))) {
-    if (!.ru_w4_scalar(x[[key]])) return(FALSE)
-    if (key %in% names(parsed) && !identical(x[[key]], parsed[[key]]))
-      return(FALSE)
+    if (!identical(x[[key]], parsed[[key]])) return(FALSE)
   }
   if ("execution_scope" %in% names(x) &&
       !identical(x$execution_scope, "INLINE_LITERAL_ONLY"))
     return(FALSE)
   if (identical(x$status, "SOLVED")) {
-    if (!identical(x$checks$verified, TRUE) ||
+    if (!identical(parsed$status, "SOLVED") ||
+        !identical(x$reason_code, "W4_COMPUTATION_VERIFIED") ||
+        !length(x$checks) ||
+        !all(vapply(x$checks, isTRUE, logical(1L))) ||
+        !identical(x$checks$verified, TRUE) ||
         !nzchar(x$code_preview) ||
         length(x$missing_inputs) ||
         !.ru_w4_validate_answer(x$answer, x$requested_outputs,
                                 x$family_id))
       return(FALSE)
   } else {
+    if (identical(parsed$status, "SOLVED") &&
+        !identical(x$status, "INVALID")) return(FALSE)
+    if (!identical(parsed$status, "SOLVED") &&
+        (!identical(x$status, parsed$status) ||
+         !identical(x$reason_code, parsed$reason_code)))
+      return(FALSE)
     if (!is.list(x$answer) || length(x$answer) ||
-        nzchar(x$code_preview))
+        nzchar(x$code_preview) ||
+        isTRUE(x$checks$verified))
       return(FALSE)
   }
   TRUE
