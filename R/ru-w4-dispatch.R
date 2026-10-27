@@ -596,27 +596,137 @@
       is.na(question) || !validUTF8(question) ||
       nchar(question, type = "bytes") > 4096L)
     return(FALSE)
-  s <- tolower(question)
-  dice <- grepl("\\b(?:die|dice)\\b|(?<![[:alpha:]])[0-9]*d[0-9]+\\b",
-                s, perl = TRUE)
-  if (!dice) return(FALSE)
-  # An explicit separate requested method is not licensed by a correct
-  # calculation of the dice component. This additive gate deliberately
-  # leaves the frozen W3 dice parser, math and ordinary error gates intact.
-  methods <- paste0(
-    "(?:ols|(?:simple|multiple|linear|logistic|polynomial)?\\s*",
-    "regression|anova|chi[- ]?square|t[- ]?test|bootstrap|permutation",
-    "|hypothesis\\s+test|confidence\\s+interval|histogram",
-    "|scatter\\s*plot|time\\s+series|moran(?:'s)?\\s+i",
-    "|spatial\\s+(?:model|regression|interpolation))")
-  conjunction <- "(?:\\b(?:and|also|then|plus|as\\s+well\\s+as|followed\\s+by|in\\s+addition)\\b|[,;])"
-  action <- "(?:fit|run|perform|compute|calculate|estimate|construct|draw|plot|test|model|make|give|provide)"
-  forward <- paste0(conjunction, ".{0,100}\\b", action,
-                    "\\b.{0,60}\\b", methods, "\\b")
-  reverse <- paste0("\\b", action, "\\b.{0,60}\\b",
-                    methods, "\\b.{0,100}", conjunction,
-                    ".{0,100}\\b(?:dice|die|[0-9]*d[0-9]+)\\b")
-  grepl(forward, s, perl = TRUE) || grepl(reverse, s, perl = TRUE)
+  text <- .ru_w3_normalize(question)
+  if (!grepl("\\b(?:die|dice)\\b|(?<![[:alpha:]])[0-9]*d[0-9]+\\b",
+             text, perl = TRUE))
+    return(FALSE)
+
+  # Preserve the frozen W3 parser's exact missing-input, unsafe-content,
+  # invalid-model and event-refusal reasons. Its deterministic parsed plan
+  # is read only to verify whether a proposed public SOLVED is at risk;
+  # the W3 numerical solver is NOT called before this whole-request gate.
+  plan <- tryCatch(.ru_w3_parse(question), error = function(e) NULL)
+  if (!is.list(plan) || !identical(plan$status, "SOLVED") ||
+      !identical(plan$family_id, "dice_sum_independent_fair"))
+    return(FALSE)
+
+  # A closed, positive vocabulary for the TWO-fair-dice question grammar:
+  # dice operands/model declarations, instructional connectives, and ONLY
+  # the events/PMF/CDF/moments that W3 can actually compute. No registry
+  # lookup, workspace data, arbitrary callback, or executable expression.
+  # Numbers are supplied literally and checked by the unchanged W3 parser.
+  # Unknown substantive words in the request are unaccounted analytical
+  # instructions, regardless of their verb, order or punctuation. Refuse
+  # instead of returning a correct but incomplete dice answer.
+  model_words <- c(
+    "dice", "die", "sided", "faced", "side", "sides", "face", "faces",
+    "fair", "independent", "independently", "ordinary", "standard",
+    "identical", "equally", "likely", "equiprobable", "unbiased",
+    "roll", "rolls", "rolling", "rolled", "throw", "throws",
+    "throwing", "toss", "tosses", "tossing", "possible", "ordered",
+    "outcome", "outcomes", "pair", "pairs", "each", "both",
+    "first", "second", "two", "one", "separate", "single",
+    "sum", "total", "addition", "added", "adding", "plus",
+    "random", "variable", "discrete", "uniform", "model")
+  operation_words <- c(
+    "p", "x", "s", "pmf", "cdf", "probability", "probabilities",
+    "chance", "chances", "likelihood", "mass", "function",
+    "distribution", "cumulative", "expected", "value", "values",
+    "expectation", "e", "mean", "variance", "var", "event", "events",
+    "even", "equal", "equals", "at", "most", "least", "less",
+    "greater", "than", "number", "numbers", "count", "counts",
+    "frequency", "frequencies", "r", "code", "example", "examples",
+    "answer", "answers", "table", "tables", "steps", "step",
+    "explanation", "explain", "calculation", "calculations",
+    "assumption", "assumptions", "interpretation", "interpretations")
+  context_words <- c(
+    "a", "an", "the", "this", "these", "that", "those", "of",
+    "for", "to", "in", "on", "from", "with", "by", "as", "about",
+    "between", "among", "and", "or", "also", "then", "together",
+    "so", "therefore", "where", "when", "which", "what", "how",
+    "who", "why", "is", "are", "be", "being", "was", "were",
+    "have", "has", "do", "does", "can", "could", "would", "will",
+    "we", "i", "you", "me", "please", "given", "assuming",
+    "assume", "suppose", "under", "if", "all", "any", "every",
+    "using", "use", "used", "such", "respectively", "their", "its")
+  request_words <- c(
+    "find", "compute", "calculate", "determine", "evaluate",
+    "derive", "obtain", "give", "report", "show", "list", "tell",
+    "describe", "state", "write", "solve", "provide", "display",
+    "work", "out", "identify", "get", "make", "create", "draw",
+    "plot", "produce", "construct", "generate", "estimate",
+    "perform", "run", "fit", "test", "predict", "return")
+  # Action words by themselves are not approval for an unknown object:
+  # "produce a boxplot", "construct a prediction interval", or "fit an
+  # OLS model" still have uncovered substantive tokens.
+  allowed <- unique(c(model_words, operation_words, context_words,
+                      request_words))
+  lexical <- gsub("(?<![[:alpha:]])[0-9]*d[0-9]+\\b",
+                  " dice ", text, perl = TRUE)
+  lexical <- gsub("[^a-z]+", " ", lexical, perl = TRUE)
+  tokens <- strsplit(trimws(lexical), "\\s+", perl = TRUE)[[1L]]
+  if (any(!tokens %in% allowed))
+    return(TRUE)
+
+  # A second independently requested action requires its own supported
+  # output. Conjunctions within the dice operand/model description do not
+  # create output obligations. In request-bearing clauses, however, an
+  # action without a mapped output is unaccounted, even when it happens to
+  # use only familiar words (e.g. "... and test" or "... and predict").
+  clauses <- strsplit(gsub("[,;]+", " and ", text, perl = TRUE),
+                      "\\b(?:and|also|then)\\b", perl = TRUE)[[1L]]
+  request_verb <- paste0(
+    "\\b(?:find|compute|calculate|determine|evaluate|derive|obtain",
+    "|give|report|show|list|tell|describe|state|write|solve",
+    "|provide|display|identify|make|create|draw|plot|produce",
+    "|construct|generate|estimate|perform|run|fit|test|predict",
+    "|return)\\b")
+  supported_object <- paste0(
+    "\\b(?:pmf|cdf|probability|probabilities|chance|chances",
+    "|likelihood|distribution|mass|cumulative|expected|expectation",
+    "|mean|variance|var|event|events|sum|total|outcomes?|count",
+    "|frequency|frequencies|answer|answers|table|tables",
+    "|explanation|steps|assumptions?|code)\\b",
+    "|\\bp\\s*\\(")
+  for (clause in clauses) {
+    if (grepl(request_verb, clause, perl = TRUE) &&
+        !grepl(supported_object, clause, perl = TRUE))
+      return(TRUE)
+    # Probability or a moment of an individual die is not a statistic
+    # of the SUM. A normal operand declaration ("d6 and d4") is safe.
+    if (grepl("\\b(?:first|second)\\s+(?:die|dice)\\b",
+              clause, perl = TRUE) &&
+        grepl("\\b(?:pmf|cdf|probability|chance|mean|variance|expected|expectation)\\b|\\bp\\s*\\(",
+              clause, perl = TRUE) &&
+        !grepl("\\b(?:sum|total)\\b", clause, perl = TRUE))
+      return(TRUE)
+  }
+  # A confidence level modifies the requested estimand; W3 has no
+  # confidence/prediction-interval output or percent-qualified inference.
+  if (grepl("[0-9]+\\s*%", text, perl = TRUE))
+    return(TRUE)
+
+  # Positive output accountability: every supported requested operation
+  # must occur in the W3 typed plan. The output IDs and event identities
+  # are read from W3's existing bounded mathematical-event recognition,
+  # not guessed from loose words such as "probability" alone.
+  patterns <- list(
+    pmf = "\\bpmf\\b|\\bprobability\\s+(?:mass\\s+function|distribution)\\b|\\bprobability\\s+function\\b",
+    cdf = "\\bcdf\\b|\\bcumulative\\s+(?:distribution|probability)\\b",
+    expected_value = "\\bexpected\\s+value\\b|\\bexpectation\\b|\\bmean\\b|\\be\\s*\\(\\s*x\\s*\\)",
+    variance = "\\bvariance\\b|\\bvar\\s*\\(\\s*x\\s*\\)")
+  recognized <- names(patterns)[vapply(patterns, grepl,
+                                       logical(1L), x = text, perl = TRUE)]
+  event_plan <- .ru_w3_events(text)
+  if (!is.list(event_plan) || !is.null(event_plan$error))
+    return(TRUE)
+  if (length(event_plan$events))
+    recognized <- c(recognized, "events")
+  if (!setequal(recognized, plan$requested_outputs))
+    return(TRUE)
+  if (!identical(event_plan$events, plan$inputs$events))
+    return(TRUE)
+  FALSE
 }
 
 .ru_w4_dispatch <- function(question) {

@@ -457,6 +457,152 @@ pass("SUP56 H070 explicit compound dice analysis refuses partial answer", {
   }
 })
 
+pass("SUP61 U008 U011 whole dice request cannot be partially SOLVED", {
+  audit <- private(".ru_w4_dice_composite_unsupported")
+  failures <- c(
+    "For fair dice d6 plus d4 calculate P(sum=4) and produce a boxplot.",
+    "For fair dice d6 plus d4 calculate P(sum=4) and construct a 95% prediction interval.",
+    "For independent fair dice d6 plus d4 compute P(sum=4) and fit an OLS model.")
+  for (q in failures) {
+    # Frozen W3's parser would have reported a partial SOLVED;
+    # the additive A1 audit refuses BEFORE any W3 computation.
+    legacy <- private(".ru_w3_parse")(q)
+    stopifnot(identical(legacy$status, "SOLVED"),
+              isTRUE(audit(q)))
+    raw <- dispatch(q)
+    stopifnot(identical(raw$status,"UNSUPPORTED"),
+              identical(raw$reason_code,"ADDITIONAL_ANALYSIS_UNSUPPORTED"),
+              !length(raw$answer),
+              identical(raw$code_preview,""),
+              identical(raw$executed,FALSE))
+    result <- ru_solve(q,open=FALSE)
+    stopifnot(inherits(result,"ru_solution"),
+              identical(result$status,"UNSUPPORTED"),
+              identical(result$reason_code,"ADDITIONAL_ANALYSIS_UNSUPPORTED"),
+              !length(result$answer),
+              identical(result$code_preview,""),
+              identical(result$code_status,"NOT_EXECUTED"),
+              identical(result$executed,FALSE),
+              identical(result$opened,FALSE))
+  }
+})
+
+pass("SUP61 affirmative supported dice output and context inventory", {
+  audit <- private(".ru_w4_dice_composite_unsupported")
+  valid <- c(
+    "For independent fair d6 and d4, find P(sum=4).",
+    "Find PMF CDF expected value and variance for sum of d6 and d4.",
+    paste("Determine the PMF, expected value and variance",
+          "of the sum of one six-sided die and one four-sided die."),
+    paste("What is the probability distribution (PMF) of the",
+          "sum of one six-sided die and one four-sided die [1-4]?"),
+    "Find P(X=4 or X=5) for the sum of d6 and d4.",
+    "Compute P(X<=6) and variance for the sum of d6 plus d4.",
+    "For two fair independent dice d6 and d4 calculate PMF and CDF of their sum.",
+    "For fair d6 plus d4 compute expectation and variance of their total.",
+    "Give P(sum=4) and the PMF of the total from d6 and d4.",
+    paste("For a fair six-sided die and a fair four-sided die,",
+          "find P(sum=4)."),
+    "Find the probability the sum is even for two fair dice d6 and d4.",
+    "Find P(sum=4) and explain the assumptions for independent fair d6 and d4.",
+    "For two fair dice d6 plus d4 calculate P(sum=4) and provide R code.")
+  for (q in valid) {
+    stopifnot(!isTRUE(audit(q)))
+    result <- ru_solve(q, open=FALSE)
+    stopifnot(identical(result$status,"SOLVED"),
+              identical(result$reason_code,"DICE_SUM_VERIFIED"),
+              identical(result$answer$total_outcomes,24L),
+              identical(result$executed,FALSE),
+              identical(result$code_status,"NOT_EXECUTED"),
+              identical(result$opened,FALSE))
+  }
+})
+
+pass("SUP61 unsupported request phrasings and reversed clauses refuse", {
+  audit <- private(".ru_w4_dice_composite_unsupported")
+  extra <- c(
+    "and produce a boxplot",
+    "and construct a 95% prediction interval",
+    "and draw a violin chart",
+    "and estimate a bootstrap confidence interval",
+    "and calculate an unrelated Pearson correlation",
+    "and output my private workspace data",
+    "and also do a spatial interpolation",
+    "and report entropy of the sample",
+    "and create a visualization of unrelated measurements",
+    "and construct a forecast of rainfall")
+  for (post in extra) {
+    q <- paste("For fair dice d6 plus d4 compute P(sum=4)",post)
+    z <- ru_solve(q,open=FALSE)
+    stopifnot(!identical(z$status,"SOLVED"),
+              identical(z$executed,FALSE),
+              identical(z$code_preview,""))
+    if (identical(private(".ru_w3_parse")(q)$status,"SOLVED"))
+      stopifnot(isTRUE(audit(q)),
+                identical(z$reason_code,"ADDITIONAL_ANALYSIS_UNSUPPORTED"))
+  }
+  reversed <- c(
+    "Produce a boxplot and calculate P(sum=4) for fair dice d6 plus d4.",
+    "Construct a 95% prediction interval; also find P(sum=4) for d6 and d4.",
+    "Create a violin chart, then find P(sum=4) for d6 plus d4.",
+    "Estimate a rainfall forecast; calculate P(sum=4) for d6 and d4.",
+    "Report a new geospatial model AND P(sum=4) of dice d6 and d4.")
+  for (q in reversed) {
+    z <- ru_solve(q,open=FALSE)
+    stopifnot(!identical(z$status,"SOLVED"),
+              identical(z$executed,FALSE),
+              identical(z$code_preview,""))
+    if (identical(private(".ru_w3_parse")(q)$status,"SOLVED"))
+      stopifnot(isTRUE(audit(q)))
+  }
+})
+
+pass("SUP61 incomplete action clauses and wrong die estimands refuse", {
+  negative <- c(
+    "For fair d6 and d4 calculate P(sum=4) and test.",
+    "For independent d6 and d4 compute P(sum=4) and predict.",
+    "For fair d6 plus d4 calculate P(sum=4) and calculate mean of the first die.",
+    "For fair dice d6 plus d4 calculate P(sum=4) and report variance of the second die.",
+    "For d6 and d4 calculate P(sum=4) and 95% variance.")
+  audit <- private(".ru_w4_dice_composite_unsupported")
+  for (q in negative) {
+    stopifnot(identical(private(".ru_w3_parse")(q)$status,"SOLVED"),
+              isTRUE(audit(q)))
+    z <- ru_solve(q,open=FALSE)
+    stopifnot(identical(z$status,"UNSUPPORTED"),
+              identical(z$reason_code,"ADDITIONAL_ANALYSIS_UNSUPPORTED"),
+              !length(z$answer),identical(z$code_preview,""),
+              identical(z$executed,FALSE))
+  }
+})
+
+pass("SUP61 frozen W3 refusal semantics remain authoritative", {
+  audit <- private(".ru_w4_dice_composite_unsupported")
+  controls <- c(
+    "Calculate P(sum=4) for two loaded dice d6 and d4.",
+    "For dependent dice d6 and d4 calculate P(sum=4).",
+    "Find P(sum>5) for d6 plus d4.",
+    "Find the PMF of the sum of d6 and d4 and a third die.",
+    "For d6 and d4 compute the probability of a coin toss.",
+    "Calculate PMF of sum d6 plus d4 plus 2.",
+    "Find PMF for d6 and d4 with unequal face weights.")
+  for (q in controls) {
+    w3 <- private(".ru_w3_parse")(q)
+    stopifnot(!identical(w3$status,"SOLVED"),
+              !isTRUE(audit(q)))
+    result <- ru_solve(q,open=FALSE)
+    stopifnot(identical(result$status,w3$status),
+              identical(result$reason_code,w3$reason_code),
+              identical(result$executed,FALSE),
+              identical(result$code_preview,""))
+  }
+  for(q in c("PMF","CDF","What is a PMF?","What is a CDF?")) {
+    r <- ru_solve(q,open=FALSE)
+    stopifnot(identical(r$status,"GUIDED_REFERENCE"),
+              identical(r$reason_code,"CONCEPT_ONLY"))
+  }
+})
+
 pass("SUP56 genuine A3 result integrity rejects numeric and code forgeries", {
   q <- "Binomial n=10 p=0.2 calculate P(X=2)."
   parse_w4 <- peer("parse"); compute_w4 <- peer("compute")
