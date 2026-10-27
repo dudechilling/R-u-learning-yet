@@ -164,6 +164,152 @@
   if(length(z))return(list(type="at_least",k=.ru_w4_num(z[[1L]])))
   NULL
 }
+# Whole-request accounting: collect independently requested outputs and
+# distinct probability events. The current typed schema can express one event.
+# Only fixed bounded string matching is used, never R evaluation or lookups.
+.ru_w4_request_inventory <- function(s, family, outputs) {
+  hit<-function(re) .ru_w4_hit(re,s)
+  distribution<-family%in%c("distribution.binomial","distribution.poisson",
+                             "distribution.normal","distribution.uniform_continuous")
+  events<-character()
+  if(distribution) {
+    open<-gregexpr("\\bp\\s*\\(",s,perl=TRUE)[[1L]]
+    events<-regmatches(s,gregexpr("\\bp\\s*\\([^()]{0,160}\\)",
+                               s,perl=TRUE))[[1L]]
+    count<-if(open[[1L]]<0L)0L else length(open)
+    if(count!=length(events))
+      return(list(reason="PROBABILITY_EVENT_EXPRESSION_INCOMPLETE"))
+    events<-unique(gsub("\\s+","",events,perl=TRUE))
+    if(length(events)>1L)
+      return(list(reason="MULTIPLE_PROBABILITY_EVENTS_UNSUPPORTED"))
+    if(length(events)&&hit("\\b(?:quantile|percentile)\\b"))
+      return(list(reason="MULTIPLE_DISTRIBUTION_OPERATIONS_UNSUPPORTED"))
+  }
+  need<-character()
+  if(family=="descriptive.numeric") {
+    if(hit("\\b(?:mean|average)\\b"))need<-c(need,"mean")
+    if(hit("\\bmedian\\b"))need<-c(need,"median")
+    if(hit("\\bvariance\\b")) {
+      v<-outputs[grepl("^(?:sample|population)_variance$",outputs)]
+      if(!length(v))return(list(reason="REQUESTED_OUTPUT_NOT_COMPUTED"))
+      need<-c(need,v)
+    }
+    if(hit("\\bstandard deviation\\b")) {
+      v<-outputs[grepl("^(?:sample|population)_sd$",outputs)]
+      if(!length(v))return(list(reason="REQUESTED_OUTPUT_NOT_COMPUTED"))
+      need<-c(need,v)
+    }
+    if(hit("\\b(?:quantile|quartile|percentile)\\b"))need<-c(need,"quantile")
+  } else if(distribution) {
+    if(length(events))need<-c(need,"probability")
+    if(hit("\\b(?:expected value|expectation|mean of (?:the )?distribution)\\b"))
+      need<-c(need,"expected_value")
+    if(hit("\\bvariance\\b"))need<-c(need,"variance")
+    if(hit("\\b(?:percentile|quantile)\\b"))need<-c(need,"quantile")
+  } else if(family=="probability.event_scalar") {
+    if(hit("\\bunion\\b|\\ba\\s+or\\s+b\\b"))need<-c(need,"union")
+    if(hit("\\bconditional\\b|\\bgiven\\s+b\\b|p\\s*\\(\\s*a\\s*\\|\\s*b"))
+      need<-c(need,"conditional")
+    if(hit("\\bcomplement\\b|\\ba\\s*\\^\\s*c\\b"))need<-c(need,"complement")
+    if(length(unique(need))>1L)
+      return(list(reason="MULTIPLE_EVENT_OPERATIONS_UNSUPPORTED"))
+  } else if(family=="inference.one_sample_t") {
+    test<-hit("\\b(?:t[- ]test|hypothesis\\s+test|p[- ]value|test\\s+mu0|t[- ]statistic|test statistic)\\b")
+    interval<-hit("\\b(?:confidence interval|confidence limits|\\bci\\b)")
+    if(test&&interval)
+      return(list(reason="MULTIPLE_INFERENCE_OPERATIONS_UNSUPPORTED"))
+    if(test)need<-c(need,"t_statistic","degrees_freedom","p_value")
+    if(interval)need<-c(need,"ci_lower","ci_upper")
+  } else if(family=="regression.simple_ols") {
+    # Bare "OLS model" describes a prediction source, not necessarily a
+    # request to report all coefficients.
+    if(hit("\\b(?:slope|intercept|coefficients?|fit)\\b"))
+      need<-c(need,"intercept","slope")
+    if(hit("\\b(?:r[- ]?squared|r\\s*\\^\\s*2)\\b"))need<-c(need,"r_squared")
+    if(hit("\\b(?:predict\\s+y|prediction)\\b"))need<-c(need,"prediction")
+  }
+  if(!all(unique(need)%in%outputs))
+    return(list(reason="REQUESTED_OUTPUT_NOT_COMPUTED"))
+  list(reason=NULL,events=events,required=unique(need))
+}
+# Every additional requested action must be explainable by an actual
+# output ID; conjunctions among model inputs/data are not actions.
+.ru_w4_request_complete <- function(s, family, outputs) {
+  inventory<-.ru_w4_request_inventory(s,family,outputs)
+  if(!is.null(inventory$reason))return(inventory$reason)
+  hit<-function(re,txt=s).ru_w4_hit(re,txt)
+  if(hit("\\b(?:workspace|working environment|ambient (?:object|variable)|current session)\\b") &&
+     hit("\\b(?:access|read|load|retrieve|output|display|show|print|return|list|fetch)\\b"))
+    return("WORKSPACE_OBJECT_ACCESS_UNSUPPORTED")
+  # Requests for other mathematical operations, graphics or artifacts cannot
+  # be silently substituted by a supported scalar, even if one exists.
+  other<-c(
+    "\\b(?:histograms?|boxplots?|scatterplots?|scatter\\s+plots?|bar\\s+charts?|charts?|graphs?|visuali[sz](?:e|ation)|plots?|figures?|density\\s+plots?)\\b",
+    "\\b(?:prediction\\s+interval|prediction\\s+band|credible\\s+interval|forecast|extrapolation|standard\\s+errors?)\\b",
+    "\\b(?:variance\\s+(?:hypothesis\\s+)?test|test\\s+(?:of|for)\\s+(?:the\\s+)?variance|geometric\\s+mean|entropy|skewness|kurtosis|covariance|correlation|pearson|spearman)\\b",
+    "\\b(?:anova|chi[- ]?square|bootstrap|permutation|resampling|spatial|geospatial|time\\s+series|causal\\s+effect|power\\s+analysis)\\b"
+  )
+  if(any(vapply(other,hit,logical(1L))))
+    return("ADDITIONAL_ANALYSIS_UNSUPPORTED")
+  if(family!="inference.one_sample_t" &&
+     hit("\\b(?:hypothesis\\s+test|significance\\s+test|test\\s+of\\s+(?:independence|means?|proportions?)|p[- ]value|z[- ]test|confidence\\s+interval|confidence\\s+limits)\\b"))
+    return("ADDITIONAL_ANALYSIS_UNSUPPORTED")
+  action<-paste0("(?:\\b(?:and|also|then|plus)\\b|[;,])\\s*",
+    "(?:also\\s+)?(?:calculate|compute|find|give|report|return|provide|",
+    "estimate|determine|derive|fit|predict|construct|generate|produce|",
+    "display|show|plot|draw|output|retrieve|load|read|access|run|test|",
+    "list|create|build|explain|summari[sz]e)\\b[^;!?]{0,512}")
+  clauses<-regmatches(s,gregexpr(action,s,perl=TRUE))[[1L]]
+  if(length(clauses)>16L)return("REQUEST_ACTION_CAP_EXCEEDED")
+  for(clause in clauses) {
+    cv<-function(pattern)hit(pattern,clause)
+    required<-switch(family,
+      "descriptive.numeric"=c(
+        if(cv("\\b(?:mean|average)\\b"))"mean",
+        if(cv("\\bmedian\\b"))"median",
+        if(cv("\\bvariance\\b"))
+          outputs[grepl("_variance$",outputs)],
+        if(cv("\\bstandard\\s+deviation\\b"))
+          outputs[grepl("_sd$",outputs)],
+        if(cv("\\b(?:quantile|percentile|quartile)\\b"))"quantile"),
+      "probability.event_scalar"=c(
+        if(cv("\\bunion\\b"))"union",
+        if(cv("\\b(?:conditional|given)\\b"))"conditional",
+        if(cv("\\bcomplement\\b"))"complement"),
+      "distribution.binomial"=c(
+        if(cv("\\bp\\s*\\(|\\b(?:probability|cdf|pmf|tail)\\b"))"probability",
+        if(cv("\\b(?:expected value|expectation)\\b"))"expected_value",
+        if(cv("\\bvariance\\b"))"variance"),
+      "distribution.poisson"=c(
+        if(cv("\\bp\\s*\\(|\\b(?:probability|cdf|pmf|tail)\\b"))"probability",
+        if(cv("\\b(?:expected value|expectation)\\b"))"expected_value",
+        if(cv("\\bvariance\\b"))"variance"),
+      "distribution.normal"=c(
+        if(cv("\\bp\\s*\\(|\\b(?:probability|cdf|tail)\\b"))"probability",
+        if(cv("\\b(?:expected value|expectation)\\b"))"expected_value",
+        if(cv("\\bvariance\\b"))"variance",
+        if(cv("\\b(?:quantile|percentile)\\b"))"quantile"),
+      "distribution.uniform_continuous"=c(
+        if(cv("\\bp\\s*\\(|\\b(?:probability|cdf|tail)\\b"))"probability",
+        if(cv("\\b(?:expected value|expectation)\\b"))"expected_value",
+        if(cv("\\bvariance\\b"))"variance"),
+      "inference.one_sample_t"=c(
+        if(cv("\\b(?:p[- ]value|hypothesis|t[- ]test|test|t[- ]statistic|test statistic)\\b"))
+          c("t_statistic","p_value"),
+        if(cv("\\b(?:confidence\\s+interval|confidence\\s+limits|ci)\\b"))
+          c("ci_lower","ci_upper")),
+      "regression.simple_ols"=c(
+        if(cv("\\b(?:slope|intercept|coefficients?|ols|regression|fit)\\b"))
+          c("intercept","slope"),
+        if(cv("\\b(?:r[- ]?squared|r\\s*\\^\\s*2)\\b"))"r_squared",
+        if(cv("\\b(?:predict|prediction)\\b"))"prediction"),
+      character())
+    if((!length(required)||!all(required%in%outputs)) &&
+       !cv("\\b(?:r\\s+code|code\\s+preview|r\\s+script|results?|answers?)\\b"))
+      return("ADDITIONAL_REQUEST_ACTION_UNSUPPORTED")
+  }
+  NULL
+}
 .ru_w4_parse<-function(question) {
   if(!is.character(question)||length(question)!=1L||is.na(question)||
      !nzchar(trimws(question))||!validUTF8(question)||
@@ -204,6 +350,14 @@
     if(is.list(inp)&&length(inp))
       inp<-inp[!vapply(inp,function(z)is.null(z) ||
         (is.atomic(z)&&anyNA(z)),logical(1L))]
+    if(identical(status,"SOLVED")) {
+      uncovered<-.ru_w4_request_complete(s,fam,outs)
+      if(!is.null(uncovered)) {
+        status<-"UNSUPPORTED"
+        reason<-uncovered
+        missing<-character()
+      }
+    }
     .ru_w4_result(status,reason,question,fam,inp,outs,assum,missing)
   }
   # Do not misinterpret a legitimate P(3<X<5) as HTML.

@@ -382,6 +382,99 @@ mark("A5 H034 honest normal SD refusal retains exact reason",{
             identical(p$inputs$event$type,"cdf"),
             identical(p$requested_outputs,"probability"))
 })
+mark("SUP61 unique probability-event inventory, not first-event success",{
+  cases<-c(
+    "For Poisson lambda=3, find P(X>4), then calculate P(X=2).",
+    "Binomial(n=8,p=0.25); report P(X=3); also give P(X=2).",
+    "Normal(mu=0,sigma=1) calculate P(X>2) then show P(X<=1).",
+    "Continuous uniform U(2,8), find P(X>6); compute P(3<X<5).",
+    "For Poisson lambda=3 calculate P(X=2) and P(X>4).",
+    "For a Binomial n=8 p=0.25 calculate P(X=2) plus P(X=3).",
+    "For Normal mu=0 sigma=1, compute P(X<=1), P(X>2), and variance.",
+    "For continuous uniform U(2,8) find P(3<X<5) and P(X>6).")
+  for(q in cases) {
+    p<-assert_refusal(q,"UNSUPPORTED",
+                      "MULTIPLE_PROBABILITY_EVENTS_UNSUPPORTED")
+    stopifnot(p$family_id%in%c("distribution.poisson","distribution.binomial",
+      "distribution.normal","distribution.uniform_continuous"))
+  }
+  # Repetition of the same event represents one distinct mathematical target.
+  assert_answer("For Binomial(n=10,p=0.2), find P(X=2) and P(X=2).",
+                "distribution.binomial",
+                list(probability=choose(10,2)*(.2)^2*(.8)^8))
+  assert_refusal(
+    "For Normal(mu=0,sigma=1), find P(X<=1) and the 90th percentile.",
+    "UNSUPPORTED","MULTIPLE_DISTRIBUTION_OPERATIONS_UNSUPPORTED")
+})
+mark("SUP61 separate inferential actions cannot disappear",{
+  cases<-c(
+    paste("For independent approximately normal sample",
+          "x=[2,4,6,8,10] test mu0=5 two-sided AND construct a",
+          "two-sided 95% Student t confidence interval."),
+    paste("For independent approximately normal observations",
+          "2,4,6,8,10 construct a two-sided 95% Student t",
+          "confidence interval and test mu0=5 two-sided."),
+    paste("For an independent approximately normal one-sample t-test",
+          "of values=2,4,6,8,10 against mu0=5, two-sided calculate",
+          "p-value and 95% confidence interval."),
+    paste("For independent approximately normal one-sample t test",
+          "of x=[2,4,6,8,10] test mu0=5 two-sided;",
+          "also report a 95% confidence interval."))
+  for(q in cases)
+    assert_refusal(q,"UNSUPPORTED",
+                   "MULTIPLE_INFERENCE_OPERATIONS_UNSUPPORTED")
+  assert_answer(
+    paste("For independent approximately normal sample x=[7,9,10,12,12]",
+          "test mu0=8 with a two-sided one-sample t test."),
+    "inference.one_sample_t",
+    list(t_statistic=2.1081851067789197))
+})
+mark("SUP61 additional artifacts, data sources and unknown action clauses",{
+  q<-c(
+    "Compute mean of values=1,2,3 and generate a histogram.",
+    "Generate a histogram and compute mean of values=1,2,3.",
+    "For mean of values 1,2,3 calculate a histogram too.",
+    "Normal mu=0 sigma=1 calculate P(X<=1) and output an unprovided workspace object x.",
+    "For Normal(mu=0,sigma=1), show the current workspace variable and find P(X<=1).",
+    "Binomial n=6 p=0.3 calculate P(X=1) and also compute an unrelated variance test.",
+    "For Binomial n=6 p=0.3, run a test of variance; calculate P(X=1).",
+    "For Poisson lambda=3 find P(X=2) and explain assumptions.",
+    "For Normal(mu=0,sigma=1) calculate P(X<=1); determine an unknown metric.",
+    "Find median of values 1,2,3 and summarize a source dataset.",
+    "For simple OLS regression x=[1,2,3] y=[2,4,6] find a scatterplot.",
+    "Compute mean of values 1,2,3; produce a graphic.",
+    "Normal(mu=0,sigma=1) calculate P(X<=1) and create a CSV file.")
+  for(x in q){
+    p<-parse_w4(x)
+    stopifnot(!is.null(p),p$status!="SOLVED",
+              identical(p$original_question,x))
+    res<-compute_w4(p)
+    stopifnot(res$status!="SOLVED",identical(res$code_preview,""),
+              identical(res$executed,FALSE),length(res$answer)==0L)
+  }
+})
+mark("SUP61 true within-family compounds and benign and-clauses still solve",{
+  assert_answer("Compute median and mean of values 1,2,3,4.",
+                "descriptive.numeric",list(median=2.5,mean=2.5))
+  assert_answer("Calculate mean of values 1,2,3,4 and sample variance.",
+                "descriptive.numeric",list(mean=2.5,sample_variance=5/3))
+  assert_answer("For Binomial(n=10,p=0.2), find P(X=2) and expected value.",
+                "distribution.binomial",
+                list(probability=choose(10,2)*.2^2*.8^8,
+                     expected_value=2))
+  assert_answer("For Poisson lambda=3, compute variance and expectation.",
+                "distribution.poisson",list(variance=3,expected_value=3))
+  assert_answer("Normal(mu=0,sigma=1) find P(X<=1) and report expected value and variance.",
+                "distribution.normal",
+                list(probability=stats::pnorm(1),expected_value=0,variance=1))
+  assert_answer("Fit simple OLS regression x=[1,2,3,4] and y=[2,3,5,7], report slope intercept and r-squared.",
+                "regression.simple_ols",
+                list(intercept=0,slope=1.7,r_squared=0.979661016949153))
+  # "and" joins model assumptions and explanatory data, not an action.
+  assert_answer("For independent approximately normal sample x=[7,9,10,12,12], test mu0=8 with a two-sided one-sample t test.",
+                "inference.one_sample_t",
+                list(degrees_freedom=4))
+})
 mark("bounded repeated deterministic parsing",{
   q<-"For a continuous uniform U(2,8), compute P(3<X<5)."
   first<-serialize(parse_w4(q),NULL,version=3L)
@@ -390,6 +483,75 @@ mark("bounded repeated deterministic parsing",{
   stopwatch<-system.time(for(i in seq_len(100L))parse_w4(q))[["elapsed"]]
   stopifnot(is.finite(stopwatch),stopwatch<20)
 })
+# A5's independent files are optional fixtures supplied at execution time.
+# Never copy/modify an independently frozen challenge corpus in source Git.
+a5_r5_dir<-Sys.getenv("RU_A3_W4_A5_R5_DIR",unset="")
+if(nzchar(a5_r5_dir)){
+  mark("SUP61 independent A5 R5 all 30 unseen cases",{
+    file<-file.path(a5_r5_dir,"A5-new-unseen-holdouts.csv")
+    stopifnot(file.exists(file))
+    b<-utils::read.csv(file,stringsAsFactors=FALSE)
+    stopifnot(nrow(b)==30L,setequal(names(b),c("id","risk","question")),
+              sum(b$risk=="NEGATIVE")==24L,
+              sum(b$risk=="POSITIVE")==4L,
+              sum(b$risk=="MISSING")==2L)
+    for(i in seq_len(nrow(b))){
+      q<-b$question[[i]]
+      p<-parse_w4(q)
+      status<-if(is.null(p))"NOT_RECOGNIZED" else p$status
+      if(b$risk[[i]]=="POSITIVE"){
+        stopifnot(identical(status,"SOLVED"))
+        a<-compute_w4(p)
+        stopifnot(identical(a$status,"SOLVED"),
+                  isTRUE(a$checks$verified),
+                  identical(a$executed,FALSE))
+      } else if(b$risk[[i]]=="MISSING"){
+        stopifnot(identical(status,"NEEDS_INPUT"))
+      } else stopifnot(!identical(status,"SOLVED"))
+      if(!is.null(p)){
+        stopifnot(identical(p$original_question,q))
+        if(!identical(status,"SOLVED")){
+          r<-compute_w4(p)
+          stopifnot(!identical(r$status,"SOLVED"),
+                    identical(r$code_preview,""),
+                    identical(r$executed,FALSE),
+                    is.list(r$answer),length(r$answer)==0L)
+        }
+      }
+    }
+    for(j in c("U001","U002","U003","U004","U006","U007","U022","U024")){
+      i<-match(paste0("A5R5-",j),b$id)
+      p<-parse_w4(b$question[[i]])
+      stopifnot(!is.null(p),identical(p$status,"UNSUPPORTED"),
+                nzchar(p$reason_code))
+    }
+  })
+}
+a5_r3_dir<-Sys.getenv("RU_A3_W4_A5_R3_DIR",unset="")
+if(nzchar(a5_r3_dir)){
+  mark("SUP61 independent frozen A5 104 plus previous 70 cases",{
+    a<-utils::read.csv(file.path(a5_r3_dir,"A5-frozen104.csv"),
+                       stringsAsFactors=FALSE)
+    b<-utils::read.csv(file.path(a5_r3_dir,"A5-holdouts.csv"),
+                       stringsAsFactors=FALSE)
+    stopifnot(nrow(a)==104L,nrow(b)==70L,
+              sum(a$risk!="NONE")==45L,
+              sum(b$risk=="NEGATIVE")==34L,
+              sum(b$risk=="POSITIVE")==28L)
+    ps<-lapply(c(a$question,b$question),parse_w4)
+    st<-vapply(ps,function(p)if(is.null(p))"NOT_RECOGNIZED" else p$status,
+               character(1L))
+    stopifnot(!any(st[which(a$risk!="NONE")]=="SOLVED"),
+              !any(tail(st,nrow(b))[b$risk=="NEGATIVE"]=="SOLVED"),
+              all(tail(st,nrow(b))[b$risk=="POSITIVE"]=="SOLVED"))
+    for(i in which(st=="SOLVED")){
+      r<-compute_w4(ps[[i]])
+      stopifnot(identical(r$status,"SOLVED"),
+                isTRUE(r$checks$verified),
+                identical(r$executed,FALSE))
+    }
+  })
+}
 # Integration contract probe is opt-in because A1 owns a separate worktree
 # and the committed A1-only installation deliberately lacks these A3 helpers.
 # Never modify A1 files or silently accept its pre-correction registry.
