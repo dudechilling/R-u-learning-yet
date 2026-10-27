@@ -673,6 +673,14 @@ ru_find <- function(query,n=10L,type=NULL) {
      is.na(query) || !nzchar(trimws(query)))
     return(invisible(.ru_catalog()[FALSE,,drop=FALSE]))
   hits <- .ru_search_results(query,n=n,type=type)
+  # An exact existing ru_apply method ID must not be replaced by an
+  # unrelated fuzzy reference. Preserve the public data.frame schema.
+  route <- .ru_w5_method_route(query)
+  if (!is.null(route) && is.null(type)) {
+    method_hits <- .ru_catalog()
+    method_hits <- method_hits[method_hits$id==route$method_id,,drop=FALSE]
+    if (nrow(method_hits)) hits <- utils::head(method_hits,n)
+  }
   # Search and n/type filtering are always the legacy search engine's job.
   # Guided pages are an optional VIEW of a confidently recognized question,
   # not a replacement for the invisible data.frame result.

@@ -1,6 +1,14 @@
 # Open an installed walkthrough in the Viewer or return its Quarto path.
 # The guide explains the method; its paired R script supplies runnable code.
 ru_guide <- function(query) {
+  # W5 private guides are a presentation path only: never execute previews.
+  guide <- .ru_w5_method_guide(query)
+  if (!is.null(guide)) {
+    render <- get0(".ru_w5_method_render",mode="function",inherits=TRUE)
+    if (!is.null(render) && .ru_rstudio_ready("viewer"))
+      tryCatch(render(guide,open=TRUE),error=function(e) NULL)
+    return(invisible(guide))
+  }
   hits <- .ru_search_results(query,n=3L,type="walkthrough")
   if(!nrow(hits)) return(invisible(NULL))
   first <- hits[1L,,drop=FALSE]
