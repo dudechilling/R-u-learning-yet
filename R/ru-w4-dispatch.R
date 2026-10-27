@@ -724,7 +724,13 @@
     recognized <- c(recognized, "events")
   if (!setequal(recognized, plan$requested_outputs))
     return(TRUE)
-  if (!identical(event_plan$events, plan$inputs$events))
+  # The frozen W3 typed fixture omits the optional empty events field.
+  # Absent is equivalent to empty ONLY when no event was requested; actual
+  # event identities must still match the parsed model without exception.
+  declared_events <- plan$inputs$events
+  if (is.null(declared_events) && !length(event_plan$events))
+    declared_events <- list()
+  if (!identical(event_plan$events, declared_events))
     return(TRUE)
   FALSE
 }
