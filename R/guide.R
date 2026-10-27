@@ -2,7 +2,16 @@
 # The guide explains the method; its paired R script supplies runnable code.
 ru_guide <- function(query) {
   # W5 private guides are a presentation path only: never execute previews.
-  guide <- .ru_w5_method_guide(query)
+  # Resolve ordinary language through the compatibility-ranked walkthrough,
+  # not through an incidental substring of a less-specific method ID.
+  resolved <- query
+  if (!identical(tolower(trimws(query)),query) ||
+      is.null(.ru_w5_method_route(query))) {
+    ranked <- .ru_search_results(query,n=1L,type="walkthrough")
+    if (nrow(ranked) && ranked$id[[1L]] %in% .ru_w5_method_ids())
+      resolved <- ranked$id[[1L]]
+  }
+  guide <- .ru_w5_method_guide(resolved)
   if (!is.null(guide)) {
     render <- get0(".ru_w5_method_render",mode="function",inherits=TRUE)
     if (!is.null(render) && .ru_rstudio_ready("viewer"))

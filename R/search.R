@@ -676,7 +676,11 @@ ru_find <- function(query,n=10L,type=NULL) {
   # An exact existing ru_apply method ID must not be replaced by an
   # unrelated fuzzy reference. Preserve the public data.frame schema.
   route <- .ru_w5_method_route(query)
-  if (!is.null(route) && is.null(type)) {
+  # Exact canonical method IDs may select their own catalogue entry.
+  # Ordinary questions must retain the compatibility-ranked legacy results:
+  # "boxplot" within a grouped comparison is not a request for a plain boxplot.
+  if (!is.null(route) && is.null(type) &&
+      identical(tolower(trimws(query)),route$method_id)) {
     method_hits <- .ru_catalog()
     method_hits <- method_hits[method_hits$id==route$method_id,,drop=FALSE]
     if (nrow(method_hits)) hits <- utils::head(method_hits,n)
