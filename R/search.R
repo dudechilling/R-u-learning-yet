@@ -330,7 +330,12 @@
   },integer(1))
 }
 
-.ru_catalog <- function() {
+.ru_catalog <- local({
+  # Installed references and lessons are immutable package assets. Cache
+  # their index only, never user questions, data or computed results.
+  cached <- NULL
+  function() {
+    if (!is.null(cached)) return(cached)
   path <- system.file("extdata","reference.csv",package="rulearn")
   if (!nzchar(path)) stop("The reference index is not installed.",call.=FALSE)
   refs <- utils::read.csv(path,stringsAsFactors=FALSE,
@@ -371,8 +376,10 @@
     else
       paste0("ru_open('",item$id,"')")
   },character(1))
-  data
-}
+    cached <<- data
+    data
+  }
+})
 .ru_search_results <- function(query,n=10L,type=NULL) {
   if(!is.character(query) || length(query)!=1L || is.na(query) ||
      !nzchar(trimws(query))) return(.ru_catalog()[FALSE,,drop=FALSE])
@@ -672,19 +679,10 @@ ru_find <- function(query,n=10L,type=NULL) {
   if(missing(query) || !is.character(query) || length(query)!=1L ||
      is.na(query) || !nzchar(trimws(query)))
     return(invisible(.ru_catalog()[FALSE,,drop=FALSE]))
-  hits <- .ru_search_results(query,n=n,type=type)
-  # An exact existing ru_apply method ID must not be replaced by an
-  # unrelated fuzzy reference. Preserve the public data.frame schema.
-  route <- .ru_w5_method_route(query)
-  # Exact canonical method IDs may select their own catalogue entry.
-  # Ordinary questions must retain the compatibility-ranked legacy results:
-  # "boxplot" within a grouped comparison is not a request for a plain boxplot.
-  if (!is.null(route) && is.null(type) &&
-      identical(tolower(trimws(query)),route$method_id)) {
-    method_hits <- .ru_catalog()
-    method_hits <- method_hits[method_hits$id==route$method_id,,drop=FALSE]
-    if (nrow(method_hits)) hits <- utils::head(method_hits,n)
-  }
+  # One compatibility policy is shared with ru_guide(). It preserves
+  # historical references, selects exact method IDs and abstains when a
+  # question requests incompatible or multiple analytical operations.
+  hits <- .ru_w5_method_resolve(query,n=n,type=type)$hits
   # Search and n/type filtering are always the legacy search engine's job.
   # Guided pages are an optional VIEW of a confidently recognized question,
   # not a replacement for the invisible data.frame result.

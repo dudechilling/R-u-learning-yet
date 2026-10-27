@@ -1,22 +1,31 @@
 # Open an installed walkthrough in the Viewer or return its Quarto path.
 # The guide explains the method; its paired R script supplies runnable code.
 ru_guide <- function(query) {
-  # W5 private guides are a presentation path only: never execute previews.
-  # Resolve ordinary language through the compatibility-ranked walkthrough,
-  # not through an incidental substring of a less-specific method ID.
-  resolved <- query
-  if (!identical(tolower(trimws(query)),query) ||
-      is.null(.ru_w5_method_route(query))) {
-    ranked <- .ru_search_results(query,n=1L,type="walkthrough")
-    if (nrow(ranked) && ranked$id[[1L]] %in% .ru_w5_method_ids())
-      resolved <- ranked$id[[1L]]
-  }
-  guide <- .ru_w5_method_guide(resolved)
-  if (!is.null(guide)) {
-    render <- get0(".ru_w5_method_render",mode="function",inherits=TRUE)
-    if (!is.null(render) && .ru_rstudio_ready("viewer"))
-      tryCatch(render(guide,open=TRUE),error=function(e) NULL)
-    return(invisible(guide))
+  # W5 guides are presentation only. Resolve exactly as public ru_find()
+  # does; never let a method-name substring outrank the data/design roles.
+  resolved <- .ru_w5_method_resolve(query,n=1L)
+  if (resolved$status %in% c("AMBIGUOUS","UNSUPPORTED","NO_MATCH"))
+    return(invisible(NULL))
+  if (identical(resolved$status,"METHOD")) {
+    guide <- .ru_w5_method_guide(query,method_id=resolved$method_id)
+    if (!is.null(guide)) {
+      render <- get0(".ru_w5_method_render",mode="function",inherits=TRUE)
+      if (!is.null(render) && .ru_rstudio_ready("viewer"))
+        tryCatch(render(guide,open=TRUE),error=function(e) NULL)
+      return(invisible(guide))
+    }
+    # Six IDs have no new W5 teaching guide. Offer only their actual
+    # installed legacy guide, if present, never a different method.
+    id <- resolved$method_id
+    path <- system.file("guides",paste0(id,".qmd"),package="rulearn")
+    if (!nzchar(path)) return(invisible(NULL))
+    if (.ru_rstudio_ready("viewer")) {
+      first <- .ru_catalog()
+      first <- first[first$id==id & first$type=="walkthrough",,drop=FALSE]
+      if (nrow(first)) .ru_viewer_show(first[1L,,drop=FALSE],query,
+                                     force_page=id)
+    }
+    return(invisible(path))
   }
   hits <- .ru_search_results(query,n=3L,type="walkthrough")
   if(!nrow(hits)) return(invisible(NULL))
