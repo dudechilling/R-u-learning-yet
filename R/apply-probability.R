@@ -111,6 +111,10 @@
     n <- if (is.null(a$n)) length(z) else .ru_integer(a$n,"n",min=2L)
     reps <- .ru_integer(a$reps,"reps",min=50L)
     if (reps>20000L) stop("Limit reps to 20000 for an interactive exercise.")
+    # Cost is proportional to n * reps; both axes need a finite work cap.
+    if (n>10000L || as.double(n)*as.double(reps)>2000000)
+      stop("Bootstrap work cap exceeded: n <= 10000 and n * reps <= 2000000.",
+           call.=FALSE)
     means <- .ru_seeded(a$seed,replicate(reps,mean(sample(z,n,replace=TRUE))))
     if (isTRUE(a$show_plot)) {
       graphics::hist(means,col="#CEE2F0",border="#244967",

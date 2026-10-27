@@ -475,6 +475,140 @@ mark("SUP61 true within-family compounds and benign and-clauses still solve",{
                 "inference.one_sample_t",
                 list(degrees_freedom=4))
 })
+
+mark("SUP67 atomic requested outputs and unknown coordinated products",{
+  questions<-c(
+    "Calculate the mean of values=3,7,9,11 and an ecological footprint index.",
+    "Compute mean of values=2,4,6,8; derive a novel dispersion score.",
+    "For values=2,4,6,8, calculate the mean, report an unexplained index.",
+    "Find the union if P(A)=0.45 P(B)=0.25 P(A intersection B)=0.1 and an unknown dependency metric.",
+    "Binomial n=8 p=0.4 find P(X=2) plus the chance of four or more successes.",
+    "Poisson lambda=3 calculate P(X=1) and the probability of no arrivals.",
+    "For Normal(mu=0,sigma=1) calculate P(X<=1) and an unknown index.",
+    "Continuous uniform U(2,9) calculate P(3<X<6) together with the chance of X greater than 7.",
+    paste("For independent approximately normal one-sample t-test of",
+          "values=2,4,6,8,10 versus mu0=5 two-sided, report p-value",
+          "along with an unspecified diagnostic."),
+    paste("Fit simple OLS regression x=[1,2,3,4] and y=[2,5,7,9],",
+          "report the slope; derive a novel influence measure."),
+    "For binomial n=10 p=0.2, calculate P(X=3) and the entropy of outcomes.",
+    "Normal(mu=2,sigma=3) calculate P(X>4) and its standardized effect.")
+  for(q in questions) {
+    p<-parse_w4(q)
+    stopifnot(!is.null(p),p$status!="SOLVED",
+              identical(p$original_question,q))
+    a<-compute_w4(p)
+    stopifnot(identical(a$status,p$status),
+              identical(a$executed,FALSE),
+              identical(a$code_preview,""),
+              is.list(a$answer),length(a$answer)==0L)
+  }
+  # Every atomic request has a bounded source span and a known output ID
+  # or an explicit unsupported identifier. The parsed object is unchanged.
+  atom_fn<-if(nzchar(src)) .ru_w4_result_atoms else
+    getFromNamespace(".ru_w4_result_atoms","rulearn")
+  q<-"For Binomial(n=9,p=0.4), calculate expected value and variance."
+  norm_fn<-if(nzchar(src)) .ru_w4_norm else
+    getFromNamespace(".ru_w4_norm","rulearn")
+  entries<-atom_fn(norm_fn(q),"distribution.binomial")$atoms
+  stopifnot(length(entries)==2L,
+            setequal(vapply(entries,function(e)e$output,character(1)),
+                     c("expected_value","variance")),
+            all(vapply(entries,function(e)e$start>=1L &&
+              e$end>=e$start && e$end<=nchar(q),logical(1L))))
+})
+mark("SUP67 full-list comma-to-verb grammar without prefix truncation",{
+  assert_answer("For values=5,10,15,20, compute the mean and median.",
+                "descriptive.numeric",list(mean=12.5,median=12.5))
+  assert_answer("For values=7,9,11,13, calculate the median and mean.",
+                "descriptive.numeric",list(mean=10,median=10))
+  assert_answer("For numbers=4,8,12,16, report the mean.",
+                "descriptive.numeric",list(mean=10))
+  for(q in c(
+    "For values=5,10,15,NA, compute mean and median.",
+    "For values=5,10,15,Inf, compute mean.",
+    "For values=5,10,15,, compute mean.",
+    "For values=5,10,15, compute mean,2.",
+    "For values=5,10,15,foo, compute mean.",
+    "For values=5,10,15, compute mean; system('whoami').")) {
+    p<-parse_w4(q)
+    stopifnot(!is.null(p),p$status!="SOLVED")
+    a<-compute_w4(p)
+    stopifnot(a$status!="SOLVED",identical(a$executed,FALSE),
+              identical(a$code_preview,""),length(a$answer)==0L)
+  }
+})
+mark("SUP67 legitimate multi-output and input conjunctions remain correct",{
+  assert_answer("For Binomial(n=6,p=0.3) find expected value and variance.",
+                "distribution.binomial",
+                list(expected_value=1.8,variance=1.26))
+  assert_answer("For Poisson lambda=3 calculate expectation and variance.",
+                "distribution.poisson",list(expected_value=3,variance=3))
+  assert_answer("Normal mu=0 sigma=1 calculate P(X<=1) and expected value.",
+                "distribution.normal",
+                list(probability=stats::pnorm(1),expected_value=0))
+  assert_answer("Given P(A)=0.5 and P(B)=0.4 and P(A intersection B)=0.1, find the union.",
+                "probability.event_scalar",list(union=0.8))
+  assert_answer("Fit simple OLS regression x=[1,2,3,4] and y=[2,4,6,9], report slope and r-squared.",
+                "regression.simple_ols",list(slope=2.3,r_squared=1-.3/26.75))
+  assert_answer("For values=3,5,7,9, compute the median and mean.",
+                "descriptive.numeric",list(mean=6,median=6))
+  assert_answer("Normal mu=0 sigma=1 calculate P(X<=1) with mean=0 and standard deviation=1.",
+                "distribution.normal",list(probability=stats::pnorm(1)))
+
+})
+# The independent A5 R6 corpus is NEVER copied into source; activate only
+# against its sealed read-only directory supplied through an environment var.
+a5_r6_dir<-Sys.getenv("RU_A3_W5_R2_A5_R6_DIR",unset="")
+if(nzchar(a5_r6_dir)){
+  mark("SUP67 all 70 independent A5 R6 questions and clean refusals",{
+    d<-utils::read.csv(file.path(a5_r6_dir,"A5-R6-genuinely-unseen.csv"),
+                       stringsAsFactors=FALSE)
+    stopifnot(nrow(d)==70L,
+              sum(d$risk=="NEGATIVE")==48L,
+              sum(d$risk=="POSITIVE")==16L,
+              sum(d$risk=="MISSING")==6L,
+              identical(d$id[[49L]],"A5R6-N049"),
+              !anyDuplicated(d$id))
+    for(i in seq_len(nrow(d))){
+      q<-d$question[[i]];p<-parse_w4(q)
+      if(d$family_hint[[i]]=="dice"){
+        # W3 owns dice dispatch and the W4 statistical adapter must not
+        # masquerade as a second dice solver.
+        stopifnot(is.null(p)||p$status!="SOLVED")
+        next
+      }
+      stopifnot(is.list(p),identical(p$original_question,q),
+                identical(p$schema_version,"ru.guided.v1"))
+      if(d$risk[[i]]=="POSITIVE"){
+        stopifnot(identical(p$status,"SOLVED"))
+        a<-compute_w4(p)
+        stopifnot(identical(a$status,"SOLVED"),
+                  isTRUE(a$checks$verified),
+                  identical(a$executed,FALSE),
+                  setequal(p$requested_outputs,
+                           a$answer$quantities$output_id))
+        con<-textConnection(a$code_preview)
+        value<-source(con,local=new.env(parent=globalenv()))$value
+        close(con)
+        stopifnot(identical(value$output_id,
+                            a$answer$quantities$output_id))
+        near(value$value,a$answer$quantities$value)
+      } else {
+        stopifnot(p$status!="SOLVED",nzchar(p$reason_code))
+        if(d$risk[[i]]=="MISSING")
+          stopifnot(identical(p$status,"NEEDS_INPUT"))
+        a<-compute_w4(p)
+        stopifnot(identical(a$status,p$status),
+                  identical(a$code_preview,""),
+                  identical(a$executed,FALSE),
+                  length(a$answer)==0L)
+      }
+    }
+    stopifnot(identical(parse_w4(d$question[[49L]])$status,"SOLVED"))
+  })
+}
+
 mark("bounded repeated deterministic parsing",{
   q<-"For a continuous uniform U(2,8), compute P(3<X<5)."
   first<-serialize(parse_w4(q),NULL,version=3L)

@@ -65,6 +65,8 @@
 .ru_integer <- function(x,label,min=0L) {
   v <- .ru_required(x,label)
   if (v<min || v!=floor(v)) stop(label," must be a whole number >= ",min,".")
+  if (v > .Machine$integer.max)
+    stop(label," exceeds the supported R integer range.",call.=FALSE)
   as.integer(v)
 }
 .ru_level <- function(a) {
@@ -137,6 +139,12 @@
 # A frequency column describes observations, not one observation per row.
 .ru_counts <- function(a) {
   x <- .ru_column(a,"x")
+  # A missing category must never disappear from the denominator unnoticed.
+  # Require an explicit recode/subset rather than silently deleting rows.
+  if (anyNA(x) || (is.numeric(x) && any(!is.finite(x))))
+    stop("Category values include missing/nonfinite observations. ",
+         "Explicitly recode or subset these observations before counting.",
+         call.=FALSE)
   if (is.null(a$weight)) {
     counts <- table(x,useNA="no")
     if (!length(counts) || sum(counts)==0L)

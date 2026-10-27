@@ -40,10 +40,13 @@
     ylab <- .ru_axis(a,"y","Y")
     col <- .ru_text(a$col,"#3F78A8")
     if (id=="scatterplot") {
-      if (!isTRUE(a$show_plot)) {
-        if (length(unique(d$x))<=1L) return(invisible(NULL))
+      # A single predictor value cannot identify a fitted line. Do not
+      # return NULL as if a graphical computation had succeeded.
+      if (length(unique(d$x))<=1L)
+        stop("Scatterplot fitted line requires variation in x.",call.=FALSE)
+      if (!isTRUE(a$show_plot))
         return(stats::lm(y~x,data=d))
-      }
+
       return(ru_scatter(d$x,d$y,xlab=xlab,ylab=ylab,
                         col=col,title=.ru_text(a$title,
                         "Paired measurements and fitted line")))

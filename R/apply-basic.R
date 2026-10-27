@@ -15,10 +15,18 @@
   if (id=="filter_rows") {
     if (!is.data.frame(a$data)) stop("Supply a data frame.")
     value <- .ru_column(a,"x")
-    if (is.null(a$threshold) || length(a$threshold)!=1L)
-      stop("Supply threshold= as the value to compare.")
+    if (is.null(a$threshold) || length(a$threshold)!=1L ||
+        is.na(a$threshold))
+      stop("Supply one nonmissing threshold= as the value to compare.")
+    if (is.numeric(value) &&
+        (!is.numeric(a$threshold) || !is.finite(a$threshold)))
+      stop("A numeric comparison requires a finite numeric threshold.")
+    if (anyNA(value) || (is.numeric(value) && any(!is.finite(value))))
+      stop("Filter column has missing/nonfinite values. Explicitly ",
+           "handle these rows before filtering.",call.=FALSE)
     op <- a$operator
-    if (!(op %in% c(">=",">","<=","<","==","!=")))
+    if (!is.character(op) || length(op)!=1L || is.na(op) ||
+        !(op %in% c(">=",">","<=","<","==","!=")))
       stop("operator= must be one of >=, >, <=, <, ==, !=.")
     if (!is.numeric(value) && !(op %in% c("==","!=")))
       stop("Category comparisons support == and != only.")

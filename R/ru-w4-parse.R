@@ -123,16 +123,23 @@
   # A completed vector cannot leave an extra item, unmatched bracket, or
   # arithmetic continuation. In paired data only a named second vector may
   # follow a bracketed first vector after a comma.
+  # A comma may separate a complete numeric list from a calculation verb,
+  # but never a further token, NA/Inf, dangling comma or malformed suffix.
   if(.ru_w4_hit("^\\s*[,\\]\\)]",suffix) &&
-     !(nzchar(wrapper) &&
-       .ru_w4_hit(paste0("^\\s*,\\s*(?:(?:x|y)\\s*(?:=|:)|",
-                         "(?:test|compute|calculate|find|give|report|fit|",
-                         "predict|estimate|construct|and\\s+(?:find|compute|",
-                         "calculate|give|test|fit|construct|estimate))\\b)"),
-                  suffix)))
+     !(.ru_w4_hit(paste0("^\\s*,\\s*(?:compute|calculate|find|give|report|",
+                         "estimate|test|construct|predict|fit)\\b"),suffix) ||
+       (nzchar(wrapper) &&
+        .ru_w4_hit("^\\s*,\\s*(?:x|y)\\s*(?:=|:)",suffix))))
     return(bad)
   if(.ru_w4_hit("^\\s*(?:[;|]\\s*|[+*/^]\\s*)",suffix) &&
      .ru_w4_hit(paste0("^\\s*(?:[;|+*/^]\\s*)",.ru_w4_numre),suffix))
+    return(bad)
+  # A verb can terminate a list, but not legitimize a stray trailing
+  # numeric operand in the subsequent output clause.
+  if(.ru_w4_hit(paste0("^\\s*,\\s*(?:compute|calculate|find|give|report|",
+                       "estimate|test|construct|predict|fit)\\b",
+                       "[^;!?]{0,180},\\s*",.ru_w4_numre,
+                       "(?:[,;.]|$)"),suffix))
     return(bad)
   if(.ru_w4_hit("^[[:alnum:]_]",suffix) ||
      .ru_w4_hit(paste0("^\\s*(?:and|or|plus)\\s+(?:\\[|c\\s*\\(|",
@@ -310,6 +317,255 @@
   }
   NULL
 }
+
+# W5-R2: conservative, bounded recognition of *requested* atomic results.
+# Lexicon entries describe statistic types (not specific A5 questions). Each
+# atom retains its source position; the existing typed answer IDs are the sole
+# authority for what can be reported as computed.
+.ru_w4_result_atoms <- function(s, family) {
+  verb <- "(?:calculate|compute|find|give|report|return|estimate|determine|derive|fit|predict|construct|generate|produce|display|show|plot|draw|output|retrieve|load|read|access|run|test|list|create|build|explain|summari[sz]e)"
+  start <- regexpr(paste0("\\b",verb,"\\b|\\bwhat\\s+is\\b"),s,perl=TRUE)[[1L]]
+  request <- if(start>0L) substr(s,start,nchar(s)) else s
+  if(nchar(request)>4096L) return(list(reason="REQUEST_ACTION_CAP_EXCEEDED"))
+  # Remove numerical model parameter assignments, not action language.
+  # These do not request a separate computed statistic.
+  q <- gsub(paste0("\\b(?:mean|standard deviation|sd|mu|sigma|mu0|",
+                    "lambda|rate|n|p|a|b|x0|x_new|lower|upper)\\s*(?:=|:)\\s*",
+                    .ru_w4_numre), " ",request,perl=TRUE)
+  terms <- list(
+    mean="\\b(?:arithmetic\\s+mean|mean|average)\\b",
+    expectation="\\b(?:expected\\s+(?:value|number|count|arrivals?|successes?)|expectation)\\b",
+    median="\\bmedian\\b",
+    mode="\\b(?:modal\\s+value|mode)\\b",
+    variance="\\bvariance\\b",
+    deviation="\\b(?:standard\\s+deviation|std\\.?\\s*deviation)\\b",
+    quantile="\\b(?:quantile|quartile|percentile)\\b",
+    range="",  # Composite statistic labels are completed below.
+    ratio="",
+    density="\\b(?:probability\\s+density|density\\s+(?:at|of)|density\\s+function)\\b",
+    effect="",
+    ols_diagnostic="",
+    spatial="",
+    time="",
+    hazard="\\b(?:hazard\\s+(?:function|rate)|z[- ]scores?)\\b",
+    probability_extra="\\b(?:credible\\s+interval|confidence\\s+interval\\s+for\\s+(?:the\\s+)?chance)\\b",
+    graph="\\b(?:histograms?|boxplots?|scatterplots?|bar\\s+charts?|plots?|graphs?|graphics?|charts?)\\b",
+    document="\\b(?:csv\\s+files?|workspace\\s+objects?|unprovided\\s+datasets?)\\b",
+    coefficient="\\b(?:coefficients?|intercept|slope)\\b",
+    rsquared="\\b(?:r[- ]?squared|r\\s*\\^\\s*2)\\b",
+    prediction="\\b(?:predict\\s+y|predictions?)\\b",
+    complement="\\bcomplement\\b",
+    union="\\bunion\\b|\\ba\\s+or\\s+b\\b",
+    conditional="\\bconditional\\b|\\ba\\s+given\\s+b\\b",
+    tstatistic="\\b(?:t[- ]statistic|test\\s+statistic|p[- ]value)\\b"
+  )
+  terms$range <- paste0("\\b(?:range|interquartile\\s+range|iqr|",
+                        "five[- ]number\\s+summary|median\\s+absolute\\s+deviation|",
+                        "coefficient\\s+of\\s+variation|maximum|minimum|",
+                        "ninety[- ]?th\\s+percentile|gini\\s+coefficient)\\b")
+  terms$ratio <- paste0("\\b(?:odds\\s+ratio|risk\\s+ratio|bayes\\s+factor|",
+                        "fano\\s+factor|entropy|skewness|kurtosis)\\b")
+  terms$effect <- paste0("\\b(?:cohen'?s?\\s+d|effect\\s+sizes?|",
+                         "standardized\\s+(?:effects?|beta))\\b")
+  terms$ols_diagnostic <- paste0("\\b(?:adjusted\\s+r[- ]?squared|",
+                                 "adjusted\\s+r\\s*\\^\\s*2|residuals?|",
+                                 "cook'?s?\\s+distance|\\baic\\b|\\bbic\\b)\\b")
+  terms$spatial <- paste0("\\b(?:nearest[- ]neighbou?r\\s+distance|",
+                         "moran'?s?\\s+i|kriging|semivariogram|",
+                         "geodesic\\s+distance|spatial\\s+autocorrelation)\\b")
+  terms$time <- paste0("\\b(?:sample\\s+autocorrelation|",
+                       "autocorrelations?|acf|moving\\s+average|forecast)\\b")
+  # Ignore a mean/variance/deviation noun when it is an *input* label,
+  # e.g. "Normal mean=0, standard deviation=1; calculate P(X<=2)".
+  supported <- switch(family,
+    "descriptive.numeric"=c(mean="mean",median="median",
+          variance="__variance__",deviation="__sd__",quantile="quantile"),
+    "probability.event_scalar"=c(complement="complement",union="union",
+                                  conditional="conditional"),
+    "distribution.binomial"=c(expectation="expected_value",mean="expected_value",
+                               variance="variance"),
+    "distribution.poisson"=c(expectation="expected_value",mean="expected_value",
+                              variance="variance"),
+    "distribution.normal"=c(expectation="expected_value",mean="expected_value",
+                             variance="variance",quantile="quantile"),
+    "distribution.uniform_continuous"=c(expectation="expected_value",
+                                         mean="expected_value",variance="variance"),
+    "inference.one_sample_t"=c(tstatistic="__test__"),
+    "regression.simple_ols"=c(coefficient="__coefficients__",
+                               rsquared="r_squared",prediction="prediction"),
+    character())
+  atoms<-list()
+  offset<-if(start>0L)start-1L else 0L
+  for(kind in names(terms)){
+    m<-gregexpr(terms[[kind]],q,perl=TRUE)[[1L]]
+    if(m[[1L]]<1L)next
+    lengths<-attr(m,"match.length")
+    for(i in seq_along(m)){
+      if(length(atoms)>=32L)return(list(reason="REQUEST_ACTION_CAP_EXCEEDED"))
+      atoms[[length(atoms)+1L]]<-list(kind=kind,
+                       start=as.integer(m[[i]]+offset),
+                       end=as.integer(m[[i]]+lengths[[i]]-1L+offset),
+                       output=unname(supported[kind]))
+    }
+  }
+  list(reason=NULL,atoms=atoms,request_start=if(start>0L)start else 1L)
+}
+
+
+.ru_w4_request_accountable <- function(s,family,outputs) {
+  inv<-.ru_w4_result_atoms(s,family)
+  if(!is.null(inv$reason))return(inv$reason)
+  atoms<-inv$atoms
+  # The same P(X...) twice denotes one event; a distinct natural-language
+  # event clause is a second target even without a second P(...) token.
+  distribution<-family%in%c("distribution.binomial","distribution.poisson",
+                             "distribution.normal","distribution.uniform_continuous")
+  request<-substr(s,inv$request_start,nchar(s))
+  formal<-if(distribution)regmatches(request,gregexpr(
+    "\\bp\\s*\\([^()]{0,160}\\)",request,perl=TRUE))[[1L]] else character()
+  formal<-unique(gsub("\\s+","",formal,perl=TRUE))
+  if(length(formal)>1L)return("MULTIPLE_PROBABILITY_EVENTS_UNSUPPORTED")
+  prose<-if(distribution) regmatches(request,gregexpr(
+    "\\b(?:chance|probability|likelihood)\\s+(?:that\\s+)?of\\s+",
+    request,perl=TRUE))[[1L]] else character()
+  # The expression "probability of P(X=...)" is the same single event;
+  # "probability of no successes" is an independently specified event.
+  if(length(prose)){
+    positions<-gregexpr("\\b(?:chance|probability|likelihood)\\s+(?:that\\s+)?of\\s+",
+                       request,perl=TRUE)[[1L]]
+    len<-attr(positions,"match.length")
+    descriptions<-vapply(seq_along(positions),function(i){
+      suffix<-substr(request,positions[[i]]+len[[i]],nchar(request))
+      .ru_w4_hit("^p\\s*\\(",suffix)
+    },logical(1L))
+    if(length(formal)>0L && any(!descriptions))
+      return("MULTIPLE_PROBABILITY_EVENTS_UNSUPPORTED")
+    if(length(formal)==0L && any(!descriptions))
+      return("UNREPRESENTED_PROBABILITY_EVENT_UNSUPPORTED")
+  }
+  # Every observed output noun, including a second result joined to a
+  # supported one, must have a fixed exact output ID. The parser cannot
+  # silently convert a request for a different statistic to the first one.
+  if(length(atoms)){
+    for(a in atoms){
+      id<-a$output
+      if(is.null(id)||!length(id)||is.na(id))
+        return("UNREPRESENTED_STATISTICAL_OUTPUT_UNSUPPORTED")
+      if(identical(id,"__variance__"))
+        id<-outputs[grepl("^(?:sample|population)_variance$",outputs)]
+      if(identical(id,"__sd__"))
+        id<-outputs[grepl("^(?:sample|population)_sd$",outputs)]
+      if(identical(id,"__coefficients__"))
+        id<-c("intercept","slope")
+      if(identical(id,"__test__"))
+        id<-c("t_statistic","p_value")
+      if(!length(id)||!all(id%in%outputs))
+        return("REQUESTED_OUTPUT_NOT_COMPUTED")
+    }
+  }
+  # The old W4 schema carries one event only. Event identity is checked
+  # above, and exact output IDs here; an unknown additional *action* after
+  # a coordinating conjunction must not be swallowed as a model modifier.
+  connector<-paste0("\\b(?:and|plus|also|along\\s+with|",
+                    "as\\s+well\\s+as|together\\s+with)\\b")
+  indices<-gregexpr(connector,request,perl=TRUE)[[1L]]
+  if(indices[[1L]]>0L){
+    lengths<-attr(indices,"match.length")
+    if(length(indices)>32L)return("REQUEST_ACTION_CAP_EXCEEDED")
+    for(i in seq_along(indices)){
+      from<-indices[[i]]+lengths[[i]]
+      until<-if(i<length(indices))indices[[i+1L]]-1L else nchar(request)
+      segment<-substr(request,from,until)
+      segment<-trimws(strsplit(segment,"[;.!?]",perl=TRUE)[[1L]][[1L]])
+      if(!nzchar(segment))next
+      # Verified model operands, parameter bindings, and assumptions do not
+      # constitute extra output requests; these are syntactically recognized.
+      if(.ru_w4_hit(paste0("^(?:(?:the|a|an)\\s+)?",
+                          "(?:x|y|z|mu|sigma|mu0|n|p|lambda|a|b|",
+                          "x0|x_new|values|observations)\\s*(?:=|:)"),
+                    segment))next
+      # Coordinated probability assignments are model inputs, not events.
+      # Only accept a complete scalar assignment, not an extra request.
+      if(family=="probability.event_scalar" &&
+         .ru_w4_hit(paste0("^p\\s*\\([^()]{1,100}\\)\\s*(?:=|:)\\s*",
+                           .ru_w4_numre,"(?:\\s|[,;.]|$)"),segment))next
+      if(.ru_w4_hit(paste0("^(?:(?:the|a|an)\\s+)?",
+                            "(?:mean|standard\\s+deviation|sd|",
+                            "success\\s+probability|rate|trials?)",
+                            "\\s*(?:=|:)\\s*",.ru_w4_numre,
+                            "(?:\\s|[,;.]|$)"),segment))next
+      if(.ru_w4_hit("^(?:identically distributed|independent|approximately normal)\\b",
+                    segment))next
+      if(.ru_w4_hit("^(?:r\\s+code|code\\s+preview|r\\s+script|results?|answers?)\\b",
+                    segment))next
+      # Require an actual atom *in this coordinated component*, never a
+      # recognized atom in a later component that would conceal an omission.
+      from_abs<-inv$request_start+from-1L
+      to_abs<-from_abs+nchar(segment)-1L
+      if(any(vapply(atoms,function(a)
+          a$start>=from_abs && a$start<=to_abs,logical(1L))))next
+      if(distribution && .ru_w4_hit("\\bp\\s*\\(",segment))next
+      # Unknown coordinated output is never automatically identified with
+      # a calculated predecessor, regardless of what keyword that had.
+      return("ADDITIONAL_REQUEST_ACTION_UNSUPPORTED")
+    }
+  }
+  # Also catch independent verb-started requests separated by semicolons,
+  # e.g. "calculate P(X=2); derive an unfamiliar index".
+  clauses<-strsplit(request,"[;!?]",perl=TRUE)[[1L]]
+  if(length(clauses)>16L)return("REQUEST_ACTION_CAP_EXCEEDED")
+  if(length(clauses)>1L)for(i in seq_along(clauses)){
+    clause<-trimws(clauses[[i]])
+    if(i==1L||!nzchar(clause))next
+    if(.ru_w4_hit("^(?:also\\s+)?(?:compute|calculate|derive|show|report)\\b",
+                  clause)){
+      begin<-regexpr(clause,request,fixed=TRUE)[[1L]]+inv$request_start-1L
+      if(!any(vapply(atoms,function(a)a$start>=begin,logical(1L))) &&
+         !.ru_w4_hit("\\bp\\s*\\(",clause))
+        return("ADDITIONAL_REQUEST_ACTION_UNSUPPORTED")
+    }
+  }
+  # Independently introduced verbs (including comma-separated verbs)
+  # define a new obligation even without an "and". A recognized target in
+  # another clause cannot discharge it. Exceptions are fixed model actions
+  # that inherently return the registered OLS coefficients or t test outputs.
+  actions<-gregexpr(paste0("\\b(?:calculate|compute|find|give|report|",
+                            "return|estimate|determine|derive|fit|predict|",
+                            "construct|generate|produce|display|show|plot|",
+                            "draw|output|retrieve|load|read|access|run|test|",
+                            "list|create|build|explain|summari[sz]e)\\b"),
+                    request,perl=TRUE)[[1L]]
+  if(actions[[1L]]>0L){
+    if(length(actions)>24L)return("REQUEST_ACTION_CAP_EXCEEDED")
+    for(i in seq_along(actions)){
+      from<-actions[[i]]
+      until<-if(i<length(actions))actions[[i+1L]]-1L else nchar(request)
+      action_clause<-substr(request,from,until)
+      end_marker<-regexpr("[;!?]",action_clause,perl=TRUE)[[1L]]
+      if(end_marker>0L)action_clause<-substr(action_clause,1L,end_marker-1L)
+      begin<-inv$request_start+from-1L
+      end<-begin+nchar(action_clause)-1L
+      has_atom<-any(vapply(atoms,function(a)
+        a$start>=begin&&a$start<=end,logical(1L)))
+      has_event<-distribution&&.ru_w4_hit("\\bp\\s*\\(",action_clause)
+      t_test<-family=="inference.one_sample_t"&&
+        .ru_w4_hit("^test\\b|t[- ]test\\b",action_clause)&&
+        all(c("t_statistic","p_value")%in%outputs)
+      t_ci<-family=="inference.one_sample_t"&&
+        .ru_w4_hit("\\bconfidence\\s+interval\\b",action_clause)&&
+        all(c("ci_lower","ci_upper")%in%outputs)
+      ols_fit<-family=="regression.simple_ols"&&
+        .ru_w4_hit("^fit\\b",action_clause)&&
+        all(c("intercept","slope")%in%outputs)
+      code_only<-.ru_w4_hit("\\b(?:r\\s+code|code\\s+preview|r\\s+script)\\b",
+                           action_clause)
+      if(!has_atom&&!has_event&&!t_test&&!t_ci&&!ols_fit&&!code_only)
+        return("ADDITIONAL_REQUEST_ACTION_UNSUPPORTED")
+    }
+  }
+  NULL
+}
+
 .ru_w4_parse<-function(question) {
   if(!is.character(question)||length(question)!=1L||is.na(question)||
      !nzchar(trimws(question))||!validUTF8(question)||
@@ -352,6 +608,8 @@
         (is.atomic(z)&&anyNA(z)),logical(1L))]
     if(identical(status,"SOLVED")) {
       uncovered<-.ru_w4_request_complete(s,fam,outs)
+      if(is.null(uncovered))
+        uncovered<-.ru_w4_request_accountable(s,fam,outs)
       if(!is.null(uncovered)) {
         status<-"UNSUPPORTED"
         reason<-uncovered
