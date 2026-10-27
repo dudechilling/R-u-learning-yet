@@ -584,8 +584,10 @@
       is.null(.ru_w4_peer_function("render")))
     return(.ru_w4_refusal(parsed, "UNSUPPORTED", "W4_ADAPTERS_UNAVAILABLE"))
   computed <- tryCatch(compute(parsed), error = function(e) NULL)
-  if (!.ru_w4_validate_computed(computed, parsed))
+  if (!.ru_w4_validate_computed_schema(computed, parsed))
     return(.ru_w4_refusal(parsed, "INVALID", "W4_COMPUTED_SCHEMA_INVALID"))
+  if (!.ru_w4_validate_result_integrity(computed, parsed))
+    return(.ru_w4_refusal(parsed, "INVALID", "W4_RESULT_INTEGRITY_FAILED"))
   structure(computed, class = c("ru_w4_computed", "list"))
 }
 
