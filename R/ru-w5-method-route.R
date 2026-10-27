@@ -88,12 +88,27 @@
   if (prediction) ops <- c(ops,"predict_regression")
   else add("linear_regression","\\b(regression|ols|linear\\s+model)\\b")
   add("interpolation","\\binterpolat(?:e|ion|ing)\\b")
-  add("paired_t","\\bpaired\\b.*\\bt[- ]?tests?\\b|\\bt[- ]?tests?\\b.*\\bpaired\\b")
-  add("two_sample_t","\\b(two|2)\\s+(?:independent\\s+)?(?:sample|group)\\b.*\\bt[- ]?tests?\\b|\\bindependent\\b.*\\bt[- ]?tests?\\b")
-  add("one_sample_t","\\bone[- ]sample\\b.*\\bt[- ]?tests?\\b")
-  if (has("\\bt[- ]?tests?\\b") &&
-      !any(c("one_sample_t","two_sample_t","paired_t") %in% ops))
-    ops <- c(ops,"generic_t_test")
+  # The test's null mean, sample SD and variance assumptions are inputs,
+  # not additional requested descriptive calculations. A separate imperative
+  # "compute mean and run a t-test" still requests two operations.
+  t_context <- has("\\b(t[. -]?tests?|student\\s+t|welch\\s+t|t\\s+procedure|t\\s+statistic)\\b")
+  if (t_context) {
+    if (has("\\b(paired|matched[- ]pairs?|before[- ]after|within[- ]person)\\b"))
+      ops <- c(ops,"paired_t")
+    else if (has("\\b(welch|unpaired|unrelated|unequal\\s+variances)\\b") ||
+             has("\\b(two|2)\\s+(?:independent\\s+)?(?:samples?|groups?)\\b") ||
+             has("\\bindependent\\s+(?:samples?|groups?)\\b"))
+      ops <- c(ops,"two_sample_t")
+    else if (has("\\b(one[- ]sample|one\\s+(?:numeric\\s+)?sample|single\\s+sample|one\\s+population\\s+mean|one\\s+mean|target\\s+mean|benchmark)\\b"))
+      ops <- c(ops,"one_sample_t")
+    else ops <- c(ops,"generic_t_test")
+    if (!has("\\b(compute|calculate|find|report)\\s+(?:the\\s+)?(?:sample\\s+)?means?\\b"))
+      ops <- setdiff(ops,"mean_median")
+    if (!has("\\b(compute|calculate|find|report)\\s+(?:the\\s+)?(?:sample\\s+)?(?:standard\\s+deviation|sd)\\b"))
+      ops <- setdiff(ops,"sample_sd")
+    if (!has("\\b(compute|calculate|find|report)\\s+(?:the\\s+)?(?:sample\\s+)?variance\\b"))
+      ops <- setdiff(ops,"variance")
+  }
   if (has("\\banova\\b")) ops <- c(ops,"anova")
   add("conditional_probability","\\bconditional\\s+probability\\b|\\bprobability\\b.*\\bgiven\\b")
   add("probability_union","\\bunion\\s+probability\\b|\\bprobability\\b.*\\b(?:a\\s+or\\s+b|either\\s+event)\\b")
@@ -107,6 +122,11 @@
   add("normal_right_tail","\\bnormal\\b.*\\b(right\\s+tail|greater\\s+than|above)\\b")
   add("normal_percentile","\\bnormal\\b.*\\b(percentile|quantile)\\b")
   add("percentile_cutoff","\\bpercentile\\s+cutoff\\b")
+  # A regression coefficient's confidence interval belongs to the fitted
+  # regression, rather than an unrelated second interval-estimation method.
+  if ("linear_regression" %in% ops &&
+      has("\\b(slope|coefficient)\\b.*\\bconfidence\\s+interval\\b|\\bconfidence\\s+interval\\b.*\\b(slope|coefficient)\\b"))
+    ops <- setdiff(ops,"generic_confidence_interval")
   # The existing sample_sd contract reports range, variance and SD together.
   if ("sample_sd" %in% ops && all(c("range","variance") %in% ops))
     ops <- setdiff(ops,c("range","variance"))
@@ -164,8 +184,7 @@
        !grepl("\\b(categorical|category|nominal|factor)\\b",q,perl=TRUE)) ||
     (grepl("\\bpearson\\b",q,perl=TRUE) &&
        grepl("\\brank\\s+correlation\\b",q,perl=TRUE)) ||
-    (grepl("\\bpaired\\b",q,perl=TRUE) &&
-       grepl("\\bindependent\\b",q,perl=TRUE) &&
+    (grepl("\\b(paired\\s+(?:and|or|versus|vs)\\s+independent|independent\\s+(?:and|or|versus|vs)\\s+paired)\\b",q,perl=TRUE) &&
        grepl("\\bt[- ]?tests?\\b",q,perl=TRUE))
   if (role_conflict)
     return(result("UNSUPPORTED",rows=hits[FALSE,,drop=FALSE],

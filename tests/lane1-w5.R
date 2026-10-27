@@ -128,6 +128,16 @@ positive <- list(
  c("Create a histogram for measured heights","histogram"),
  c("Draw a bar graph for nominal categories","bar_chart")
 )
+# Explicit t-test inputs (null mean, SD, design) are not extra outputs.
+positive <- c(positive,list(
+ c("Run a one-sample t test against a reference mean","one_sample_t"),
+ c("Test a single sample mean against 8 with Student t","one_sample_t"),
+ c("Run a Welch t test on two independent groups","two_sample_t"),
+ c("Compare unrelated samples using Welch t test","two_sample_t"),
+ c("Use a paired Student t procedure for matched observations","paired_t"),
+ c("Estimate the slope confidence interval from a linear regression",
+   "linear_regression")
+))
 for (item in positive) {
   q <- item[[1L]]; id <- item[[2L]]
   for (variant in unique(c(q,tolower(q),toupper(q)))) {
@@ -216,6 +226,9 @@ negative <- c(
  "Calculate Pearson rank correlation",
  "Run a paired and independent t-test on the same unmatched groups"
 )
+negative <- c(negative,
+  "Compute the sample mean and run a paired t-test",
+  "Calculate sample standard deviation and perform an independent two sample t-test")
 check(length(negative)>=40L && !anyDuplicated(negative),
       "40 independently distinct incompatible prompts")
 for (q in negative) {
