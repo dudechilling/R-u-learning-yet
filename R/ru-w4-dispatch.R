@@ -618,6 +618,12 @@
 }
 
 .ru_w4_dispatch <- function(question) {
+  # This whole-question refusal remains effective even when an optional A3
+  # parser is not installed; W3 may otherwise silently solve just the dice.
+  if (.ru_w4_dice_composite_unsupported(question))
+    return(.ru_w4_refusal(
+      list(original_question = question, family_id = "dice_sum_independent_fair"),
+      "UNSUPPORTED", "ADDITIONAL_ANALYSIS_UNSUPPORTED"))
   parser <- .ru_w4_peer_function("parse")
   if (is.null(parser)) return(NULL)
   # Bare/conceptual PMF and CDF queries have an established W3
@@ -627,12 +633,6 @@
       "^(?:(?:what\\s+is|define|explain)\\s+(?:(?:a|the)\\s+)?)?(?:pmf|cdf)\\s*\\??$",
       trimws(tolower(question)), perl = TRUE))
     return(NULL)
-  # Refuse a genuinely separate requested analysis BEFORE W3's dice
-  # fallback, which historically could return a misleading partial SOLVED.
-  if (.ru_w4_dice_composite_unsupported(question))
-    return(.ru_w4_refusal(
-      list(original_question = question, family_id = "dice_sum_independent_fair"),
-      "UNSUPPORTED", "ADDITIONAL_ANALYSIS_UNSUPPORTED"))
   # The frozen W3 dice parser owns every dice question, including its
   # adversarial extra-components, dependence and transformation refusals.
   # A newly recognized W4 model must never override those protections.
