@@ -271,7 +271,12 @@ pass("typed negative and incomplete W4 states preserve reason and never solve", 
     stopifnot(identical(z$status, status),
               identical(z$reason_code, p$reason_code),
               identical(z$code_preview, ""), identical(z$executed, FALSE),
-              identical(z$answer, list()))
+              identical(z$answer, list()),
+              all(vapply(c("method_id", "model_id", "estimand",
+                           "study_design", "execution_scope"),
+                         function(key) identical(z[[key]], p[[key]]),
+                         logical(1L))),
+              valid_computed(z,p))
   }
 })
 

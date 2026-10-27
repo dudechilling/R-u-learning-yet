@@ -501,6 +501,19 @@
     missing_inputs = if (is.character(fields$missing_inputs) &&
                          !anyNA(fields$missing_inputs))
       fields$missing_inputs else character())
+  # A3's non-SOLVED parsed metadata is part of the typed contract.
+  # Preserve only safe fixed-key scalars: do not discard source/model identity
+  # or turn missing/unsupported statuses into anonymous computed objects.
+  for (key in c("method_id", "model_id", "estimand",
+                "study_design", "execution_scope")) {
+    value <- fields[[key]]
+    if (is.character(value) && length(value) == 1L &&
+        ((key %in% c("method_id", "model_id", "estimand") &&
+          identical(value, NA_character_)) || .ru_w4_scalar(value)) &&
+        (!identical(key, "execution_scope") ||
+         identical(value, "INLINE_LITERAL_ONLY")))
+      result[[key]] <- value
+  }
   structure(result, class = c("ru_w4_computed", "list"))
 }
 
