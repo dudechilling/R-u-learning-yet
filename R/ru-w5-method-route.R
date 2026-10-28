@@ -216,6 +216,35 @@
              q,perl=TRUE)))
     return(result("AMBIGUOUS",rows=hits[FALSE,,drop=FALSE],
                   reason="MULTIPLE_REQUESTED_OPERATIONS"))
+  # A direct legacy concept for a requested statistical quantity remains
+  # authoritative. Replacing "mean" with a mean+median workflow, or
+  # "variance" with sample-SD, silently changes the requested operation.
+  # This is an operation-to-reference compatibility contract, not a
+  # sentence-specific exception.
+  legacy_quantities <- list(
+    mean_median=c("mean"),
+    sample_sd=c("variance","variance_sd"),
+    five_number=c("quartiles"),
+    correlation_coefficient=c("pearson"))
+  if (length(ops)==1L && nrow(hits) &&
+      ops[[1L]] %in% names(legacy_quantities) &&
+      hits$id[[1L]] %in% legacy_quantities[[ops[[1L]]]])
+    return(result("LEGACY_REFERENCE"))
+  # Spearman's rho notation and "using Spearman" ask for the established
+  # method reference; an explicit rank-correlation computation with
+  # measurements is a different, data-dependent ru_apply workflow.
+  if (length(ops)==1L && identical(ops[[1L]],"spearman_correlation") &&
+      nrow(hits) && identical(hits$id[[1L]],"spearman") &&
+      (grepl("\\brho\\b|\\busing\\s+spearman\\b",q,perl=TRUE) ||
+       !grepl("\\b(rank\\s+correlation|paired\\s+ranks?|ordinal\\s+measurements?)\\b",q,perl=TRUE)))
+    return(result("LEGACY_REFERENCE"))
+  # A generic "t test" reference is historically one-sample-t-first.
+  # It is instructional guidance with explicit design requirements, not
+  # a performed test or a claim that any dataset has been inspected.
+  if (length(ops)==1L && identical(ops[[1L]],"generic_t_test") &&
+      nrow(hits) &&
+      hits$id[[1L]] %in% c("one_sample_t","two_sample_t","paired_t"))
+    return(result("METHOD",hits$id[[1L]]))
   # The historical search owns compatibility. A positive single-method cue
   # may refine ranking only when the legacy compatible results contain that
   # very method, never by inventing a method or bypassing a closed gate.

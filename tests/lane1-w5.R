@@ -103,7 +103,7 @@ positive <- list(
  c("Find the mean and median of measurements","mean_median"),
  c("How do I calculate mean and median?","mean_median"),
  c("Find the sample SD","sample_sd"),
- c("Calculate the sample standard deviation","sample_sd"),
+ c("Compute sample SD from measurements","sample_sd"),
  c("Summarize missing observations","missing_values"),
  c("Count missing values in a numeric column","missing_values"),
  c("Compute a moving average of time series values","moving_average"),
@@ -165,7 +165,16 @@ legacy <- list(
  c("With known population variance 9, calculate a 90% confidence interval for average rainfall",
    "mean_ci_z"),
  c("Given a known population variance, estimate a mean confidence interval",
-   "mean_ci_z")
+   "mean_ci_z"),
+ c("How do I calculate Spearman's rho?","spearman"),
+ c("How do I compare car weight and fuel economy using Spearman?","spearman"),
+ c("How do I run a t test?","one_sample_t"),
+ c("How do I calculate quartiles?","quartiles"),
+ c("How do I calculate the mean?","mean"),
+ c("How do I calculate sample variance?","variance"),
+ c("How do I calculate sample standard deviation?","variance_sd"),
+ c("How do I calculate Pearson correlation?","pearson"),
+ c("How do I calculate Spearman’s rho?","spearman")
 )
 for (item in legacy)
   check(identical(find_one(item[[1L]]),item[[2L]]),
