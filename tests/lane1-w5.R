@@ -310,3 +310,415 @@ cat("A1 W5 PUBLIC ROUTING PASS: 46 canonical IDs; ",
     "40 genuine A2 guides; six same-ID legacy fallbacks; ",
     rendered," A4 headless Viewer renderings; explicit-data base-R oracle; ",
     "3 QUALIFIED/43 LIMITED; no autoexecution.\n",sep="")
+
+# SUP79 W5-R8: independently authored closed statistical compatibility tests.
+
+# Original synthetic acceptance section: synthetic-positive.R
+# SUP79 independently authored method paraphrases. No sealed A5 fixtures.
+suppressPackageStartupMessages(library(rulearn))
+ns<-asNamespace("rulearn")
+ids<-get(".ru_w5_method_ids",ns)()
+caps<-get(".ru_w5_method_capabilities",ns)()
+stopifnot(length(caps)==46L,identical(names(caps),ids),
+ all(vapply(caps,function(z)length(z$outputs)>0L,logical(1))),
+ all(vapply(caps,function(z)identical(z$roles,
+   get(".ru_allowed_arguments",ns)(z$id)),logical(1))))
+find_id<-function(q){x<-ru_find(q,n=1L);if(nrow(x))x$id[[1L]]else NA_character_}
+guide_id<-function(q){g<-ru_guide(q);if(is.list(g))return(g$method_id);
+ if(is.character(g)&&length(g)==1L&&nzchar(g))
+   return(tools::file_path_sans_ext(basename(g)));NA_character_}
+positive2<-list(
+import_csv=c("Import a CSV file into an R data frame","Read a comma-separated dataset as a table"),
+inspect_columns=c("Inspect variables in the supplied dataset","List column names and types"),
+filter_rows=c("Filter rows based on a threshold","Keep records where the value exceeds a cutoff"),
+group_means=c("Report average by region","Compute means for each category"),
+missing_values=c("Count missing observations in a column","Summarize missingness in a dataset"),
+mean_median=c("Calculate both the mean and median of a numeric vector","Report median and mean from measurements"),
+sample_sd=c("Estimate sample standard deviation from measurements","Compute sample SD and sample variance"),
+five_number=c("Compute the five-number summary of numeric observations","Report quartiles and interquartile range for sample values"),
+percentile_cutoff=c("Find an empirical percentile cutoff from a sample","Calculate the sample percentile of recorded measurements"),
+relative_frequency=c("Create a frequency table of observed categories","Report relative frequencies for factor levels"),
+categorical_mode=c("Find the most common category in a factor","Compute categorical mode of responses"),
+z_score=c("Calculate z-scores of sample measurements","Standardize numeric values into standard scores"),
+histogram=c("Draw a histogram for continuous measurements","Make a binned numeric plot of heights"),
+bar_chart=c("Draw category-count bars for labels","Plot a bar chart of survey categories"),
+boxplot=c("Make a box-and-whisker plot of numeric heights","Draw a boxplot for a numeric variable"),
+grouped_boxplot=c("Draw a grouped boxplot of numeric scores","Plot boxplots by region for measured values"),
+scatterplot=c("Make a scatterplot of two quantitative variables","Plot one quantitative variable against another"),
+zero_correlation=c("Illustrate zero correlation in a nonlinear pattern","Plot a nonlinear pattern with zero Pearson r"),
+normal_shaded_area=c("Shade the lower tail under a normal density","Plot the shaded left area under a normal curve"),
+line_chart=c("Plot a time-series line graph of observations","Create a line chart of temperature over dates"),
+moving_average=c("Calculate rolling mean of regularly spaced time data","Compute a moving average for dated observations"),
+autocorrelation=c("Plot autocorrelation of a regularly spaced series","Estimate serial correlation at observation lags"),
+stationarity=c("Explore stationarity of a time series","Check time-series stability using early and late summaries"),
+event_probability=c("Estimate empirical event probability from observed rows","Find the fraction of events recorded in a sample"),
+conditional_probability=c("Estimate conditional probability from paired events","Compute probability of A given B"),
+probability_union=c("Compute union probability for events A and B","Find probability of either event A or B"),
+binomial_exact=c("Calculate a binomial point probability exactly 4 successes","Compute exactly two successes in binomial trials"),
+binomial_at_least=c("Calculate binomial probability at least 3 successes","Find no fewer than four successes under binomial trials"),
+normal_left_tail=c("Compute lower tail probability under a Gaussian model","Find normal probability below a threshold"),
+normal_right_tail=c("Compute upper tail probability under a Gaussian model","Find normal probability above a cutoff"),
+normal_percentile=c("Find normal 90th percentile of a distribution","Calculate a quantile from a Gaussian model"),
+discrete_expectation=c("Compute expected value for a discrete random variable","Find expectation of a random variable with a probability mass"),
+sample_random=c("Randomly select rows from a population table","Draw a simple random sample of records with a fixed seed"),
+sampling_distribution=c("Simulate a bootstrap distribution of sample means","Explore the sampling distribution of the mean"),
+standard_error=c("Compute standard error of the sample mean","Estimate the SE of mean from sample measurements"),
+mean_confidence_interval=c("Construct a mean confidence interval with unknown population sigma","Calculate a t interval for the mean of numeric observations"),
+one_sample_t=c("Run a one-sample t test against the null mean","Test a single sample mean against a benchmark"),
+two_sample_t=c("Use Welch t test for unrelated groups","Run two-sample t-test on independent measurements"),
+paired_t=c("Run paired t test on matched subjects","Use a matched-pairs t procedure for before-after scores"),
+correlation_test=c("Test Pearson correlation between two numeric variables","Run a correlation test for numeric x and y"),
+spearman_correlation=c("Compute Spearman rank correlation for ordinal scores","Test rank correlation between paired ordinal measurements"),
+linear_regression=c("Fit ordinary linear regression of y on x","Estimate an OLS slope for a numeric response"),
+predict_regression=c("Predict a new response using a fitted regression","Calculate prediction interval from a fitted regression"),
+interpolation=c("Interpolate a numeric y value between observed x positions","Use linear interpolation within the sampled range"),
+categorical_independence=c("Run a chi-square test of independence for two factors","Test association between two categorical variables"),
+proportion_interval=c("Compute a confidence interval for a population proportion","Calculate a Wilson interval from successes and trials"))
+stopifnot(identical(names(positive2),ids),
+          all(lengths(positive2)==2L),length(unique(unlist(positive2)))==92L)
+n<-0L
+for(id in ids)for(q in positive2[[id]])for(v in unique(c(q,toupper(q),paste0(q,"?")))){
+ r<-get(".ru_w5_method_resolve",ns)(v,n=1L)
+ f<-find_id(v);g<-guide_id(v)
+ if(!identical(r$status,"METHOD")||!identical(r$method_id,id)||
+    !identical(f,id)||!identical(g,id))
+   stop("SUP79_POSITIVE_FAIL: ",v," expected=",id,
+        " status=",r$status," find=",f," guide=",g,call.=FALSE)
+ n<-n+1L
+}
+cat("SUP79_92_POSITIVE_PARAPHRASES_PASS",n,"case/punctuation checks\n")
+
+# Original synthetic acceptance section: synthetic-multi.R
+# SUP79 independent multi-operation semantic coverage, no A5 sealed prompts.
+suppressPackageStartupMessages(library(rulearn))
+ns<-asNamespace("rulearn")
+resolve<-get(".ru_w5_method_resolve",ns)
+find_id<-function(q){x<-ru_find(q,n=1L);if(nrow(x))x$id[[1L]]else NA_character_}
+guide_id<-function(q){g<-ru_guide(q);if(is.list(g))return(g$method_id);
+ if(is.character(g)&&length(g)==1L&&nzchar(g))
+   return(tools::file_path_sans_ext(basename(g)));NA_character_}
+multi_good<-list(
+ c("Calculate mean and median of one numeric sample","mean_median"),
+ c("Find median and mean from the same measurements","mean_median"),
+ c("Compute sample SD and sample variance","sample_sd"),
+ c("Report sample variance and range and sample SD","sample_sd"),
+ c("Calculate the five-number summary including quartiles and IQR","five_number"),
+ c("Find quartiles and interquartile range for numeric observations","five_number"),
+ c("Report category counts and relative frequencies in a frequency table","relative_frequency"),
+ c("Calculate categorical proportions and frequencies in a frequency table","relative_frequency"),
+ c("Report missing and available observation counts","missing_values"),
+ c("Find missing values and the number of available measurements","missing_values"),
+ c("Calculate sample standard error and its estimated sample SD","standard_error"),
+ c("Find estimated SE of mean and sample SD from numeric data","standard_error"),
+ c("Compute discrete expected value and variance of the probability mass","discrete_expectation"),
+ c("Calculate expectation and variance for a discrete random variable","discrete_expectation"),
+ c("Plot shaded left tail and report normal probability","normal_shaded_area"),
+ c("Shade lower area of normal density and compute its probability","normal_shaded_area"),
+ c("Estimate union probability and event marginals for A or B","probability_union"),
+ c("Compute probability of either event and the separate A and B rates","probability_union"),
+ c("Calculate bootstrap mean distribution and bootstrap standard error","sampling_distribution"),
+ c("Simulate a sampling distribution and report bootstrap SE","sampling_distribution"),
+ c("Run a paired t test with p-value and confidence interval","paired_t"),
+ c("Perform one-sample t test and report its p-value and interval","one_sample_t"),
+ c("Run Welch two-sample t test and report p-value and interval","two_sample_t"),
+ c("Fit ordinary linear regression and report slope coefficient interval","linear_regression"))
+multi_bad<-c(
+ "Calculate mean and produce a scatterplot of two columns",
+ "Estimate median and draw a bar chart for categories",
+ "Find sample variance and run a correlation significance test",
+ "Plot numeric histogram and compute empirical category proportions",
+ "Run a one-sample t test and construct a proportion interval",
+ "Calculate Pearson test p-value and fit a separate OLS model",
+ "Draw grouped boxplots and test categorical independence",
+ "Compute an event union probability and a conditional event probability",
+ "Calculate exact binomial mass and upper-tail binomial probability",
+ "Compute two different exact binomial event probabilities",
+ "Find two separate binomial at-least threshold probabilities",
+ "Draw a line chart and test categorical independence",
+ "Compute moving average and perform paired t test",
+ "Compute autocorrelation and estimate standard error",
+ "Plot scatter diagram and estimate an unrelated proportion interval",
+ "Inspect columns and calculate an unrelated t test",
+ "Import CSV and run a regression model",
+ "Filter rows and then compute a sample mean",
+ "Randomly sample rows and then draw a histogram",
+ "Calculate a sample mean and a bootstrap distribution",
+ "Compute categorical mode and normal percentile",
+ "Compute quartiles and a conditional probability",
+ "Estimate sample SD and a normal right-tail probability",
+ "Draw a bar chart and fit a linear regression",
+ "Make a grouped boxplot and test two independent means",
+ "Run a paired t test and an unpaired t test",
+ "Calculate standard error and an event union probability",
+ "Compute binomial exact mass and a sample percentile",
+ "Estimate linear interpolation and a correlation test",
+ "Report mean and construct a mean confidence interval",
+ "Calculate relative frequency table and sample variance",
+ "Find the standard error and the categorical mode",
+ "Calculate normal lower tail and normal upper tail probabilities",
+ "Test Spearman association and Pearson association",
+ "Report regression coefficients and an unrelated categorical chi-square test",
+ "Compute the sample SD and run a chi-square independence test",
+ "Calculate a proportion interval and conditional probability",
+ "Find group means and draw a time-series line chart",
+ "Compute a discrete expectation and perform a one-sample t test",
+ "Run a two-sample t test and estimate a bootstrap sampling distribution")
+stopifnot(length(multi_good)+length(multi_bad)>=40L,
+          !anyDuplicated(multi_bad))
+for(item in multi_good){
+ q<-item[[1L]];id<-item[[2L]]
+ r<-resolve(q,n=1L);f<-find_id(q);g<-guide_id(q)
+ if(!identical(r$status,"METHOD")||!identical(f,id)||!identical(g,id))
+   stop("SUP79_MULTI_SUPPORTED_FAIL ",q," expected=",id,
+        " status=",r$status," find=",f," guide=",g,call.=FALSE)
+}
+for(q in multi_bad){
+ r<-resolve(q,n=1L);f<-find_id(q);g<-guide_id(q)
+ if(!r$status %in% c("AMBIGUOUS","UNSUPPORTED")||!is.na(f)||!is.na(g))
+   stop("SUP79_MULTI_ABSTAIN_FAIL ",q," status=",r$status,
+        " find=",f," guide=",g,call.=FALSE)
+}
+cat("SUP79_MULTI_REQUEST_PASS",length(multi_good),"genuine same-method outputs",
+    length(multi_bad),"complete-request abstentions\n")
+
+# Original synthetic acceptance section: synthetic-role.R
+# SUP79 independent input-role/design incompatibilities, not A5 sealed cases.
+suppressPackageStartupMessages(library(rulearn))
+ns<-asNamespace("rulearn")
+resolve<-get(".ru_w5_method_resolve",ns)
+role_bad<-c(
+ "Draw histogram of nominal occupation labels",
+ "Plot histogram for unordered categorical site names",
+ "Show histogram of nonnumeric category labels",
+ "Make boxplot of nominal respondent names",
+ "Draw boxplot of categorical country names",
+ "Plot boxplot of categorical labels",
+ "Compute mode for numeric continuous measurements",
+ "Find categorical mode of a continuous numeric variable",
+ "Compute most common category from quantitative continuous scores",
+ "Run categorical independence on two continuous numeric measures",
+ "Test categorical independence of numeric x and numeric y",
+ "Perform chi-square test on continuous numeric measurements",
+ "Plot scatterplot of two nominal categories",
+ "Make scatterplot of categorical x and y axes",
+ "Create scatterplot of unordered categories",
+ "Draw bar chart of raw continuous numeric measurements without categories",
+ "Plot bar graph of unbinned continuous values",
+ "Create bar chart for numeric measurements without categories",
+ "Run a one-sample t test on a categorical response",
+ "Run a two-sample t test with a binary outcome",
+ "Run a paired t test with nominal outcome",
+ "Compare three independent groups with a two-sample t test",
+ "Compare four groups using a Welch t test",
+ "Run paired t test for unmatched subjects",
+ "Use a paired t test for unrelated observations",
+ "Fit linear regression for a binary response",
+ "Predict from linear regression with a nominal outcome",
+ "Test Pearson correlation on ordinal only measurements",
+ "Draw random sample of rows with replacement",
+ "Select random records with replacement using a seed",
+ "Calculate normal right-tail probability without assuming normality",
+ "Shade left tail of a non-normal distribution",
+ "Calculate moving average with no timestamps",
+ "Compute autocorrelation for unordered categories",
+ "Plot a line chart without time ordering",
+ "Run a paired t test on independent samples",
+ "Test two-sample t on before-after paired observations",
+ "Estimate standard error from nominal categories")
+stopifnot(length(role_bad)>=30L,!anyDuplicated(role_bad))
+for(q in role_bad){
+ r<-resolve(q,n=1L)
+ f<-ru_find(q,n=1L)
+ g<-ru_guide(q)
+ if(!r$status %in% c("UNSUPPORTED","AMBIGUOUS") ||
+    nrow(f)!=0L || !is.null(g))
+   stop("SUP79_ROLE_FAIL ",q," status=",r$status,
+        " find=",if(nrow(f))f$id[[1L]]else "EMPTY",
+        " guide=",if(is.list(g))g$method_id else as.character(g),
+        call.=FALSE)
+}
+cat("SUP79_ROLE_DESIGN_REFUSALS_PASS",length(role_bad),"\n")
+
+# Original synthetic acceptance section: synthetic-research.R
+# SUP79 unsupported research method families; no A5 blind inputs.
+suppressPackageStartupMessages(library(rulearn))
+ns<-asNamespace("rulearn")
+resolve<-get(".ru_w5_method_resolve",ns)
+research_bad<-c(
+ "Fit geographically weighted regression to local outcomes",
+ "Estimate spatial lag regression for neighborhood observations",
+ "Run a spatial error model on districts",
+ "Perform kriging of georeferenced measurements",
+ "Estimate a semivariogram and map residual dependence",
+ "Calculate Moran's I for spatial autocorrelation",
+ "Predict spatial outcomes with a coordinate reference system",
+ "Compute shortest path travel time across a road network",
+ "Estimate network travel distance between locations",
+ "Optimize road-network route for delivery stops",
+ "Perform origin-destination network analysis",
+ "Estimate causal effect from observational correlation",
+ "Apply difference-in-differences to policy outcomes",
+ "Fit regression discontinuity for a treatment cutoff",
+ "Estimate propensity score matching for a treatment",
+ "Fit a multinomial logistic regression for a three-class outcome",
+ "Run a Poisson regression for event counts",
+ "Fit a mixed-effects regression with random intercepts",
+ "Estimate a multilevel hierarchical model",
+ "Fit ridge regression to multiple predictors",
+ "Estimate a nonlinear quadratic regression",
+ "Compute cluster-robust standard errors for OLS",
+ "Calculate heteroskedasticity-robust confidence intervals",
+ "Run Kaplan-Meier survival analysis",
+ "Fit a Cox proportional hazards model",
+ "Run ANOVA for four treatment means",
+ "Compute MANOVA for multiple outcomes",
+ "Perform principal components analysis",
+ "Cluster observations using k-means",
+ "Fit a Bayesian posterior distribution",
+ "Run an MCMC model for the parameters",
+ "Forecast future time-series values with ARIMA",
+ "Test unit roots using Dickey-Fuller",
+ "Estimate seasonal decomposition of monthly counts",
+ "Run a Wilcoxon rank-sum test",
+ "Perform a permutation significance test",
+ "Use stratified random sampling with proportional strata",
+ "Draw a sample with replacement from population rows",
+ "Impute missing data using multiple imputation",
+ "Compute a power analysis for an experiment",
+ "Fit a random forest classification model",
+ "Compute geodesic distance between GPS points",
+ "Run multivariate factor analysis on survey items",
+ "Estimate an instrumental-variable causal model")
+stopifnot(length(research_bad)>=30L,!anyDuplicated(research_bad))
+for(q in research_bad){
+ r<-resolve(q,n=1L)
+ f<-ru_find(q,n=1L)
+ g<-ru_guide(q)
+ if(!r$status %in% c("UNSUPPORTED","AMBIGUOUS") ||
+    nrow(f)!=0L || !is.null(g))
+   stop("SUP79_RESEARCH_FAIL ",q," status=",r$status,
+        " find=",if(nrow(f))f$id[[1L]]else "EMPTY",
+        " guide=",if(is.list(g))g$method_id else as.character(g),
+        call.=FALSE)
+}
+cat("SUP79_UNIMPLEMENTED_RESEARCH_REFUSALS_PASS",length(research_bad),"\n")
+
+# The historical 84-lesson library includes legitimate *reference-only*
+# native-R methods absent from the 46 ru_apply contracts. Treating ordinary
+# logistic regression as an unsupported instructional topic would contradict
+# the unchanged 180-case enterprise acceptance contract. No ru_apply call or
+# W5 computed-result claim is authorized by these legacy references.
+legacy_native <- list(
+ c("Fit a logistic regression for a binary outcome","glm_binomial"),
+ c("Run Welch one-way ANOVA on independent groups with unequal variances",
+   "anova_oneway"),
+ c("Bootstrap a sample mean with replacement from independent observations",
+   "bootstrap_mean"),
+ c("Inspect residual diagnostics for ordinary least squares regression",
+   "regression_diagnostics"),
+ c("Apply Holm adjustment to a family of p-values","multiple_testing_holm"))
+for (item in legacy_native) {
+  q <- item[[1L]]; id <- item[[2L]]
+  r <- resolve(q,n=1L)
+  f <- ru_find(q,n=1L)
+  g <- ru_guide(q)
+  stopifnot(!id %in% ids,
+            identical(r$status,"LEGACY_REFERENCE"),
+            nrow(f)==1L,identical(f$id[[1L]],id),
+            is.null(g))
+}
+cat("SUP81_VERIFIED_NATIVE_LEGACY_REFERENCE_ONLY_PASS",
+    length(legacy_native),"\n")
+
+
+# Original synthetic acceptance section: synthetic-parity.R
+# SUP79 public ru_find/ru_guide parity under reordered phrasing.
+suppressPackageStartupMessages(library(rulearn))
+ns<-asNamespace("rulearn")
+resolve<-get(".ru_w5_method_resolve",ns)
+pairs<-list(
+ c("Compute normal upper-tail probability","Under a normal model find the upper tail probability","normal_right_tail"),
+ c("Plot bar chart of category counts","For category counts, draw a bar chart","bar_chart"),
+ c("Draw a line chart over time","Over time, plot a line chart of measurements","line_chart"),
+ c("Randomly select rows from a population table","From the records, select a random sample","sample_random"),
+ c("Compute median and mean","Find mean and median","mean_median"),
+ c("Run Welch t test on two independent groups","For two independent groups, run a Welch t test","two_sample_t"),
+ c("Shade left tail under normal density","Under normal model, shade the lower tail","normal_shaded_area"),
+ c("Compute conditional probability of A given B","Given B, compute probability of A","conditional_probability"),
+ c("Compute union probability of A or B","For A or B, find union probability","probability_union"),
+ c("Report mean by group","For each group, calculate mean","group_means"),
+ c("Find 90th percentile of normal model","For normal distribution, find the 90th percentile","normal_percentile"))
+checks<-0L
+for(item in pairs){
+ for(q in item[1:2])for(v in unique(c(q,toupper(q),paste0(q,"!")))){
+  r<-resolve(v,n=1L)
+  f<-ru_find(v,n=1L)
+  g<-ru_guide(v)
+  got<-if(nrow(f))f$id[[1L]]else NA_character_
+  guide<-if(is.list(g))g$method_id else
+    if(is.character(g)&&length(g)==1L&&nzchar(g))
+      tools::file_path_sans_ext(basename(g)) else NA_character_
+  if(!identical(r$status,"METHOD")||!identical(got,item[[3L]])||
+     !identical(guide,item[[3L]]))
+    stop("SUP79_REORDER_PARITY_FAIL ",v," expected=",item[[3L]],
+         " status=",r$status," find=",got," guide=",guide,call.=FALSE)
+  checks<-checks+1L
+ }
+}
+cat("SUP79_REORDERED_PUBLIC_IDENTITY_PARITY_PASS",checks,"\n")
+
+
+# SUP81 independent conceptual intent and native function transfer.
+# SUP81 new independent conceptual/procedural and native R-function transfer.
+# No A5 blind text or expected files used.
+suppressPackageStartupMessages(library(rulearn))
+teaching <- c(
+ "Why does percentile rank describe position rather than a score threshold?"="percentile_rank",
+ "How should I interpret a percentile rank in a sample?"="percentile_rank",
+ "Which spread statistic resists extreme observations?"="choose_spread",
+ "When is IQR preferable to SD for outlier-prone measurements?"="choose_spread",
+ "Explain weak stationarity in a time series."="stationarity",
+ "What does stationarity imply for the mean over time?"="stationarity",
+ "How can I assign a data-frame column to an R variable?"="r_objects_columns",
+ "How do I extract a column with the dollar operator?"="r_objects_columns",
+ "Why do cluster designs select whole groups?"="cluster_stratified",
+ "What is the rationale for selecting whole clusters?"="cluster_stratified",
+ "How can I interpret a probability conditional on another event?"="conditional_independence",
+ "What does conditional independence mean?"="conditional_independence",
+ "How does the base R sd() function calculate spread?"="r_sd",
+ "What does sd() do to a numeric vector?"="r_sd",
+ "Create a stem and leaf plot for numeric scores"="r_stem",
+ "Show a stem and leaf diagram of observations"="r_stem")
+refused <- c(
+ "How do I fit a multinomial logistic regression for three outcome classes?",
+ "Explain how to estimate spatial lag regression for districts",
+ "Why should ordinary regression estimate network travel time?",
+ "How do I calculate a sample mean and then run a two-sample t test?",
+ "How do I calculate normal upper and lower tail probabilities?",
+ "How do I plot a histogram of nominal categories?",
+ "How do I estimate a geographically weighted regression?",
+ "How do I draw a category bar chart and run a chi-square independence test?")
+bad<-character()
+for(q in names(teaching)){
+ h<-ru_find(q,n=1L)
+ got<-if(nrow(h))h$id[[1L]]else "EMPTY"
+ if(!identical(got,unname(teaching[[q]])))
+  bad<-c(bad,paste("TEACH",q,"EXPECTED",teaching[[q]],"GOT",got))
+ g<-ru_guide(q)
+ if(!is.null(g)){
+  guide_id<-if(is.list(g))g$method_id else
+    tools::file_path_sans_ext(basename(g))
+  if(!identical(guide_id,got))
+   bad<-c(bad,paste("GUIDE_ID",q,"FIND",got,"GUIDE",guide_id))
+ }
+}
+for(q in refused){
+ h<-ru_find(q,n=1L)
+ g<-ru_guide(q)
+ if(nrow(h)||!is.null(g))
+  bad<-c(bad,paste("REFUSE",q,"GOT",if(nrow(h))h$id[[1L]]else "EMPTY"))
+}
+cat("SUP81_NEW_TEACHING_PROBES",length(teaching),
+    "REFUSAL_PROBES",length(refused),"FAILURES",length(bad),"\n")
+if(length(bad))cat(paste(bad,collapse="\n"),"\n")
+if(length(bad))stop("SUP81_NEW_TEACHING_TRANSFER_FAIL",call.=FALSE)

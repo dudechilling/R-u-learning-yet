@@ -27,12 +27,20 @@ ru_guide <- function(query) {
     }
     return(invisible(path))
   }
-  hits <- .ru_search_results(query,n=3L,type="walkthrough")
-  if(!nrow(hits)) return(invisible(NULL))
+  # A legacy reference is eligible only when the SAME first-ranked public
+  # ru_find() hit has a real installed guide. Never perform a second fuzzy
+  # walkthrough search that silently changes the method identity.
+  hits <- resolved$hits
+  if (!nrow(hits)) return(invisible(NULL))
   first <- hits[1L,,drop=FALSE]
-  if(.ru_rstudio_ready("viewer"))
-    .ru_viewer_show(first,query,force_page=first$id)
-  invisible(system.file("guides",paste0(first$id,".qmd"),package="rulearn"))
+  if (!identical(first$type[[1L]],"walkthrough"))
+    return(invisible(NULL))
+  path <- system.file("guides",paste0(first$id[[1L]],".qmd"),
+                      package="rulearn")
+  if (!nzchar(path)) return(invisible(NULL))
+  if (.ru_rstudio_ready("viewer"))
+    .ru_viewer_show(first,query,force_page=first$id[[1L]])
+  invisible(path)
 }
 
 # Copy an editable ordinary R script. Revised guides keep an immediate
