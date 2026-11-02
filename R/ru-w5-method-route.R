@@ -40,7 +40,7 @@
       bar_chart="\\b(?:bar\\s*(?:charts?|graphs?|plots?)|barplots?|categor(?:y|ical)[- ]count\\s+bars?|bars?\\s+of\\s+(?:category|categorical)\\s+counts?|count\\s+bars?)\\b",
       boxplot="\\b(?:box\\s*plots?|box[- ]and[- ]whisker\\s+plots?)\\b",
       grouped_boxplot="\\b(?:grouped\\s+box\\s*plots?|box\\s*plots?\\s+(?:by|per|across|grouped\\s+by|separated\\s+by)\\s+(?:a\\s+)?(?:group|category|site|region|treatment|class)|box\\s*plots?\\s+of\\s+.*\\s+by\\s+(?:group|category))\\b",
-      scatterplot="\\b(?:scatter\\s*plots?|scatter\\s*diagrams?|plot\\s+one\\s+quantitative\\s+variable\\s+against\\s+another|plot\\s+.*\\s+against\\s+.*)\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:x\\s+(?:and|versus|vs\\.?|against|by)\\s+y|y\\s+(?:and|versus|vs\\.?|against|by)\\s+x|(?:two|paired)\\s+(?:numeric|numerical|quantitative|continuous)\\s+(?:variables?|measurements?|columns?))\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:numeric|quantitative)\\s+[xy]\\s+(?:and|versus|vs\\.?|against|by)\\s+(?:numeric|quantitative)\\s+[xy]\\b",
+      scatterplot="\\b(?:scatter\\s*plots?|scatter\\s*diagrams?|plot\\s+one\\s+quantitative\\s+variable\\s+against\\s+another|plot\\s+.*\\s+against\\s+.*)\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:x\\s+(?:and|versus|vs\\.?|against|by)\\s+y|y\\s+(?:and|versus|vs\\.?|against|by)\\s+x|(?:two|paired)\\s+(?:numeric|numerical|quantitative|continuous)\\s+(?:variables?|measurements?|columns?))\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:numeric|quantitative)\\s+[xy]\\s+(?:and|versus|vs\\.?|against|by)\\s+(?:numeric|quantitative)\\s+[xy]\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:relationship|association)\\s+between\\s+(?:two|2)\\s+(?:(?:numeric|numerical|quantitative|continuous)\\s+)?(?:columns?|variables?|measurements?)\\b",
       zero_correlation="\\b(?:zero\\s+correlation|zero\\s+pearson\\s+r|nonlinear\\s+pattern\\s+with\\s+zero\\s+correlation)\\b",
       normal_shaded_area="\\b(?:shade|shading|shaded|colour\\s+the\\s+area|color\\s+the\\s+area|area\\s+under\\s+(?:the\\s+)?normal\\s+curve)\\b",
       line_chart="\\b(?:line\\s+(?:charts?|plots?|graphs?)|time[- ](?:ordered|series)\\s+(?:line|plot|graph)|plot\\s+.*\\s+over\\s+time|time[- ]ordered\\s+(?:measurements?|values?)|time\\s+series\\s+plots?)\\b",
@@ -202,7 +202,7 @@
   # A paired x/y plotting request denotes a numerical scatterplot only.
   # An explicit categorical role or a geographic map is a different output.
   if ("scatterplot" %in% methods &&
-      has("\\b(?:nominal|categorical|factor|unordered)\\b.{0,36}\\b(?:x|y|variables?|axes|values?)\\b|\\b(?:x|y)\\b.{0,36}\\b(?:nominal|categorical|factor|unordered)\\b"))
+      has("\\b(?:nominal|categorical|factor|unordered)\\b.{0,36}\\b(?:x|y|variables?|axes|values?|columns?)\\b|\\b(?:x|y)\\b.{0,36}\\b(?:nominal|categorical|factor|unordered)\\b"))
     return("SCATTERPLOT_REQUIRES_NUMERIC_PAIRS")
   if ("scatterplot" %in% methods &&
       has("\\b(?:on|onto|as)\\s+(?:a\\s+)?(?:geograph(?:ic|ical)|geospatial|spatial|road|street)?\\s*maps?\\b"))
@@ -443,6 +443,13 @@
   if ("scatterplot" %in% methods &&
       has("\\b(?:and|plus|then|also)\\b.{0,40}\\b(?:fit|run|test|compute|calculate|estimate|draw|plot|make|create)\\b") &&
       has("\\b(?:regression|correlation|means?|median|variance|standard\\s+deviation|histograms?|box\\s*plots?|bar\\s*charts?|t[- ]?test|p[- ]?value)\\b"))
+    return(list(status="AMBIGUOUS",reason="MULTIPLE_REQUESTED_OPERATIONS",
+                detail=methods,methods=methods))
+  # Creating or extracting a data-frame column is an R programming
+  # operation, not an input to a subsequent statistical analysis. A
+  # second requested calculation/plot is a separate whole-request output.
+  if (has("\\b(?:make|create|add|assign|store|save|extract)\\b.{0,50}\\b(?:columns?|fields?|variables?)\\b") &&
+      has("\\b(?:and|then|plus|also)\\b.{0,50}\\b(?:plot|graph|draw|fit|test|compute|calculate|estimate|run|predict)\\b"))
     return(list(status="AMBIGUOUS",reason="MULTIPLE_REQUESTED_OPERATIONS",
                 detail=methods,methods=methods))
   # Explicit outputs absent from every implemented method are unsupported,
@@ -884,6 +891,22 @@
       return(result("LEGACY_REFERENCE",rows=hits,
                     reason="VERIFIED_NATIVE_FUNCTION_REFERENCE"))
   }
+  # Ordinary R data-frame mutation/extraction belongs to the installed
+  # r_objects_columns instructional reference. The 46 ru_apply methods
+  # do not implement arbitrary derived-column creation; this is a
+  # reference-only route with an exact verified top-ranked function.
+  if (is.null(method) && identical(contract$status,"UNCLASSIFIED") &&
+      nrow(hits) && identical(hits$id[[1L]],"r_objects_columns") &&
+      identical(hits$type[[1L]],"function") &&
+      grepl("^(?:make|create|add|assign|store|save|extract|select)\\b",
+            q,perl=TRUE) &&
+      grepl("\\b(?:columns?|fields?|variables?|vectors?)\\b",q,perl=TRUE) &&
+      grepl("\\b(?:data\\s*frame|dataframe|dataset|r\\s+object)\\b",
+            q,perl=TRUE) &&
+      !grepl("\\b(?:and|then|plus|also)\\b.{0,50}\\b(?:compute|calculate|test|fit|run|plot|draw|forecast|predict|estimate)\\b",
+             q,perl=TRUE))
+    return(result("LEGACY_REFERENCE",rows=hits,
+                  reason="VERIFIED_R_DATAFRAME_COLUMN_INSTRUCTION"))
   # An unfamiliar analytical action is not an invitation to show the nearest
   # lexical hit. A reference-only question without a requested action may
   # still use the original installed concept/function ranking.

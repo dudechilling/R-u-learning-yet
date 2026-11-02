@@ -830,3 +830,53 @@ for (query in r_concept_questions) {
 stopifnot(nrow(ru_find("Does r measure regression slope?",n=1L))==0L)
 cat("SUP82_R_CORRELATION_CONCEPT_ROUTING_PASS",
     length(r_concept_questions),"symbolic explanations\n")
+
+
+# SUP82 unchanged Windows RStudio variable lesson transfer: an ordinary
+# derived data-frame column is native-R instruction, not an unimplemented
+# statistical method. Paired quantitative columns still permit a
+# scatterplot guide, but categories, maps and separate outputs do not.
+r_column_reference <- c(
+  "Make a new column in a data frame",
+  "Create a derived variable in a data frame",
+  "Make a column from another variable in a data frame")
+for (query in r_column_reference) {
+  result <- resolve(query,n=1L)
+  found <- ru_find(query,n=1L)
+  stopifnot(identical(result$status,"LEGACY_REFERENCE"),
+            nrow(found)==1L,
+            identical(found$id[[1L]],"r_objects_columns"),
+            identical(found$type[[1L]],"function"),
+            is.null(ru_guide(query)))
+}
+bivariate_column_plots <- c(
+  "Plot the relationship between two columns",
+  "Graph the relationship between two numeric columns",
+  "Draw the association between two quantitative variables")
+for (query in bivariate_column_plots) {
+  result <- resolve(query,n=1L)
+  found <- ru_find(query,n=1L)
+  guide <- ru_guide(query)
+  stopifnot(identical(result$status,"METHOD"),
+            identical(result$method_id,"scatterplot"),
+            nrow(found)==1L,
+            identical(found$id[[1L]],"scatterplot"),
+            is.list(guide),
+            identical(guide$method_id,"scatterplot"))
+}
+column_incompatible <- c(
+  "Make a new column in a data frame and plot a histogram",
+  "Create a derived variable in a data frame and fit a linear regression",
+  "Plot the relationship between two categorical columns",
+  "Plot the relationship between two columns and fit a regression",
+  "Plot the relationship between two columns on a map")
+for (query in column_incompatible) {
+  result <- resolve(query,n=1L)
+  stopifnot(result$status %in% c("UNSUPPORTED","AMBIGUOUS","NO_MATCH"),
+            nrow(ru_find(query,n=1L))==0L,
+            is.null(ru_guide(query)))
+}
+cat("SUP82_WINDOWS_VARIABLES_TRANSFER_PASS",
+    length(r_column_reference),"R column references",
+    length(bivariate_column_plots),"paired-column plots",
+    length(column_incompatible),"incompatible requests\n")
