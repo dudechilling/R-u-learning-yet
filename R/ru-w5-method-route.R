@@ -40,7 +40,7 @@
       bar_chart="\\b(?:bar\\s*(?:charts?|graphs?|plots?)|barplots?|categor(?:y|ical)[- ]count\\s+bars?|bars?\\s+of\\s+(?:category|categorical)\\s+counts?|count\\s+bars?)\\b",
       boxplot="\\b(?:box\\s*plots?|box[- ]and[- ]whisker\\s+plots?)\\b",
       grouped_boxplot="\\b(?:grouped\\s+box\\s*plots?|box\\s*plots?\\s+(?:by|per|across|grouped\\s+by|separated\\s+by)\\s+(?:a\\s+)?(?:group|category|site|region|treatment|class)|box\\s*plots?\\s+of\\s+.*\\s+by\\s+(?:group|category))\\b",
-      scatterplot="\\b(?:scatter\\s*plots?|scatter\\s*diagrams?|plot\\s+one\\s+quantitative\\s+variable\\s+against\\s+another|plot\\s+.*\\s+against\\s+.*)\\b",
+      scatterplot="\\b(?:scatter\\s*plots?|scatter\\s*diagrams?|plot\\s+one\\s+quantitative\\s+variable\\s+against\\s+another|plot\\s+.*\\s+against\\s+.*)\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:x\\s+(?:and|versus|vs\\.?|against|by)\\s+y|y\\s+(?:and|versus|vs\\.?|against|by)\\s+x|(?:two|paired)\\s+(?:numeric|numerical|quantitative|continuous)\\s+(?:variables?|measurements?|columns?))\\b|\\b(?:plot|draw|graph)\\b.{0,48}\\b(?:numeric|quantitative)\\s+[xy]\\s+(?:and|versus|vs\\.?|against|by)\\s+(?:numeric|quantitative)\\s+[xy]\\b",
       zero_correlation="\\b(?:zero\\s+correlation|zero\\s+pearson\\s+r|nonlinear\\s+pattern\\s+with\\s+zero\\s+correlation)\\b",
       normal_shaded_area="\\b(?:shade|shading|shaded|colour\\s+the\\s+area|color\\s+the\\s+area|area\\s+under\\s+(?:the\\s+)?normal\\s+curve)\\b",
       line_chart="\\b(?:line\\s+(?:charts?|plots?|graphs?)|time[- ](?:ordered|series)\\s+(?:line|plot|graph)|plot\\s+.*\\s+over\\s+time|time[- ]ordered\\s+(?:measurements?|values?)|time\\s+series\\s+plots?)\\b",
@@ -61,7 +61,7 @@
       standard_error="\\b(?:standard\\s+error|\\bse\\s+of\\s+(?:the\\s+)?mean|sd\\s*/\\s*sqrt\\s*\\(\\s*n\\s*\\))\\b",
       mean_confidence_interval="\\b(?:mean\\s+confidence\\s+interval|confidence\\s+interval\\s+(?:for|of)\\s+(?:the\\s+)?(?:population\\s+)?mean|confidence\\s+bounds?\\s+for\\s+(?:the\\s+)?mean|t\\s+interval\\s+for\\s+(?:the\\s+)?mean|confidence\\s+interval\\s+for\\s+average)\\b",
       one_sample_t="\\b(?:one[- ]sample\\s+t[- ]?test|single\\s+sample\\s+t|t[- ]?test\\s+against\\s+(?:a\\s+)?reference|student\\s+t\\s+.*\\b(?:single|one)\\s+sample|test\\s+(?:a\\s+)?single\\s+sample\\s+mean|test\\s+.*\\bsingle\\s+sample\\s+mean)\\b",
-      two_sample_t="\\b(?:test\\s+two\\s+independent\\s+means|two[- ]sample\\s+t[- ]?test|(?:two\\s+independent|independent\\s+two)\\s+(?:groups?|samples?)\\b.*\\b(?:test|means?|t)|welch\\s+t|unpaired\\s+t|unrelated\\s+samples?\\b.*\\bt[- ]?test|compare\\s+.*\\btwo\\s+independent\\s+groups?)\\b",
+      two_sample_t="\\b(?:test\\s+two\\s+independent\\s+means|two[- ]sample\\s+t[- ]?test|(?:two\\s+independent|independent\\s+two)\\s+(?:groups?|samples?)\\b.*\\b(?:test|means?|t)|welch\\s+t|unpaired\\s+t|unrelated\\s+samples?\\b.*\\bt[- ]?test|compare\\s+.*\\btwo\\s+independent\\s+groups?)\\b|\\bcompare\\s+(?:(?:two|2)\\s+)?(?:independent|unpaired|unrelated)\\s+(?:groups?|samples?)\\b",
       paired_t="\\b(?:paired\\s+t[- ]?test|matched\\s+pairs?\\b.*\\bt|before[- ]after\\b.*\\bt|within[- ]person\\b.*\\bt|paired\\s+student\\s+t)\\b",
       correlation_test="\\b(?:correlation\\s+significance\\s+test|pearson\\s+test|pearson\\s+association|pearson\\s+correlation\\s+test|correlation\\s+tests?|test\\s+(?:the\\s+)?(?:pearson\\s+)?correlation|significance\\s+of\\s+(?:pearson\\s+)?correlation|p[- ]?value\\s+for\\s+pearson\\s+correlation)\\b",
       spearman_correlation="\\b(?:spearman|rank\\s+correlation|ranked\\s+association)\\b",
@@ -199,6 +199,14 @@
   if ("scatterplot" %in% methods &&
       has("\\b(?:two\\s+nominal|categorical\\s+(?:x\\s+and\\s+y|variables?|axes)|unordered\\s+categories)\\b"))
     return("SCATTERPLOT_REQUIRES_NUMERIC_PAIRS")
+  # A paired x/y plotting request denotes a numerical scatterplot only.
+  # An explicit categorical role or a geographic map is a different output.
+  if ("scatterplot" %in% methods &&
+      has("\\b(?:nominal|categorical|factor|unordered)\\b.{0,36}\\b(?:x|y|variables?|axes|values?)\\b|\\b(?:x|y)\\b.{0,36}\\b(?:nominal|categorical|factor|unordered)\\b"))
+    return("SCATTERPLOT_REQUIRES_NUMERIC_PAIRS")
+  if ("scatterplot" %in% methods &&
+      has("\\b(?:on|onto|as)\\s+(?:a\\s+)?(?:geograph(?:ic|ical)|geospatial|spatial|road|street)?\\s*maps?\\b"))
+    return("SCATTERPLOT_NOT_GEOGRAPHIC_MAP")
   if ("bar_chart" %in% methods &&
       has("\\b(?:bar\\s+(?:chart|graph|plot))\\b.{0,38}\\b(?:raw\\s+continuous|unbinned\\s+continuous|numeric\\s+measurements?\\s+without\\s+categories)\\b"))
     return("BAR_CHART_REQUIRES_CATEGORIES")
@@ -429,6 +437,14 @@
   if (!is.null(role))
     return(list(status="UNSUPPORTED",reason=role,detail=NULL,
                 methods=character()))
+  # A scatterplot cannot silently stand in for a separately requested
+  # inference, descriptive calculation or second graphic. The second
+  # operation can be phrased without a canonical method signature.
+  if ("scatterplot" %in% methods &&
+      has("\\b(?:and|plus|then|also)\\b.{0,40}\\b(?:fit|run|test|compute|calculate|estimate|draw|plot|make|create)\\b") &&
+      has("\\b(?:regression|correlation|means?|median|variance|standard\\s+deviation|histograms?|box\\s*plots?|bar\\s*charts?|t[- ]?test|p[- ]?value)\\b"))
+    return(list(status="AMBIGUOUS",reason="MULTIPLE_REQUESTED_OPERATIONS",
+                detail=methods,methods=methods))
   # Explicit outputs absent from every implemented method are unsupported,
   # even when a related keyword appears in a legacy lesson.
   if (has("\\b(?:prediction\\s+interval|predictive\\s+interval)\\b") &&
@@ -479,7 +495,8 @@
 # identities, never aliases for unsupported ru_apply computations.
 .ru_w5_reference_subject <- function(q,catalog) {
   has <- function(p) grepl(p,q,perl=TRUE)
-  if (!has("^(?:what|why|which|when|how\\s+(?:can|does|should)|define|explain)\\b"))
+  if (!has("^(?:what|why|which|when|how\\s+(?:can|does|should)|define|explain)\\b") &&
+      !has("^(?:does|can|is)\\s+(?:pearson(?:'s)?\\s+)?r\\b"))
     return(NULL)
   pick <- function(id,kind=NULL) {
     rows <- catalog[catalog$id==id,,drop=FALSE]
@@ -499,6 +516,13 @@
       if (nrow(rows)==1L) return(rows)
     }
   }
+  # "Does r measure correlation?" is an explanatory yes/no question
+  # about a statistical symbol, not an instruction to calculate a
+  # correlation coefficient or substitute Spearman's rank statistic.
+  if (has("^(?:does|can|is)\\s+(?:pearson(?:'s)?\\s+)?r\\b") &&
+      has("\\b(?:correlation|association|linear\\s+relationship)\\b") &&
+      has("\\b(?:measure|represent|describe|indicate|mean|express)\\b"))
+    return(pick("correlation","concept"))
   # Comparative dispersion, time-series stationarity, sampling design and
   # event conditioning each have a verified, dedicated teaching reference.
   if (has("\\b(?:iqr|interquartile\\s+range)\\b") &&
@@ -527,9 +551,22 @@
   kind <- first$type[[1L]]
   explanatory <- grepl(
     "^(?:what\\s+(?:is|are|does)|why\\b|which\\b|when\\b|define\\b|explain\\b|how\\s+does\\b)",
-    q,perl=TRUE)
+    q,perl=TRUE) ||
+    (identical(id,"correlation") &&
+     grepl("^(?:does|can|is)\\s+(?:pearson(?:'s)?\\s+)?r\\b",
+           q,perl=TRUE))
   procedural <- grepl("^how\\s+(?:do|can|should)\\s+i\\b",q,perl=TRUE)
   if (!explanatory && !procedural) return(FALSE)
+  # An explicit supported graphic action takes precedence over an
+  # unrelated fuzzy-ranked concept. This does not alter explanatory
+  # questions about a graph or historical non-graphic how-to lessons.
+  if (procedural && identical(contract$status,"METHOD") &&
+      length(contract$methods)==1L &&
+      contract$methods[[1L]] %in%
+        c("histogram","bar_chart","boxplot","grouped_boxplot",
+          "scatterplot","line_chart") &&
+      grepl("\\b(?:plot|draw|graph|make|create)\\b",q,perl=TRUE))
+    return(FALSE)
   # Method selection is still a method decision. A concrete supported W5
   # walkthrough should not be converted into an unrelated concept.
   if (procedural && kind=="walkthrough" && id %in% .ru_w5_method_ids())

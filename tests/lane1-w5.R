@@ -722,3 +722,111 @@ cat("SUP81_NEW_TEACHING_PROBES",length(teaching),
     "REFUSAL_PROBES",length(refused),"FAILURES",length(bad),"\n")
 if(length(bad))cat(paste(bad,collapse="\n"),"\n")
 if(length(bad))stop("SUP81_NEW_TEACHING_TRANSFER_FAIL",call.=FALSE)
+
+# SUP82 exact historical search-tokenization compatibility:
+# Explicit paired x/y plotting is a scatterplot request, not an unclassified
+# statistical action. It is NOT permission to map, infer, plot categories,
+# or silently omit a separately requested operation. Independent A1 tests;
+# no A5 sealed corpus or expected-answer files consulted.
+xy_scatter_positives <- c(
+  "How do I plot x and y?",
+  "Plot x versus y",
+  "Plot y by x",
+  "How can I graph y against x?",
+  "Plot the two numeric variables x and y",
+  "Graph numeric x and numeric y as points",
+  "Draw x and y as a scatterplot")
+xy_checks <- 0L
+for (query in xy_scatter_positives) {
+  for (v in unique(c(query,toupper(query),paste0(query,"!")))) {
+    route <- resolve(v,n=1L)
+    found <- ru_find(v,n=1L)
+    guide <- ru_guide(v)
+    guide_id <- if(is.list(guide)) guide$method_id else
+      if(is.character(guide) && length(guide)==1L && nzchar(guide))
+        tools::file_path_sans_ext(basename(guide)) else NA_character_
+    stopifnot(identical(route$status,"METHOD"),
+              identical(route$method_id,"scatterplot"),
+              nrow(found)==1L,
+              identical(found$id[[1L]],"scatterplot"),
+              identical(guide_id,"scatterplot"))
+    xy_checks <- xy_checks+1L
+  }
+}
+xy_invalid <- c(
+  "Plot categorical x and y",
+  "Plot two nominal variables x and y",
+  "Plot x and y on a geographical map",
+  "Plot x and y on a map",
+  "Plot x and y on a road network",
+  "Plot x and y, then fit a regression",
+  "Plot x and y and test their correlation",
+  "Plot x and y and calculate their means",
+  "Plot x and y and make a histogram",
+  "Plot x and y as separate histograms",
+  "How do I repair the x and y axes of a printer?")
+for (query in xy_invalid) {
+  route <- resolve(query,n=1L)
+  found <- ru_find(query,n=1L)
+  guide <- ru_guide(query)
+  stopifnot(route$status %in% c("UNSUPPORTED","AMBIGUOUS","NO_MATCH"),
+            nrow(found)==0L,is.null(guide))
+}
+xy_time <- "Plot x and y over time as a line chart"
+xy_time_found <- ru_find(xy_time,n=1L)
+stopifnot(nrow(xy_time_found)==1L,
+          identical(xy_time_found$id[[1L]],"line_chart"))
+cat("SUP82_XY_SCATTERPLOT_COMPATIBILITY_PASS",
+    xy_checks,"positive variants",length(xy_invalid),
+    "incompatible requests; time chart preserved\n")
+
+
+# The unchanged search-tokenization test also preserves a historically
+# verified generic independent-groups guide. An explicit group count >2,
+# categorical outcome or separate analysis is not a two-sample t test.
+independent_group_queries <- c(
+  "How do I compare independent groups?",
+  "Compare two independent groups",
+  "How can I compare unrelated samples?",
+  "Compare unpaired groups")
+for (query in independent_group_queries) {
+  result <- resolve(query,n=1L)
+  hit <- ru_find(query,n=1L)
+  guide <- ru_guide(query)
+  stopifnot(identical(result$status,"METHOD"),
+            identical(result$method_id,"two_sample_t"),
+            nrow(hit)==1L,identical(hit$id[[1L]],"two_sample_t"),
+            is.list(guide),identical(guide$method_id,"two_sample_t"))
+}
+independent_group_invalid <- c(
+  "Compare three independent groups",
+  "Compare independent groups with a categorical response",
+  "Compare independent groups and fit a linear regression")
+for (query in independent_group_invalid) {
+  result <- resolve(query,n=1L)
+  stopifnot(result$status %in% c("AMBIGUOUS","UNSUPPORTED","NO_MATCH"),
+            nrow(ru_find(query,n=1L))==0L,
+            is.null(ru_guide(query)))
+}
+cat("SUP82_INDEPENDENT_GROUPS_METHOD_GUIDE_PASS",
+    length(independent_group_queries),"positive",
+    length(independent_group_invalid),"incompatible\n")
+
+
+# Statistical notation in an explanatory yes/no question is a concept,
+# not a request to execute a coefficient or an incompatible rank test.
+r_concept_questions <- c(
+  "Does r measure correlation?",
+  "Can r measure the strength of a linear association?",
+  "Does Pearson r represent correlation?")
+for (query in r_concept_questions) {
+  result <- resolve(query,n=1L)
+  found <- ru_find(query,n=1L)
+  stopifnot(identical(result$status,"LEGACY_REFERENCE"),
+            nrow(found)==1L,
+            identical(found$id[[1L]],"correlation"),
+            is.null(ru_guide(query)))
+}
+stopifnot(nrow(ru_find("Does r measure regression slope?",n=1L))==0L)
+cat("SUP82_R_CORRELATION_CONCEPT_ROUTING_PASS",
+    length(r_concept_questions),"symbolic explanations\n")
