@@ -44,6 +44,25 @@ jobs:
           cap <- ru_capabilities()
           stopifnot(all(cap$packages$installed))
           cat("WINDOWS_FULL_PACKAGE_DEPENDENCIES_PASS\n")
+      - name: Verify Windows checkout and installed instructional CSV bytes
+        shell: Rscript {0}
+        run: |
+          library(rulearn)
+          files <- c("sites-intro-v1.csv","sites-transfer-v1.csv")
+          expected <- c("3166dcb4137ce10342f5bed98004c71e28e3aace1a0c088c7fa7c33da8f3834a",
+                        "45879c7bc71dc297f5b862f090931637f9d0ddfb718c4107baed1ca7c773c26a")
+          for (i in seq_along(files)) {
+            source_file <- file.path("inst","tutorials","ru-learning-foundations",
+                                     "data",files[[i]])
+            installed_file <- system.file("tutorials","ru-learning-foundations",
+                                          "data",files[[i]],package="rulearn",
+                                          mustWork=TRUE)
+            actual <- c(digest::digest(source_file,algo="sha256",file=TRUE),
+                        digest::digest(installed_file,algo="sha256",file=TRUE))
+            cat("CSV_BYTE_HASHES_",files[[i]],"=",paste(actual,collapse=","),"\n")
+            stopifnot(all(actual==expected[[i]]))
+          }
+          cat("WINDOWS_AUTHORITATIVE_CSV_BYTES_PASS\n")
       - name: Run unchanged full-source R CMD build check and all regressions
         shell: Rscript {0}
         run: |

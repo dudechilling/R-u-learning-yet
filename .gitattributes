@@ -1,0 +1,4 @@
+# Keep portable committed text byte-identical across Windows and Linux.
+* text=auto eol=lf
+# This historical metadata has mixed line endings; preserve its Git blob bytes.
+inst/licensing/scope.csv -text
