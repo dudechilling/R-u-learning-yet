@@ -2,6 +2,7 @@ name: RU Windows full-package installation and regression
 on:
   push:
     branches:
+      - main
       - steward/e1db3feb/ru-win-full-install
 permissions:
   contents: read
@@ -26,15 +27,20 @@ jobs:
           cat("FIRST_USER_LIBRARY=", .libPaths()[[1L]], "\n")
       - name: Install the complete candidate through standard GitHub dependencies
         shell: Rscript {0}
-        env:
-          GITHUB_PAT: ${{ github.token }}
         run: |
           .libPaths(c(Sys.getenv("R_LIBS_USER"), .Library))
           options(repos = c(CRAN="https://cloud.r-project.org"))
           install.packages("remotes")
-          remotes::install_github("dudechilling/R-u-learning-yet",
-                                  ref="steward/e1db3feb/ru-win-full-install")
+          if (identical(Sys.getenv("GITHUB_REF_NAME"), "main")) {
+            remotes::install_github("dudechilling/R-u-learning-yet")
+          } else {
+            remotes::install_github("dudechilling/R-u-learning-yet",
+                                    ref="steward/e1db3feb/ru-win-full-install")
+          }
           library(rulearn)
+          stopifnot(identical(
+            utils::packageDescription("rulearn")$RemoteSha,
+            Sys.getenv("GITHUB_SHA")))
           required <- c("bslib","digest","filelock","learnr",
                         "palmerpenguins","rstudioapi","shiny")
           stopifnot(all(vapply(required,requireNamespace,logical(1L),
