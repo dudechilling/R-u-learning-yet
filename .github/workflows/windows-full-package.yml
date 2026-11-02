@@ -1,0 +1,54 @@
+name: RU Windows full-package installation and regression
+on:
+  push:
+    branches:
+      - steward/e1db3feb/ru-win-full-install
+permissions:
+  contents: read
+jobs:
+  windows-install-and-ci:
+    runs-on: windows-2025
+    timeout-minutes: 50
+    env:
+      R_LIBS_USER: ${{ github.workspace }}\\ru-public-lib
+      RULEARN_CI_OUTPUT: ${{ runner.temp }}\\ru-full-ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+      - name: Verify Windows R and fresh user library
+        shell: Rscript {0}
+        run: |
+          stopifnot(.Platform$OS.type == "windows")
+          dir.create(Sys.getenv("R_LIBS_USER"), recursive=TRUE, showWarnings=FALSE)
+          .libPaths(c(Sys.getenv("R_LIBS_USER"), .Library))
+          cat("WINDOWS_R_VERSION=", as.character(getRversion()), "\n")
+          cat("FIRST_USER_LIBRARY=", .libPaths()[[1L]], "\n")
+      - name: Install the complete candidate through standard GitHub dependencies
+        shell: Rscript {0}
+        env:
+          GITHUB_PAT: ${{ github.token }}
+        run: |
+          .libPaths(c(Sys.getenv("R_LIBS_USER"), .Library))
+          options(repos = c(CRAN="https://cloud.r-project.org"))
+          install.packages("remotes")
+          remotes::install_github("dudechilling/R-u-learning-yet",
+                                  ref="steward/e1db3feb/ru-win-full-install")
+          library(rulearn)
+          required <- c("bslib","digest","filelock","learnr",
+                        "palmerpenguins","rstudioapi","shiny")
+          stopifnot(all(vapply(required,requireNamespace,logical(1L),
+                               quietly=TRUE)))
+          stopifnot(length(getNamespaceExports("rulearn"))==33L)
+          stopifnot(identical(ru_learn()$status, "SELECTOR"))
+          cap <- ru_capabilities()
+          stopifnot(all(cap$packages$installed))
+          cat("WINDOWS_FULL_PACKAGE_DEPENDENCIES_PASS\n")
+      - name: Run unchanged full-source R CMD build check and all regressions
+        shell: Rscript {0}
+        run: |
+          .libPaths(c(Sys.getenv("R_LIBS_USER"), .Library))
+          options(repos = c(CRAN="https://cloud.r-project.org"))
+          source("scripts/ci-check.R",local=globalenv())
+          cat("WINDOWS_ORIGINAL_SOURCE_CI_PASS\n")
