@@ -10,8 +10,7 @@ jobs:
     runs-on: windows-2025
     timeout-minutes: 50
     env:
-      R_LIBS_USER: ${{ github.workspace }}\\ru-public-lib
-      RULEARN_CI_OUTPUT: ${{ runner.temp }}\\ru-full-ci
+      R_LIBS_USER: ${{ github.workspace }}\ru-public-lib
     steps:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-r@v2
@@ -50,5 +49,6 @@ jobs:
         run: |
           .libPaths(c(Sys.getenv("R_LIBS_USER"), .Library))
           options(repos = c(CRAN="https://cloud.r-project.org"))
+          Sys.setenv(RULEARN_CI_OUTPUT=file.path(Sys.getenv("RUNNER_TEMP"),"ru-full-ci"))
           source("scripts/ci-check.R",local=globalenv())
           cat("WINDOWS_ORIGINAL_SOURCE_CI_PASS\n")
